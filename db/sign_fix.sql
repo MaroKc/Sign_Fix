@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 22, 2020 at 02:36 PM
--- Server version: 8.0.18-0ubuntu0.19.10.1
+-- Generation Time: Jan 29, 2020 at 07:02 PM
+-- Server version: 8.0.19-0ubuntu0.19.10.3
 -- PHP Version: 7.3.11-0ubuntu0.19.10.2
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -43,12 +43,20 @@ CREATE TABLE `authentications` (
 --
 
 CREATE TABLE `courses` (
-  `id` int(5) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `start_year` int(4) DEFAULT NULL,
-  `end_year` int(4) DEFAULT NULL,
-  `token_calendar` varchar(255) COLLATE utf8_unicode_ci NOT NULL
+  `start_year` int DEFAULT NULL,
+  `end_year` int DEFAULT NULL,
+  `token_calendar` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `courses`
+--
+
+INSERT INTO `courses` (`id`, `name`, `start_year`, `end_year`, `token_calendar`) VALUES
+(1, 'Turing', 2018, 2019, NULL),
+(2, 'McLuhan', 2018, 2019, NULL);
 
 -- --------------------------------------------------------
 
@@ -57,9 +65,9 @@ CREATE TABLE `courses` (
 --
 
 CREATE TABLE `judgments` (
-  `id` int(50) NOT NULL,
-  `id_questionnaire` int(5) DEFAULT NULL,
-  `vote` int(1) NOT NULL,
+  `id` int NOT NULL,
+  `id_questionnaire` int DEFAULT NULL,
+  `vote` int NOT NULL,
   `email_user_receiving` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `email_user_sender` varchar(50) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -71,20 +79,30 @@ CREATE TABLE `judgments` (
 --
 
 CREATE TABLE `lessons` (
-  `id` int(10) NOT NULL,
+  `id` int NOT NULL,
   `lesson` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `classroom` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `id_course` int(5) DEFAULT NULL,
+  `id_course` int DEFAULT NULL,
   `date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
   `start_time` float DEFAULT NULL,
   `end_time` float DEFAULT NULL,
   `total_hours` float DEFAULT NULL,
   `creation_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
   `modify_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_supervisor_create` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `email_supervisor_modify` varchar(50) COLLATE utf8_unicode_ci NOT NULL
+  `email_supervisor_create` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email_supervisor_modify` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `lessons`
+--
+
+INSERT INTO `lessons` (`id`, `lesson`, `email_responsible`, `classroom`, `id_course`, `date`, `start_time`, `end_time`, `total_hours`, `creation_date`, `modify_date`, `email_supervisor_create`, `email_supervisor_modify`) VALUES
+(22, 'project work', 'federico garcea', 'bologna', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(23, 'growth hacking', 'denis brighi', 'sala riunioni comandini', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(24, 'metodologia agile', 'simone d\'amico', 'comandini', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(25, 'metologia agile', 'flowing', 'maggioli', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -93,9 +111,9 @@ CREATE TABLE `lessons` (
 --
 
 CREATE TABLE `questionnaires` (
-  `id` int(5) NOT NULL,
+  `id` int NOT NULL,
   `text` text COLLATE utf8_unicode_ci,
-  `subject` int(1) DEFAULT NULL
+  `subject` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -109,7 +127,7 @@ CREATE TABLE `responsibles` (
   `password` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `first_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `responsible_level` int(1) DEFAULT NULL
+  `responsible_level` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -125,7 +143,7 @@ CREATE TABLE `signatures_students` (
   `current_end_time` timestamp NULL DEFAULT NULL,
   `final_start_time` float DEFAULT NULL,
   `final_end_time` float DEFAULT NULL,
-  `id_lesson` int(10) DEFAULT NULL,
+  `id_lesson` int DEFAULT NULL,
   `hours_of_lessons` float DEFAULT NULL,
   `lost_hours` float DEFAULT NULL,
   `email_supervisor_modify` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -145,7 +163,7 @@ CREATE TABLE `signatures_teachers` (
   `current_end_time` timestamp NULL DEFAULT NULL,
   `final_start_time` float DEFAULT NULL,
   `final_end_time` float DEFAULT NULL,
-  `id_lesson` int(10) DEFAULT NULL,
+  `id_lesson` int DEFAULT NULL,
   `hours_of_lessons` float DEFAULT NULL,
   `lost_hours` float DEFAULT NULL,
   `email_supervisor_modify` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -163,8 +181,17 @@ CREATE TABLE `students` (
   `first_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `date_of_birth` varchar(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `id_course` int(5) DEFAULT NULL
+  `id_course` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`email`, `first_name`, `last_name`, `date_of_birth`, `id_course`) VALUES
+('daniele@info.com', 'daniele', 'marocchi', '01/01/1960', 1),
+('niccolo@info.com', 'niccolo', 'zona', '30/09/1992', 1),
+('pol@info.com', 'paolo', 'valmori', '01/01/1930', 1);
 
 -- --------------------------------------------------------
 
@@ -174,8 +201,15 @@ CREATE TABLE `students` (
 
 CREATE TABLE `supervisors` (
   `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `id_course` int(5) NOT NULL
+  `id_course` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `supervisors`
+--
+
+INSERT INTO `supervisors` (`email_responsible`, `id_course`) VALUES
+('luca@info.com', 1);
 
 -- --------------------------------------------------------
 
@@ -185,8 +219,16 @@ CREATE TABLE `supervisors` (
 
 CREATE TABLE `teachers` (
   `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `id_course` int(5) DEFAULT NULL
+  `id_course` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `teachers`
+--
+
+INSERT INTO `teachers` (`email_responsible`, `id_course`) VALUES
+('matteo@info.com', 1),
+('simone@flowing.com', 1);
 
 --
 -- Indexes for dumped tables
@@ -208,15 +250,13 @@ ALTER TABLE `courses`
 -- Indexes for table `judgments`
 --
 ALTER TABLE `judgments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_questionnaire` (`id_questionnaire`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `lessons`
 --
 ALTER TABLE `lessons`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `email_responsible` (`email_responsible`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `questionnaires`
@@ -234,8 +274,7 @@ ALTER TABLE `responsibles`
 -- Indexes for table `signatures_students`
 --
 ALTER TABLE `signatures_students`
-  ADD PRIMARY KEY (`code_authentication`),
-  ADD KEY `id_lesson` (`id_lesson`);
+  ADD PRIMARY KEY (`code_authentication`);
 
 --
 -- Indexes for table `signatures_teachers`
@@ -247,22 +286,19 @@ ALTER TABLE `signatures_teachers`
 -- Indexes for table `students`
 --
 ALTER TABLE `students`
-  ADD PRIMARY KEY (`email`),
-  ADD KEY `id_course` (`id_course`);
+  ADD PRIMARY KEY (`email`);
 
 --
 -- Indexes for table `supervisors`
 --
 ALTER TABLE `supervisors`
-  ADD PRIMARY KEY (`email_responsible`),
-  ADD UNIQUE KEY `id_course` (`id_course`);
+  ADD PRIMARY KEY (`email_responsible`);
 
 --
 -- Indexes for table `teachers`
 --
 ALTER TABLE `teachers`
-  ADD PRIMARY KEY (`email_responsible`),
-  ADD UNIQUE KEY `id_course` (`id_course`);
+  ADD PRIMARY KEY (`email_responsible`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -272,53 +308,25 @@ ALTER TABLE `teachers`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `judgments`
 --
 ALTER TABLE `judgments`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `questionnaires`
 --
 ALTER TABLE `questionnaires`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `judgments`
---
-ALTER TABLE `judgments`
-  ADD CONSTRAINT `judgments_ibfk_1` FOREIGN KEY (`id_questionnaire`) REFERENCES `questionnaires` (`id`);
-
---
--- Constraints for table `lessons`
---
-ALTER TABLE `lessons`
-  ADD CONSTRAINT `lessons_ibfk_1` FOREIGN KEY (`email_responsible`) REFERENCES `responsibles` (`email`);
-
---
--- Constraints for table `signatures_students`
---
-ALTER TABLE `signatures_students`
-  ADD CONSTRAINT `signatures_students_ibfk_1` FOREIGN KEY (`id_lesson`) REFERENCES `lessons` (`id`);
-
---
--- Constraints for table `students`
---
-ALTER TABLE `students`
-  ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`id_course`) REFERENCES `courses` (`id`);
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
