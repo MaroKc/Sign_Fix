@@ -10,9 +10,9 @@ const {google} = require('googleapis');
 
 var con = mysql.createConnection({
    host: "localhost",
-   user: "niccodb",
-   password: "taglierino2000",
-   database: 'sign_fix'
+   user: "yourUsername",
+   password: "yourPassword",
+   database: 'yourDatabaseName'
  });
 
  con.connect();
