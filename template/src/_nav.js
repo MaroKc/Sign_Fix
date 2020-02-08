@@ -261,6 +261,68 @@ export default {
       icon: 'icon-ban',
       attributes: { disabled: true },
     },
+
+/* */
+
+{
+  name: 'Sign_Fix',
+  url: '/dashboard',
+  icon: 'icon-speedometer',
+  badge: {
+    variant: 'info',
+    text: 'NEW',
+  },
+},
+{
+  divider: true,
+},
+{
+  title: true,
+  name: 'Gestione',
+  wrapper: {            // optional wrapper object
+    element: '',        // required valid HTML5 element tag
+    attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
+  },
+  class: ''             // optional class names space delimited list for title item ex: "text-center"
+},
+{
+  name: 'Classi',
+  url: '/',
+  icon: 'icon-pie-chart',
+},
+{
+  name: 'Dashboard',
+  url: '/',
+  icon: 'icon-pie-chart',
+},
+{
+  name: 'Studenti',
+  url: '/studenti',
+  icon: 'icon-pie-chart',
+},
+{
+  name: 'Lezioni',
+  url: '/',
+  icon: 'icon-pie-chart',
+},
+{
+  name: 'Docenti',
+  url: '/',
+  icon: 'icon-pie-chart',
+},
+{
+  name: 'Calendario',
+  url: '/',
+  icon: 'icon-pie-chart',
+},
+{
+  name: 'Impostazione',
+  url: '/',
+  icon: 'icon-pie-chart',
+},
+
+
+/* */
     {
       name: 'Download CoreUI',
       url: 'https://coreui.io/react/',

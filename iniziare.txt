@@ -1,0 +1,49 @@
+-Linee guida per creare nuove Views.
+
+1)  Nel file denominato '_nav.js' è presente il menu laterale in forma di oggetto, per ora sono state aggiunte le voci che ci sembravano piu consone.
+    Per aggiungerne delle nuove seguire la procedura : 
+
+    {
+        name: 'Studenti',
+        url: '/studenti',
+        icon: 'icon-pie-chart',
+    },
+
+2) Aggiungere la Route per poter collegare la nuova voce del menù ad una nuova view, recarsi sul file routes.js ed aggiungere 2 righe nelle posti prediposti :
+
+        const Studenti = React.lazy(() => import('./views/Gestione/Studenti'));
+
+
+        { path: '/studenti', exact: true, name: 'Info Studenti', component: Studenti },
+
+3) creare un file con il nome della route messo in precedenza nella cartella : '/views/Gestione/'
+
+4) Il file appena creato andrà a costituire la nuova pagina, es pagina nuova :
+
+import React, { Component } from 'react';
+import { Col, Row, } from 'reactstrap';
+
+class Studenti extends Component {
+
+
+  constructor(props) {
+    super(props);
+  
+  }
+
+
+  render() {
+    return (
+      <div className="animated fadeIn">
+        <Row>
+            <Col>
+
+            </Col>
+        </Row>
+      </div>
+    );
+  }
+}
+
+export default Studenti;
+
