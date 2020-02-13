@@ -39,6 +39,45 @@ app.use(function(req, res, next) {
 });
 
 
+app.get('/listStudents', function (req, res) {
+   /* con.query('SELECT * FROM students', function (error, results, fields) {
+       if (error) throw error;
+       console.log(results);
+       return res.send({ error: false, data: results, message: 'users list.' });
+       
+   }); */
+   const data = {
+      columns: [
+        {
+          label: 'Nome',
+          field: 'nome',  
+          sort: 'asc',
+          width: 150
+        },
+        {
+          label: 'Cognome',
+          field: 'cognome',
+          sort: 'asc',
+          width: 270
+        },
+        {
+          label: 'Email',
+          field: 'email',
+          sort: 'asc',
+          width: 200
+        }
+      ],
+      rows: [
+        {
+          nome: 'Tiger Nixon',
+          cognome: 'System Architect',
+          email: 'Edinburgh'
+        }
+      ]
+    };
+    return res.send(JSON.stringify(data));
+});
+
 app.get('/listCities', function (req, res) {
    connection.query('SELECT * FROM cities limit 10', function (error, items, fields) {
        if (error) throw error;
@@ -46,12 +85,7 @@ app.get('/listCities', function (req, res) {
    });
 });
 
-app.get('/listStudents', function (req, res) {
-   connection.query('SELECT * FROM students', function (error, items, fields) {
-       if (error) throw error;
-       return res.send({ error: false, items: items, message: 'users list.' });
-   });
-});
+
 
 app.get('/calendar/listLessons', function (req, res) {
    connection.query('SELECT * FROM lessons', function (error, items, fields) {

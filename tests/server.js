@@ -42,7 +42,7 @@ app.get('/listStudents', function (req, res) {
        
    }); */
    const data = {
-      ciccio: [
+      columns: [
         {
           label: 'Nome',
           field: 'nome',  
@@ -62,7 +62,7 @@ app.get('/listStudents', function (req, res) {
           width: 200
         }
       ],
-      pippo: [
+      rows: [
         {
           nome: 'Tiger Nixon',
           cognome: 'System Architect',

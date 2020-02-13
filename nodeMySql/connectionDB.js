@@ -3,9 +3,9 @@ var mysql = require('mysql');
 exports.createConnectionDB = () => {
     var con = mysql.createConnection({
         host: "localhost",
-        user: "",
+        user: "root",
         password: "",
-        database: ''
+        database: "sign_fix"
       });
     return con;
   }
