@@ -10,9 +10,9 @@ const {google} = require('googleapis');
 
 var con = mysql.createConnection({
    host: "localhost",
-   user: "yourUsername",
-   password: "yourPassword",
-   database: 'yourDatabaseName'
+   user: "root",
+   password: "",
+   database: 'sign_fix'
  });
 
  con.connect();
@@ -33,11 +33,44 @@ function myTrim(textToTrim) {
    return textToLower.toLowerCase();
  }
 
-app.get('/listCities', function (req, res) {
-   con.query('SELECT * FROM cities limit 10', function (error, results, fields) {
+ 
+app.get('/listStudents', function (req, res) {
+   /* con.query('SELECT * FROM students', function (error, results, fields) {
        if (error) throw error;
+       console.log(results);
        return res.send({ error: false, data: results, message: 'users list.' });
-   });
+       
+   }); */
+   const data = {
+      ciccio: [
+        {
+          label: 'Nome',
+          field: 'nome',  
+          sort: 'asc',
+          width: 150
+        },
+        {
+          label: 'Cognome',
+          field: 'cognome',
+          sort: 'asc',
+          width: 270
+        },
+        {
+          label: 'Email',
+          field: 'email',
+          sort: 'asc',
+          width: 200
+        }
+      ],
+      pippo: [
+        {
+          nome: 'Tiger Nixon',
+          cognome: 'System Architect',
+          email: 'Edinburgh'
+        }
+      ]
+    };
+    return res.send(JSON.stringify(data));
 });
 
 
