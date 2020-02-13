@@ -1,24 +1,35 @@
-var mysql = require('mysql');
+//npm install body-parser
 
-var express = require('express');
 
+const mysql = require('mysql');
+const express = require('express');
 const fs = require('fs');
-
 const readline = require('readline');
-
 const {google} = require('googleapis');
+const bodyParser = require('body-parser');
 
-var con = mysql.createConnection({
+const con = mysql.createConnection({
    host: "localhost",
    user: "yourUsername",
    password: "yourPassword",
    database: 'yourDatabaseName'
  });
+con.connect();
 
- con.connect();
+const app = express();
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
 
-var app = express();
+app.post('/auth', function (req, res) {
+   con.query('SELECT * FROM responsibles WHERE email = ' + con.escape(req.body.email) + ' and password = ' + con.escape(req.body.pass), function (error, results, fields) {
+       if (error) throw error;
+       //return res.send({ email: req.body.email, ruolo: results[0].responsible_level });
+       res.send({ email: req.body.email, ruolo: results[0].responsible_level });
+   });
+});
+
 
 
 
