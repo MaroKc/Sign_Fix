@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 29, 2020 at 07:02 PM
+-- Generation Time: Feb 13, 2020 at 04:31 PM
 -- Server version: 8.0.19-0ubuntu0.19.10.3
 -- PHP Version: 7.3.11-0ubuntu0.19.10.2
 
@@ -34,6 +34,17 @@ CREATE TABLE `authentications` (
   `email_student` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `code` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `code_image` blob
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `companies`
+--
+
+CREATE TABLE `companies` (
+  `id` int NOT NULL,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -81,7 +92,8 @@ CREATE TABLE `judgments` (
 CREATE TABLE `lessons` (
   `id` int NOT NULL,
   `lesson` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email_signature` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `companies_id` int NOT NULL,
   `classroom` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `id_course` int DEFAULT NULL,
   `date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -98,11 +110,11 @@ CREATE TABLE `lessons` (
 -- Dumping data for table `lessons`
 --
 
-INSERT INTO `lessons` (`id`, `lesson`, `email_responsible`, `classroom`, `id_course`, `date`, `start_time`, `end_time`, `total_hours`, `creation_date`, `modify_date`, `email_supervisor_create`, `email_supervisor_modify`) VALUES
-(22, 'project work', 'federico garcea', 'bologna', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(23, 'growth hacking', 'denis brighi', 'sala riunioni comandini', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(24, 'metodologia agile', 'simone d\'amico', 'comandini', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(25, 'metologia agile', 'flowing', 'maggioli', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `lessons` (`id`, `lesson`, `email_signature`, `companies_id`, `classroom`, `id_course`, `date`, `start_time`, `end_time`, `total_hours`, `creation_date`, `modify_date`, `email_supervisor_create`, `email_supervisor_modify`) VALUES
+(106, 'metodologia agile', 'simone d\'amico', 0, 'comandini', 1, '11/02/2020', 8.5, 11, 2.5, '07/02/2020', NULL, NULL, NULL),
+(107, 'metologia agile', 'flowing', 0, 'maggioli', 1, '13/02/2020', 9, 12, 3, '07/02/2020', NULL, NULL, NULL),
+(108, 'metodologia agile', 'simone d\'amico', 0, 'comandini', 1, '11/02/2020', 8.5, 11, 2.5, '07/02/2020', NULL, NULL, NULL),
+(109, 'metologia agile', 'flowing', 0, 'maggioli', 1, '13/02/2020', 9, 12, 3, '07/02/2020', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -129,6 +141,13 @@ CREATE TABLE `responsibles` (
   `last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `responsible_level` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `responsibles`
+--
+
+INSERT INTO `responsibles` (`email`, `password`, `first_name`, `last_name`, `responsible_level`) VALUES
+('luca@info.com', '12345', 'luca', 'arcangeli', 1);
 
 -- --------------------------------------------------------
 
@@ -201,15 +220,16 @@ INSERT INTO `students` (`email`, `first_name`, `last_name`, `date_of_birth`, `id
 
 CREATE TABLE `supervisors` (
   `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `id_course` int NOT NULL
+  `id_course` int NOT NULL,
+  `companies_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `supervisors`
 --
 
-INSERT INTO `supervisors` (`email_responsible`, `id_course`) VALUES
-('luca@info.com', 1);
+INSERT INTO `supervisors` (`email_responsible`, `id_course`, `companies_id`) VALUES
+('luca@info.com', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -320,7 +340,7 @@ ALTER TABLE `judgments`
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `questionnaires`
