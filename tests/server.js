@@ -1,35 +1,24 @@
-//npm install body-parser
+var mysql = require('mysql');
 
+var express = require('express');
 
-const mysql = require('mysql');
-const express = require('express');
 const fs = require('fs');
+
 const readline = require('readline');
+
 const {google} = require('googleapis');
-const bodyParser = require('body-parser');
 
-const con = mysql.createConnection({
+var con = mysql.createConnection({
    host: "localhost",
-   user: "yourUsername",
-   password: "yourPassword",
-   database: 'yourDatabaseName'
+   user: "root",
+   password: "",
+   database: 'sign_fix'
  });
-con.connect();
 
-const app = express();
+ con.connect();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(bodyParser.raw());
 
-app.post('/auth', function (req, res) {
-   con.query('SELECT * FROM responsibles WHERE email = ' + con.escape(req.body.email) + ' and password = ' + con.escape(req.body.pass), function (error, results, fields) {
-       if (error) throw error;
-       //return res.send({ email: req.body.email, ruolo: results[0].responsible_level });
-       res.send({ email: req.body.email, ruolo: results[0].responsible_level });
-   });
-});
-
+var app = express();
 
 
 
@@ -44,11 +33,44 @@ function myTrim(textToTrim) {
    return textToLower.toLowerCase();
  }
 
-app.get('/listCities', function (req, res) {
-   con.query('SELECT * FROM cities limit 10', function (error, results, fields) {
+ 
+app.get('/listStudents', function (req, res) {
+   /* con.query('SELECT * FROM students', function (error, results, fields) {
        if (error) throw error;
+       console.log(results);
        return res.send({ error: false, data: results, message: 'users list.' });
-   });
+       
+   }); */
+   const data = {
+      columns: [
+        {
+          label: 'Nome',
+          field: 'nome',  
+          sort: 'asc',
+          width: 150
+        },
+        {
+          label: 'Cognome',
+          field: 'cognome',
+          sort: 'asc',
+          width: 270
+        },
+        {
+          label: 'Email',
+          field: 'email',
+          sort: 'asc',
+          width: 200
+        }
+      ],
+      rows: [
+        {
+          nome: 'Tiger Nixon',
+          cognome: 'System Architect',
+          email: 'Edinburgh'
+        }
+      ]
+    };
+    return res.send(JSON.stringify(data));
 });
 
 
