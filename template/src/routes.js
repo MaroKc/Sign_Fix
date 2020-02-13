@@ -36,14 +36,22 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
+
 /* */
 
 const Studenti = React.lazy(() => import('./views/Gestione/Studenti'));
+const Docenti = React.lazy(() => import('./views/Gestione/Docenti'));
+const Classi = React.lazy(() => import('./views/Classi/Classi'));
+const Lezioni = React.lazy(() => import('./views/Gestione/Lezioni'));
+const Calendario = React.lazy(() => import('./views/Gestione/Calendario'));
+const Impostazioni = React.lazy(() => import('./views/Impostazioni/Impostazioni'))
+
 
 /* */
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
@@ -85,7 +93,15 @@ const routes = [
   { path: '/charts', name: 'Charts', component: Charts },
   { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
+
+
   { path: '/studenti', exact: true, name: 'Info Studenti', component: Studenti },
+  { path: '/classi', exact: true, name: 'Classi', component: Classi },
+  { path: '/docenti', exact: true, name: 'Docenti', component: Docenti },
+
+  { path: '/lezioni', exact: true, name: 'Lezioni', component: Lezioni },
+  { path: '/calendario', exact: true, name: 'Calendario', component: Calendario },
+  { path: '/impostazioni', exact: true, name: 'Impostazioni', component: Impostazioni },
 
 ];
 

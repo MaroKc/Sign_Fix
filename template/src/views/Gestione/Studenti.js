@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table, } from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, Row, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { MDBDataTable } from 'mdbreact';
-import {Nav, NavItem, NavLink, TabContent, TabPane} from 'reactstrap';
 
 
 const data = {
   columns: [
     {
       label: 'Nome',
-      field: 'nome',
+      field: 'nome',  
       sort: 'asc',
       width: 150
     },

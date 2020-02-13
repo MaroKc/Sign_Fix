@@ -11,7 +11,7 @@ const propTypes = {
 };
 
 const defaultProps = {
-  dataBox: () => ({ variant: 'facebook', friends: '-', feeds: '-' }),
+  dataBox: () => ({ variant: 'facebook', classe: '-', anno: '-' }),
 };
 
 class Widget03 extends Component {

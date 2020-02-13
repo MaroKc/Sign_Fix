@@ -1,23 +1,87 @@
 export default {
   items: [
+
     {
-      name: 'Dashboard',
-      url: '/dashboard',
-      icon: 'icon-speedometer',
-      badge: {
-        variant: 'info',
-        text: 'NEW',
-      },
+      title: true,
+      name: '',
+    },
+    {
+      name: 'Home',
+      url:'/',
+      icon:'icon-pie-chart',           // optional class names space delimited list for title item ex: "text-center"
+    },
+    {
+      name: 'Classi',
+      url: '/classi',
+      icon: 'icon-pie-chart',
     },
     {
       title: true,
-      name: 'Theme',
+      name: 'Gestione',
       wrapper: {            // optional wrapper object
         element: '',        // required valid HTML5 element tag
         attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
       },
       class: ''             // optional class names space delimited list for title item ex: "text-center"
     },
+    
+    {
+      name: 'Docenti',
+      url: '/docenti',
+      icon: 'icon-pie-chart',
+    },
+    {
+      name: 'Studenti',
+      url: '/studenti',
+      icon: 'icon-pie-chart',
+    },
+    
+    /*
+    {
+      title: true,
+      name: 'Dati',
+      wrapper: {            // optional wrapper object
+        element: '',        // required valid HTML5 element tag
+        attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
+      },
+      class: ''             // optional class names space delimited list for title item ex: "text-center"
+    },
+    */
+    {
+      name: 'Lezioni',
+      url: '/lezioni',
+      icon: 'icon-pie-chart',
+    },
+    
+    
+    {
+      name: 'Calendario',
+      url: '/calendario',
+      icon: 'icon-pie-chart',
+    },
+      {
+        name: 'Impostazioni',
+        url: '/impostazioni',
+        icon: 'icon-pie-chart',
+        class: 'mt-auto',
+      },
+    
+     
+        {
+          name: 'Nuova versione disponibile',
+          url: 'https://coreui.io/react/',
+          icon: 'icon-cloud-download',
+          class: 'mt-auto',
+          variant: 'success',
+          attributes: { target: '_blank', rel: "noopener" },
+        },
+
+
+
+/*
+
+
+    
     {
       name: 'Colors',
       url: '/theme/colors',
@@ -262,75 +326,10 @@ export default {
       attributes: { disabled: true },
     },
 
-/* */
-
-{
-  name: 'Sign_Fix',
-  url: '/dashboard',
-  icon: 'icon-speedometer',
-  badge: {
-    variant: 'info',
-    text: 'NEW',
-  },
-},
-{
-  divider: true,
-},
-{
-  title: true,
-  name: 'Gestione',
-  wrapper: {            // optional wrapper object
-    element: '',        // required valid HTML5 element tag
-    attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
-  },
-  class: ''             // optional class names space delimited list for title item ex: "text-center"
-},
-{
-  name: 'Classi',
-  url: '/',
-  icon: 'icon-pie-chart',
-},
-{
-  name: 'Dashboard',
-  url: '/',
-  icon: 'icon-pie-chart',
-},
-{
-  name: 'Studenti',
-  url: '/studenti',
-  icon: 'icon-pie-chart',
-},
-{
-  name: 'Lezioni',
-  url: '/',
-  icon: 'icon-pie-chart',
-},
-{
-  name: 'Docenti',
-  url: '/',
-  icon: 'icon-pie-chart',
-},
-{
-  name: 'Calendario',
-  url: '/',
-  icon: 'icon-pie-chart',
-},
-{
-  name: 'Impostazione',
-  url: '/',
-  icon: 'icon-pie-chart',
-},
 
 
-/* */
-    {
-      name: 'Download CoreUI',
-      url: 'https://coreui.io/react/',
-      icon: 'icon-cloud-download',
-      class: 'mt-auto',
-      variant: 'success',
-      attributes: { target: '_blank', rel: "noopener" },
-    },
+
+    /*
     {
       name: 'Try CoreUI PRO',
       url: 'https://coreui.io/pro/react/',
@@ -338,5 +337,6 @@ export default {
       variant: 'danger',
       attributes: { target: '_blank', rel: "noopener" },
     },
+    */
   ],
 };
