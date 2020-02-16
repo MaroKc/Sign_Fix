@@ -40,13 +40,20 @@ app.use(function(req, res, next) {
 
 
 app.get('/listStudents', function (req, res) {
-   /* con.query('SELECT * FROM students', function (error, results, fields) {
-       if (error) throw error;
-       console.log(results);
-       return res.send({ error: false, data: results, message: 'users list.' });
-       
-   }); */
-   const data = {
+   var data = {};
+   var items = [];
+   connection.query('SELECT first_name,last_name,email FROM students', function (error, results, fields) {
+      if (error) throw error;
+
+      for (let i = 0; i < results.length; i++) {
+         items.push(
+            {
+               nome: results[i].first_name,
+               cognome: results[i].last_name,
+               email: results[i].email
+            })
+      }
+      data = {
       columns: [
         {
           label: 'Nome',
@@ -67,15 +74,11 @@ app.get('/listStudents', function (req, res) {
           width: 200
         }
       ],
-      rows: [
-        {
-          nome: 'Tiger Nixon',
-          cognome: 'System Architect',
-          email: 'Edinburgh'
-        }
-      ]
+      rows: items
     };
     return res.send(JSON.stringify(data));
+
+   });
 });
 
 app.get('/listCities', function (req, res) {
