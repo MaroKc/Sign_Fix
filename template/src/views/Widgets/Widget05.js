@@ -20,7 +20,7 @@ const defaultProps = {
 
 
 class Widget05 extends Component {
-  
+
   render() {
 
     // eslint-disable-next-line
@@ -30,12 +30,14 @@ class Widget05 extends Component {
     const data = dataBox();
     const variant = data.variant;
 
-    if (!variant || ['facebook', 'fitstic2', 'fitstic3', 'fitstic3'].indexOf(variant) < 0) {
+    if (!variant || ['Turing', 'McLuhan', 'Tonioli', 'Hooper'].indexOf(variant) < 0) {
       return (null);
     }
 
-    const back = 'bg-' + variant;
-    const icon = 'fa fa-' + variant;
+    //const back = 'bg-' + variant;
+    const back = 'bg-twitter';
+    //const icon = 'fa fa-' + variant;
+    const icon = variant;
     const keys = Object.keys(data);
     const vals = Object.values(data);
 
@@ -45,24 +47,20 @@ class Widget05 extends Component {
     const classes = mapToCssModules(classNames(classCard, className), cssModule);
 
     return (
-        
+
       <div className={classes}>
         <div className={classCardHeader}>
-          <i className={icon}></i>
-          {children}
+          <i /*className={icon}*/>{icon}</i>
         </div>
         <div className={classCardBody}>
           <div>
             <div className="text-value">{vals[1]}</div>
             <div className="text-uppercase text-muted small">{keys[1]}</div>
           </div>
-          <div>
-            <div className="text-value">{vals[2]}</div>
-            <div className="text-uppercase text-muted small">{keys[2]}</div>
-          </div>
+
         </div>
       </div>
-     
+
     );
   }
 }

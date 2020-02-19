@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Col, Row, Button } from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, Row, Button, UncontrolledCollapse, CardTitle, CardText, CardImg, CardSubtitle, CardImgOverlay } from 'reactstrap';
 import { Line } from 'react-chartjs-2';
 import Widget05 from '../Widgets/Widget05';
+import Collapses from '../Base/Collapses/Collapses';
+
+
 
 
 
@@ -56,52 +59,47 @@ const socialChartOpts = {
   },
 };
 
+// Collapse const
 
 
 class Classi extends Component {
 
+
+
   render() {
 
-    
-    return (   
-      <div className="animated fadeIn">
-        
 
-        <Card>
-          <CardHeader className="text-center">
-            Classi
-          <div className="card-header-actions">
-            </div>
-          </CardHeader>
-          <CardBody>          
+    return (
+      <div className="animated fadeIn">
+
+
+          <CardBody body outline color="warning">
             <Row>
-            
+
               <Col xs={12} sm={12} md={6}>
-              <div onClick={() => alert("Hello from here")}>
-                <Widget05 dataBox={() => ({ variant: 'facebook', classe: '1', anno: '2018-2020' })} >
-                  <div className="chart-wrapper">
-                    
-                    <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
-                  </div>
-                </Widget05> 
-                </div>              
+                <div onClick={() => alert("Hello from here")}>
+                  <Widget05 dataBox={() => ({ variant: 'Hooper', anno: '2019-2021' })} >
+                    <div className="chart-wrapper">
+
+                      <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
+                    </div>
+                  </Widget05>
+                </div>
               </Col>
-              
-              <Col xs={12} sm={12} md={6}>              
-               
-                <Widget05 dataBox={() => ({ variant: 'facebook', classe: '2', anno: '2019-2021' })}  >
+
+
+              <Col xs={12} sm={12} md={6}>
+
+                <Widget05 dataBox={() => ({ variant: 'Turing', anno: '2018-2020' })}  >
                   <div className="chart-wrapper">
-                    
+
                     <Line data={makeSocialBoxData(1)} options={socialChartOpts} height={90} />
                   </div>
                 </Widget05>
-        
+
               </Col>
             </Row>
           </CardBody>
-        </Card>
-
-       
       </div>
     );
   }
