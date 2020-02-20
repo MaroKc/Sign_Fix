@@ -1,19 +1,15 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardHeader, Col, Row, Button, UncontrolledCollapse, CardTitle, CardText, CardImg, CardSubtitle, CardImgOverlay } from 'reactstrap';
 import { Line } from 'react-chartjs-2';
-import Widget05 from '../Widgets/Widget05';
+import Widget05 from './Widget05';
 import Collapses from '../Base/Collapses/Collapses';
-
-
-
-
-
+import axios from 'axios';
 
 // Brand Card Chart
 const makeSocialBoxData = (dataSetNo) => {
   const socialBoxData = [
-    { data: [65, 59, 84, 84, 51, 55, 40], label: 'fitstic' },
-    { data: [1, 13, 9, 17, 34, 41, 38], label: 'fitstic' },
+    { data: [65, 59, 84, 84, 51, 55, 40], label: '' },
+    { data: [1, 13, 9, 17, 34, 41, 38], label: '' },
   ];
 
   const dataset = socialBoxData[dataSetNo];
@@ -64,47 +60,76 @@ const socialChartOpts = {
 
 class Classi extends Component {
 
+  state = {
+    corsi: []
+  }
+
+  componentDidMount() {
+    axios.get(`http://localhost:8080/getCourses/luca@info.com`)
+      .then(res => {
+        const corsi = res.data;
+        this.setState({ corsi });
+      })
+  }
 
 
   render() {
+    const items = []
+
+    for (let i = 0; i < this.state.corsi.length; i=i+2) {
+
+      items.push(
+        
+        <Row className="mx-5">
+          <Col xs={12} sm={12} md={6}>
+            <div onClick={() => alert("Hello from here")}>
+              <Widget05 dataBox={() => ({ variant: this.state.corsi[i].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i].end_year })} >
+                <div key={i} className="chart-wrapper">
+
+                  <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
+                </div>
+              </Widget05>
+            </div>
+          </Col>
+
+          <Col xs={12} sm={12} md={6}>
+            <div onClick={() => alert("Hello from here")}>
+              <Widget05 dataBox={() => ({ variant: this.state.corsi[i+1].name, anno: this.state.corsi[i+1].start_year + "-" + this.state.corsi[i+1].end_year })} >
+                <div key={i} className="chart-wrapper">
+
+                  <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
+                </div>
+              </Widget05>
+            </div>
+          </Col>
+        </Row>
+      )
+      console.log(this.state.corsi[i].name)
+      console.log(this.state.corsi[i+1].name)
+
+    }
 
 
     return (
       <div className="animated fadeIn">
+        <CardBody body outline>
+
+          {items}
+
+         { this.state.corsi.map(corso => 
+         <div>
+         <Widget05 dataBox={() => ({ variant: corso.name, anno: corso.start_year + "-" + corso.end_year })} > 
+         </Widget05>
+         <li key={corso.id}>{corso.name}</li>
+
+         </div>
+         )}
 
 
-          <CardBody body outline color="warning">
-            <Row>
-
-              <Col xs={12} sm={12} md={6}>
-                <div onClick={() => alert("Hello from here")}>
-                  <Widget05 dataBox={() => ({ variant: 'Hooper', anno: '2019-2021' })} >
-                    <div className="chart-wrapper">
-
-                      <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
-                    </div>
-                  </Widget05>
-                </div>
-              </Col>
-
-
-              <Col xs={12} sm={12} md={6}>
-
-                <Widget05 dataBox={() => ({ variant: 'Turing', anno: '2018-2020' })}  >
-                  <div className="chart-wrapper">
-
-                    <Line data={makeSocialBoxData(1)} options={socialChartOpts} height={90} />
-                  </div>
-                </Widget05>
-
-              </Col>
-            </Row>
-          </CardBody>
+        </CardBody>
       </div>
     );
   }
 }
-
-
 
 export default Classi;
