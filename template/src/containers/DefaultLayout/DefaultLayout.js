@@ -6,6 +6,7 @@ import { Container } from 'reactstrap';
 import {
   AppAside,
   AppFooter,
+  AppHeader,
   AppSidebar,
   AppSidebarFooter,
   AppSidebarForm,
@@ -18,7 +19,7 @@ import {
 import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
-console.log(routes);
+
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 
@@ -27,18 +28,11 @@ class DefaultLayout extends Component {
 
   constructor(props) {
     super(props);
-
-    const cookieCorso = sessionStorage.getItem("corso");
+    // Non chiamre this.setState() qui!
     this.state = {
-      classe: cookieCorso ? cookieCorso : 0
+      val: 'pippo'
     }
   }
-  
-  changeCorso = (corso) => {
-    this.setState({classe: corso})
-    sessionStorage.setItem("corso", corso);
-  }
-
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
@@ -46,14 +40,11 @@ class DefaultLayout extends Component {
     e.preventDefault()
     this.props.history.push('/login')
   }
-  
+
   render() {
-    const classe = this.state.classe;
     return (
       <div className="app">
         <div className="app-body">
-
-        {classe !== 0 && (
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
@@ -63,8 +54,6 @@ class DefaultLayout extends Component {
             <AppSidebarFooter />
             <AppSidebarMinimizer />
           </AppSidebar>
-        )}
-
           <main className="main">
             <AppBreadcrumb appRoutes={routes} router={router}/>
             <Container fluid>
@@ -81,8 +70,11 @@ class DefaultLayout extends Component {
                           route.render ? (
                             <route.component {...props} {...route.extraProps} route={route} />
                           ) : (
-                            <route.component {...props} classe={this.state.classe} changeCorso={this.changeCorso} route={route} />
-                          )} />
+                            <route.component {...props} route={route} />
+                          )
+                          /*props => (
+                          <route.component {...props} />
+                        )*/} />
                     ) : (null);
                   })}
                   <Redirect from="/" to="/dashboard" />
