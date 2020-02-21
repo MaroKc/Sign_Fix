@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Col, Row } from 'reactstrap';
+import { Col, Row } from 'reactstrap';
 import { Line } from 'react-chartjs-2';
 import CardClassi from './CardClassi';
 import axios from 'axios';
@@ -65,9 +65,18 @@ const socialChartOpts = {
 
 class Classi extends Component {
 
-  state = {
-    corsi: []
+  constructor(props) {
+    super(props);
+    // Non chiamre this.setState() qui!
+    this.state = {
+      corsi: [],
+      prova: props.prova
+    }
+    console.log(props)
   }
+ 
+
+ 
 
   componentDidMount() {
     axios.get(`http://localhost:8080/getCourses/luca@info.com`)
@@ -111,10 +120,9 @@ class Classi extends Component {
       )
     }
 
-
+console.log(this.state.prova)
     return (
       <div className="animated fadeIn">
-
           {items}
 
          {/* this.state.corsi.map(corso => 
