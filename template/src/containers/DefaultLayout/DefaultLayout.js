@@ -26,6 +26,14 @@ const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 
 class DefaultLayout extends Component {
 
+  constructor(props) {
+    super(props);
+    // Non chiamre this.setState() qui!
+    this.state = {
+      val: 'pippo'
+    }
+  }
+
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   signOut(e) {
@@ -58,9 +66,15 @@ class DefaultLayout extends Component {
                         path={route.path}
                         exact={route.exact}
                         name={route.name}
-                        render={props => (
+                        render={props =>
+                          route.render ? (
+                            <route.component {...props} {...route.extraProps} route={route} />
+                          ) : (
+                            <route.component {...props} route={route} />
+                          )
+                          /*props => (
                           <route.component {...props} />
-                        )} />
+                        )*/} />
                     ) : (null);
                   })}
                   <Redirect from="/" to="/dashboard" />
