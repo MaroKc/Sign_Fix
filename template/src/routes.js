@@ -44,7 +44,7 @@ const Studenti = React.lazy(() => import('./views/Gestione/Studenti'));
 const Docenti = React.lazy(() => import('./views/Gestione/Docenti'));
 
 const Classi = React.lazy(() => import('./views/Classi/Classi'));
-const ClassiBoard = (props) => <lazyLoad component={Classi} {...props} />;
+//const ClassiBoard = (props) => <lazyLoad component={Classi} {...props} />;
 
 const Lezioni = React.lazy(() => import('./views/Gestione/Lezioni'));
 const Calendario = React.lazy(() => import('./views/Gestione/Calendario'));
@@ -101,7 +101,8 @@ const routes = [
 
   { path: '/studenti', exact: true, name: 'Studenti', component: Studenti },
 
-  { path: '/classi', exact: true, name: 'Classi', component: Classi, render: true, extraProps: {prova: 'prova'} },
+  //{ path: '/classi', exact: true, name: 'Classi', component: Classi, render: true, extraProps: {prova: () => provafun()} },
+  { path: '/classi', exact: true, name: 'Classi', component: Classi},
   { path: '/docenti', exact: true, name: 'Docenti', component: Docenti },
 
   { path: '/lezioni', exact: true, name: 'Lezioni', component: Lezioni },
