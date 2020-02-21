@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Col, Row, Button, Alert, TabPane } from 'reactstrap';
-import { AppSidebarToggler } from '@coreui/react';
+import { Card, CardBody, CardHeader, Col, Row} from 'reactstrap';
 import axios from 'axios'
-import { MDBDataTable, MDBBtn  } from 'mdbreact';
+import { MDBDataTable } from 'mdbreact';
 
 
 //https://mdbootstrap.com/docs/react/tables/search/
 
-
-
-//data="http://localhost:8080/listStudents"
 const App = (props) => {
-const studente = props.studenti
+const studente = props.item
+
+function refreshPage() {
+  window.location.reload(false);
+}
   return(
           <div>
-            {console.log(studente.email)}
             <Card>
           <Row>
               <Col className="text-left font-weight-bold m-5">
@@ -37,25 +36,22 @@ const studente = props.studenti
 
               </Col>
           </Row>
-          <button className="btn btn-outline-primary" > Indietro</button>
+          <button className="btn btn-outline-primary" onClick={refreshPage}> Indietro</button>
           </Card>
           </div>
   )
 }
-
 
 class Studenti extends Component {
   constructor(props){
     super(props)
     this.state = {
       studenti: [],
-      displayCard: false
+      displayCard: null
     }
 
   }
 
-
-  
   componentDidMount() {
     this.getStudents();
   }
@@ -93,10 +89,6 @@ class Studenti extends Component {
             label: 'Cognome',
             field: 'lastName',
           },
-          {
-            label: 'Email',
-            field: 'email',
-          },
            {
            label: 'Ore totali',
            field: 'hoursOfLessons',
@@ -113,10 +105,11 @@ class Studenti extends Component {
     <MDBDataTable 
     responsive
     hover 
-    data={{ columns: data.columns, rows: data.rows }}
+    data={data}
     searching={false}
     paging={false}
-    noBottomColumns={true}
+    noBottomColumns
+    striped
     // autoWidth={true}
     // refresh
     />
@@ -129,23 +122,19 @@ class Studenti extends Component {
   )
 }
 
-
-  displayCard = () => {
+  displayCard = (e) => {
     this.setState({
-      displayCard: !this.state.displayCard
+      displayCard: e
     });
-
   }
 
   render() {
-  
 
-
-    if (this.state.displayCard) {
-      
+    if (this.state.displayCard) {  
       return(
-      
-      <App key={this.state.studenti.find(item => item.email)} studenti={this.state.studenti.find(item => item.email)} />
+        <div>
+      <App item={this.state.studenti.find((item) => item.email === this.state.displayCard)} />
+      </div>
       )}
 
     return (

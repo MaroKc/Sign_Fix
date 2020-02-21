@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var app = express();
 var bodyParser = require('body-parser');
+var Sync = require('sync');
 
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,7 +30,7 @@ app.use(function(req, res, next) {
  
 
 //CONTROLLO UTENTE e JWT
-function chekUser(email) {
+async function chekUser(email) {
 
    var ruolo = 0;
 
@@ -41,7 +42,6 @@ function chekUser(email) {
 
       return ruolo;
   });
-   
 }
 
 app.post('/auth', function (req, res) {
@@ -56,9 +56,8 @@ app.post('/auth', function (req, res) {
 
 app.get('/getCourses/:email', function(req, res){
 
-   var ruolo = 1;
-   //ruolo = chekUser(req.params.email);
-
+   //var ruolo = 1;
+   ruolo = chekUser(req.params.email);
    if(ruolo) {
       if (ruolo == 1) {
          connection.query('SELECT id, name, start_year, end_year, token_calendar FROM courses', function (error, results, fields) {
@@ -67,7 +66,7 @@ app.get('/getCourses/:email', function(req, res){
         });
 
       } else {
-         connection.query('SELECT id ,name, start_year, end_year, token_calendar FROM supervisors s JOIN courses C ON s.id_course = c.id WHERE email_responsible  = ' + connection.escape(req.params.email), function (error, results, fields) {
+         connection.query('SELECT id ,name, start_year, end_year, token_calendar FROM supervisors s JOIN courses c ON s.id_course = c.id WHERE email_responsible  = ' + connection.escape(req.params.email), function (error, results, fields) {
             if (error) throw error;
             res.send(JSON.stringify(results));
         });
@@ -96,12 +95,6 @@ app.get('/listStudents', function (req, res) {
    });
 });
 
-app.get('/listCities', function (req, res) {
-   connection.query('SELECT * FROM cities limit 10', function (error, items, fields) {
-       if (error) throw error;
-       return res.send({ error: false, items: items, message: 'users list.' });
-   });
-});
 
 app.get('/calendar/listLessons', function (req, res) {
    connection.query('SELECT * FROM lessons', function (error, items, fields) {
@@ -243,23 +236,6 @@ app.get('/calendar/importLessons', function (req, res) {
    res.end();
 });
 
-app.get('/city=:id', function (req, res) {
-   // First read existing users.
-   fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-      var users = JSON.parse( data );
-      var user = users["user" + req.params.id] 
-      res.end( JSON.stringify(user));
-   });
-})
-
-app.post('/addUser', function (req, res) {
-    // First read existing users.
-    fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-       data = JSON.parse( data );
-       data["user4"] = user["user4"];
-       res.end( JSON.stringify(data));
-    });
- })
 
 var server = app.listen(8080, function () {
    var host = server.address().address
