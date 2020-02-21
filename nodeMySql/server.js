@@ -40,44 +40,23 @@ app.use(function(req, res, next) {
 
 
 app.get('/listStudents', function (req, res) {
-   var data = {};
-   var items = [];
-   connection.query('SELECT first_name,last_name,email FROM students', function (error, results, fields) {
+   var data = [];
+   connection.query('SELECT first_name,last_name,email,residence,hours_of_lessons,lost_hours FROM students left join signatures_students on students.email=signatures_students.email_student', function (error, results, fields) {
       if (error) throw error;
-
       for (let i = 0; i < results.length; i++) {
-         items.push(
+         var percentage= ((results[i].hours_of_lessons - results[i].lost_hours)*100)/results[i].hours_of_lessons
+         data.push(
             {
-               nome: results[i].first_name,
-               cognome: results[i].last_name,
-               email: results[i].email
+               firstName: results[i].first_name,
+               lastName: results[i].last_name,
+               email: results[i].email,
+               residence: results[i].residence,
+               hoursOfLessons: (results[i].hours_of_lessons) ? (results[i].hours_of_lessons) : '0',
+               percentage: (percentage) ? (percentage)+" %" : '0',
+
             })
       }
-      data = {
-      columns: [
-        {
-          label: 'Nome',
-          field: 'nome',  
-          sort: 'asc',
-          width: 150
-        },
-        {
-          label: 'Cognome',
-          field: 'cognome',
-          sort: 'asc',
-          width: 270
-        },
-        {
-          label: 'Email',
-          field: 'email',
-          sort: 'asc',
-          width: 200
-        }
-      ],
-      rows: items
-    };
     return res.send(JSON.stringify(data));
-
    });
 });
 

@@ -95,7 +95,8 @@ const routes = [
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
 
 
-  { path: '/studenti', exact: true, name: 'Info Studenti', component: Studenti },
+  { path: '/studenti', exact: true, name: 'Studenti', component: Studenti },
+
   { path: '/classi', exact: true, name: 'Classi', component: Classi },
   { path: '/docenti', exact: true, name: 'Docenti', component: Docenti },
 
