@@ -1,21 +1,25 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Col, Row, Button } from 'reactstrap';
+import {Col, Row } from 'reactstrap';
 import { Line } from 'react-chartjs-2';
-import Widget05 from '../Widgets/Widget05';
+import CardClassi from './CardClassi';
+import axios from 'axios';
 
 
+const rdn = () => {
 
+  const numb = []
+  for (let l = 0; l < 7; l++)
+    numb.push(Math.floor(Math.random() * (100 - 1) + 1));
+
+  return ({ data : numb, label : ''})
+}
 
 // Brand Card Chart
 const makeSocialBoxData = (dataSetNo) => {
-  const socialBoxData = [
-    { data: [65, 59, 84, 84, 51, 55, 40], label: 'fitstic' },
-    { data: [1, 13, 9, 17, 34, 41, 38], label: 'fitstic' },
-  ];
 
-  const dataset = socialBoxData[dataSetNo];
+  const dataset = rdn();
   const data = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    labels: ['', '', '', '', '', '', ''],
     datasets: [
       {
         backgroundColor: 'rgba(255,255,255,.1)',
@@ -31,6 +35,9 @@ const makeSocialBoxData = (dataSetNo) => {
 };
 
 const socialChartOpts = {
+  tooltips: {
+    enabled: false
+  },
   responsive: true,
   maintainAspectRatio: false,
   legend: {
@@ -56,57 +63,72 @@ const socialChartOpts = {
   },
 };
 
-
-
 class Classi extends Component {
 
+  state = {
+    corsi: []
+  }
+
+  componentDidMount() {
+    axios.get(`http://localhost:8080/getCourses/luca@info.com`)
+      .then(res => {
+        const corsi = res.data;
+        this.setState({ corsi });
+      })
+  }
+
+
   render() {
+    const items = []
 
-    
-    return (   
-      <div className="animated fadeIn">
+    for (let i = 0; i < this.state.corsi.length; i=i+2) {
+
+      items.push(
         
+        <Row key={i} className="mx-lg-5">
+          <Col xs={12} sm={12} md={6}>
+            <div onClick={() => alert("Hello from here")}>
+              <CardClassi dataBox={() => ({ variant: this.state.corsi[i].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i].end_year })} >
+                <div key={this.state.corsi[i].id} className="chart-wrapper">
 
-        <Card>
-          <CardHeader className="text-center">
-            Classi
-          <div className="card-header-actions">
+                  <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
+                </div>
+              </CardClassi>
             </div>
-          </CardHeader>
-          <CardBody>          
-            <Row>
-            
-              <Col xs={12} sm={12} md={6}>
-              <div onClick={() => alert("Hello from here")}>
-                <Widget05 dataBox={() => ({ variant: 'facebook', classe: '1', anno: '2018-2020' })} >
-                  <div className="chart-wrapper">
-                    
-                    <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
-                  </div>
-                </Widget05> 
-                </div>              
-              </Col>
-              
-              <Col xs={12} sm={12} md={6}>              
-               
-                <Widget05 dataBox={() => ({ variant: 'facebook', classe: '2', anno: '2019-2021' })}  >
-                  <div className="chart-wrapper">
-                    
-                    <Line data={makeSocialBoxData(1)} options={socialChartOpts} height={90} />
-                  </div>
-                </Widget05>
-        
-              </Col>
-            </Row>
-          </CardBody>
-        </Card>
+          </Col>
 
-       
+          <Col xs={12} sm={12} md={6}>
+            <div onClick={() => alert("Hello from here")}>
+              <CardClassi dataBox={() => ({ variant: this.state.corsi[i+1].name, anno: this.state.corsi[i+1].start_year + "-" + this.state.corsi[i+1].end_year })} >
+                <div key={this.state.corsi[i+1].id} className="chart-wrapper">
+
+                  <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
+                </div>
+              </CardClassi>
+            </div>
+          </Col>
+        </Row>
+      )
+    }
+
+
+    return (
+      <div className="animated fadeIn">
+
+          {items}
+
+         {/* this.state.corsi.map(corso => 
+         <div>
+         <Widget05 dataBox={() => ({ variant: corso.name, anno: corso.start_year + "-" + corso.end_year })} > 
+         </Widget05>
+         <li key={corso.id}>{corso.name}</li>
+
+         </div>
+         )*/}
+
       </div>
     );
   }
 }
-
-
 
 export default Classi;

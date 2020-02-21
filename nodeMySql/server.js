@@ -4,6 +4,8 @@ var app = express();
 var bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(bodyParser.raw());
 
 const fs = require('fs');
 const readline = require('readline');
@@ -16,9 +18,6 @@ const connectionDB = require('./connectionDB');
 const connection = connectionDB.createConnectionDB();
 connection.connect();
 
-//app.use(bodyParser.urlencoded({ extended: false }));
-//app.use(bodyParser.json());
-//app.use(bodyParser.raw());
 
 const idCalendar='qqm2jgu3mkl1hu7l987als4eto@group.calendar.google.com';
 
@@ -28,9 +27,26 @@ app.use(function(req, res, next) {
    next();
  });
  
- app.post('/auth', function (req, res) {
 
-   connection.query('SELECT * FROM responsibles WHERE email = ' + connection.escape(req.body.email) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
+//CONTROLLO UTENTE e JWT
+function chekUser(email) {
+
+   var ruolo = 0;
+
+   connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(email), function (error, results, fields) {
+      if (error) throw error;
+
+      //IN FUTURO METTERE CHECK JWT
+      ruolo = results[0].responsible_level;
+
+      return ruolo;
+  });
+   
+}
+
+app.post('/auth', function (req, res) {
+
+   connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(req.body.email) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
        if (error) throw error;
        //return res.send({ email: req.body.email, ruolo: results[0].responsible_level });
        res.send({ email: req.body.email, ruolo: results });
@@ -38,6 +54,26 @@ app.use(function(req, res, next) {
    });
 });
 
+app.get('/getCourses/:email', function(req, res){
+
+   var ruolo = 1;
+   //ruolo = chekUser(req.params.email);
+
+   if(ruolo) {
+      if (ruolo == 1) {
+         connection.query('SELECT id, name, start_year, end_year, token_calendar FROM courses', function (error, results, fields) {
+            if (error) throw error;
+            res.send(JSON.stringify(results));
+        });
+
+      } else {
+         connection.query('SELECT id ,name, start_year, end_year, token_calendar FROM supervisors s JOIN courses C ON s.id_course = c.id WHERE email_responsible  = ' + connection.escape(req.params.email), function (error, results, fields) {
+            if (error) throw error;
+            res.send(JSON.stringify(results));
+        });
+      }
+   }
+}) 
 
 app.get('/listStudents', function (req, res) {
    var data = [];
@@ -67,16 +103,12 @@ app.get('/listCities', function (req, res) {
    });
 });
 
-
-
 app.get('/calendar/listLessons', function (req, res) {
    connection.query('SELECT * FROM lessons', function (error, items, fields) {
        if (error) throw error;
        return res.send({ error: false, items: items, message: 'users list.' });
    });
 });
-
-
 
 app.get('/calendar/importLessons', function (req, res) {
    // If modifying these scopes, delete token.json.
@@ -210,8 +242,6 @@ app.get('/calendar/importLessons', function (req, res) {
    }
    res.end();
 });
-
-
 
 app.get('/city=:id', function (req, res) {
    // First read existing users.
