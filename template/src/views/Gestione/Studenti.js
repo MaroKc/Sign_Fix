@@ -18,12 +18,12 @@ const studente = props.studenti
             <Card>
           <Row>
               <Col className="text-left font-weight-bold m-5">
-              <tr><h5>Nome: </h5></tr>
-              <tr><h5>Cognome: </h5></tr>
-              <tr><h5>Email: </h5></tr>
-              <tr><h5>Residenza: </h5></tr>
-              <tr><h5>Percentuale: </h5></tr>     
-              <tr><h5>hoursOfLessons: </h5></tr>
+              <h5>Nome: </h5>
+              <h5>Cognome: </h5>
+              <h5>Email: </h5>
+              <h5>Residenza: </h5>
+              <h5>Percentuale: </h5>     
+              <h5>hoursOfLessons: </h5>
    
               </Col>
               <Col className="m-5">
@@ -37,7 +37,7 @@ const studente = props.studenti
 
               </Col>
           </Row>
-          <button className="btn btn-outline-primary"> ciao</button>
+          <button className="btn btn-outline-primary" > Indietro</button>
           </Card>
           </div>
   )
