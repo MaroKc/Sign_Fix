@@ -1,1 +1,2 @@
-nodeMySql/connectionDB.js
+/nodeMySql/connectionDB.js
+**/node_modules

@@ -19,20 +19,28 @@ import {
 import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
-
+console.log(routes);
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
+const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 
 class DefaultLayout extends Component {
 
   constructor(props) {
     super(props);
-    // Non chiamre this.setState() qui!
+
+    const cookieCorso = sessionStorage.getItem("corso");
     this.state = {
-      val: 'pippo'
+      classe: cookieCorso ? cookieCorso : 0
     }
   }
+
+  changeCorso = (corso) => {
+    this.setState({ classe: corso })
+    sessionStorage.setItem("corso", corso);
+  }
+
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
@@ -42,20 +50,32 @@ class DefaultLayout extends Component {
   }
 
   render() {
+    const classe = this.state.classe;
     return (
       <div className="app">
+
+        <AppHeader fixed>
+          <Suspense fallback={this.loading()}>
+            <DefaultHeader onLogout={e => this.signOut(e)} />
+          </Suspense>
+        </AppHeader>
+
         <div className="app-body">
-          <AppSidebar fixed display="lg">
-            <AppSidebarHeader />
-            <AppSidebarForm />
-            <Suspense>
-            <AppSidebarNav navConfig={navigation} {...this.props} router={router}/>
-            </Suspense>
-            <AppSidebarFooter />
-            <AppSidebarMinimizer />
-          </AppSidebar>
+
+          {classe !== 0 && (
+            <AppSidebar fixed display="lg">
+              <AppSidebarHeader />
+              <AppSidebarForm />
+              <Suspense>
+                <AppSidebarNav navConfig={navigation} {...this.props} router={router} />
+              </Suspense>
+              <AppSidebarFooter />
+              <AppSidebarMinimizer />
+            </AppSidebar>
+          )}
+
           <main className="main">
-            <AppBreadcrumb appRoutes={routes} router={router}/>
+            <AppBreadcrumb appRoutes={routes} router={router} />
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
@@ -70,11 +90,8 @@ class DefaultLayout extends Component {
                           route.render ? (
                             <route.component {...props} {...route.extraProps} route={route} />
                           ) : (
-                            <route.component {...props} route={route} />
-                          )
-                          /*props => (
-                          <route.component {...props} />
-                        )*/} />
+                              <route.component {...props} classe={this.state.classe} changeCorso={this.changeCorso} route={route} />
+                            )} />
                     ) : (null);
                   })}
                   <Redirect from="/" to="/dashboard" />

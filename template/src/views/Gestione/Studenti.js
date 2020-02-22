@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Col, Row, Button, Alert, TabPane } from 'reactstrap';
-import { AppSidebarToggler } from '@coreui/react';
+import { Card, CardBody, CardHeader, Col, Row} from 'reactstrap';
 import axios from 'axios'
 import { MDBDataTable, MDBBtn  } from 'mdbreact';
 import InfoStudente from './InfoStudente'
@@ -10,7 +9,6 @@ import InfoStudente from './InfoStudente'
 
 
 //data="http://localhost:8080/listStudents"
-
 
 
 
@@ -133,12 +131,10 @@ class Studenti extends Component {
     )
   }
 
-
   displayCard = (e) => {
     this.setState({
       displayCard: e
     });
-
   }
 
   render() {
