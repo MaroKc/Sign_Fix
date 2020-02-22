@@ -43,6 +43,7 @@ class Studenti extends Component {
           ritirato: item.ritirato,         
           clickEvent: () => this.displayCard(item.email)
         }));
+        console.log(studenti)
 
         this.setState({ studenti });
       })

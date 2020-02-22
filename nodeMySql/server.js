@@ -76,7 +76,7 @@ app.get('/getCourses/:email', function(req, res){
 
 app.get('/listStudents', function (req, res) {
    var data = [];
-   connection.query('SELECT first_name,last_name,email,residence,hours_of_lessons,lost_hours FROM students left join signatures_students on students.email=signatures_students.email_student', function (error, results, fields) {
+   connection.query('SELECT first_name,last_name,email,residence,hours_of_lessons,lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student', function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          var percentage= ((results[i].hours_of_lessons - results[i].lost_hours)*100)/results[i].hours_of_lessons
@@ -85,10 +85,12 @@ app.get('/listStudents', function (req, res) {
                firstName: results[i].first_name,
                lastName: results[i].last_name,
                email: results[i].email,
+               fiscalCode: results[i].fiscal_code,
                dateOfBirth: results[i].date_of_birth,
                residence: results[i].residence,
                hoursOfLessons: (results[i].hours_of_lessons) ? (results[i].hours_of_lessons) : '0',
                percentage: (percentage) ? (percentage)+" %" : '0',
+               ritirato: results[i].ritirato
             })
       }
     return res.send(JSON.stringify(data));

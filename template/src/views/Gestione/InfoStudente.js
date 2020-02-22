@@ -9,9 +9,9 @@ const infoStudente = (props) => {
 
   
   function refreshPage() {
-    props.displayCard = null
+    window.location.reload(false);
   }
-  console.log(refreshPage)
+
     return(
             <div>
                
@@ -35,7 +35,7 @@ const infoStudente = (props) => {
   
                 </Col>
             </Row>
-            <button className="btn btn-outline-primary" > Indietro</button>
+            <button className="btn btn-outline-primary" onClick={refreshPage}> Indietro</button>
             </Card>
             </div>
     )

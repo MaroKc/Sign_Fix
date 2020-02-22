@@ -76,7 +76,7 @@ class Classi extends Component {
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:8080/getCourses/luca@info.com`)
+    axios.get('http://localhost:8080/getCourses/luca@info.com')
       .then(res => {
         const corsi = res.data;
         this.setState({ corsi });
