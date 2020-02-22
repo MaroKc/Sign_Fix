@@ -3,77 +3,15 @@ import { Card, CardBody, CardHeader, Col, Row, Button, Alert, TabPane } from 're
 import { AppSidebarToggler } from '@coreui/react';
 import axios from 'axios'
 import { MDBDataTable, MDBBtn  } from 'mdbreact';
-
+import InfoStudente from './InfoStudente'
 
 //https://mdbootstrap.com/docs/react/tables/search/
 
 
 
 //data="http://localhost:8080/listStudents"
-// const App = (props) => {
 
-// const studente = props.studenti 
-// const getStudents = () => {
-//     return(<Studenti />)
-// }
-//   return(
-//           <div>
-//             {console.log(studente.email)}
-//             <Card>
-//           <Row>
-//               <Col className="text-left font-weight-bold m-5">
-//               <h5>Nome: </h5>
-//               <h5>Cognome: </h5>
-//               <h5>Email: </h5>
-//               <h5>Residenza: </h5>
-//               <h5>Percentuale: </h5>     
-//               <h5>hoursOfLessons: </h5>
-   
-//               </Col>
-//               <Col className="m-5">
 
-//               <h5>{studente.firstName}</h5>
-//               <h5>{studente.lastName}</h5>
-//               <h5>{studente.email}</h5>
-//               <h5>{studente.residence}</h5>
-//               <h5>{studente.percentage}</h5>
-//               <h5>{studente.hoursOfLessons}</h5>
-
-//               </Col>
-//           </Row>
-//           <button className="btn btn-outline-primary" onClick={getStudents()}> Indietro</button>
-//           </Card>
-//           </div>
-//   )
-// }
-
-function MyVerticallyCenteredModal(props) {
-  return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Modal heading
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <h4>Centered Modal</h4>
-        <p>
-          Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-          dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
-          consectetur ac, vestibulum at eros.
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={props.onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-}
 
 
 class Studenti extends Component {
@@ -81,12 +19,10 @@ class Studenti extends Component {
     super(props)
     this.state = {
       studenti: [],
-      displayCard: false
+      displayCard: null
     }
 
   }
-
-
   
   componentDidMount() {
     this.getStudents();
@@ -101,9 +37,12 @@ class Studenti extends Component {
           firstName: item.firstName,
           lastName: item.lastName,
           email: item.email,
+          dateOfBirth: item.dateOfBirth,
           residence: item.residence,
+          fiscalCode: item.fiscalCode,         
           hoursOfLessons: item.hoursOfLessons,
-          percentage: item.percentage,
+          percentage: item.percentage, 
+          ritirato: item.ritirato,         
           clickEvent: () => this.displayCard(item.email)
         }));
 
@@ -111,6 +50,7 @@ class Studenti extends Component {
       })
       .catch(err => console.error(err));
   }
+
 
   
   tabPane() {
@@ -129,67 +69,89 @@ class Studenti extends Component {
             label: 'Email',
             field: 'email',
           },
-           {
-           label: 'Ore totali',
-           field: 'hoursOfLessons',
-           },
-           {
-           label: '% Ore totali',
-           field: 'percentage',
-           },
+          {
+            label: 'Ore totali',
+            field: 'hoursOfLessons',
+          },
+          {
+            label: '% Ore totali',
+            field: 'percentage',
+          },
         ],
         rows: this.state.studenti,
       };
 
+      const nonRitirato = this.state.studenti.filter(el => el.ritirato === 0)
+      const ritirato = this.state.studenti.filter(el => el.ritirato === 1)
+
+      if (ritirato != null)
+        return (
+          <div>
+            <Card>
+              <CardHeader >
+                <div className="text-center font-weight-bold">STUDENTI</div>
+              </CardHeader>
+              <CardBody>
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={{ columns: data.columns, rows: nonRitirato }}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                // autoWidth={true}
+                // refresh
+                />
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader >
+                <div className="text-center font-weight-bold">STUDENTI  RITIRATI</div>
+              </CardHeader>
+              <CardBody>
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={{ columns: data.columns, rows: ritirato }}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                // autoWidth={true}
+                // refresh
+                />
+              </CardBody>
+            </Card>
+
+          </div>
+        );
+    }
     return (
-    <MDBDataTable 
-    responsive
-    hover 
-    data={{ columns: data.columns, rows: data.rows }}
-    searching={false}
-    paging={false}
-    noBottomColumns={true}
-    // autoWidth={true}
-    // refresh
-    />
-    );
+      <>
+        {DatatablePage()}
+      </>
+    )
   }
-  return (
-  <>
-      {DatatablePage()}
-  </>
-  )
-}
 
 
-  displayCard = () => {
+  displayCard = (e) => {
     this.setState({
-      displayCard: !this.state.displayCard
+      displayCard: e
     });
 
   }
 
   render() {
-  
-
 
     if (this.state.displayCard) {
-      
       return(
-      
-      <App key={this.state.studenti.find(item => item.email)} studenti={this.state.studenti.find(item => item.email)} />
-      )}
+        <div><InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} displayCard={this.state.displayCard}/></div>)}
+
+
 
     return (
       <>
-        <Card>
-          <CardHeader >
-            <div className="text-center font-weight-bold">STUDENTI</div>
-          </CardHeader>
-          <CardBody>
           {this.tabPane()}
-          </CardBody>
-      </Card>
       </>
     );
   }

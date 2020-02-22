@@ -86,10 +86,10 @@ app.get('/listStudents', function (req, res) {
                firstName: results[i].first_name,
                lastName: results[i].last_name,
                email: results[i].email,
+               dateOfBirth: results[i].date_of_birth,
                residence: results[i].residence,
                hoursOfLessons: (results[i].hours_of_lessons) ? (results[i].hours_of_lessons) : '0',
                percentage: (percentage) ? (percentage)+" %" : '0',
-
             })
       }
     return res.send(JSON.stringify(data));

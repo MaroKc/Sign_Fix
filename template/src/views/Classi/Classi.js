@@ -5,6 +5,7 @@ import CardClassi from './CardClassi';
 import axios from 'axios';
 
 
+
 const rdn = () => {
 
   const numb = []
@@ -108,7 +109,7 @@ class Classi extends Component {
 
           <Col xs={12} sm={12} md={6}>
             <div onClick={() => alert("Hello from here")}>
-              <CardClassi dataBox={() => ({ variant: this.state.corsi[i].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i+1].end_year })} >
+              <CardClassi dataBox={() => ({ variant: this.state.corsi[i+1].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i+1].end_year })} >
                 <div key={this.state.corsi[i+1].id} className="chart-wrapper">
 
                   <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
