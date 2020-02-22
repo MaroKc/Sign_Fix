@@ -5,6 +5,7 @@ import CardClassi from './CardClassi';
 import axios from 'axios';
 
 
+
 const rdn = () => {
 
   const numb = []
@@ -75,7 +76,7 @@ class Classi extends Component {
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:8080/getCourses/luca@info.com`)
+    axios.get('http://localhost:8080/getCourses/luca@info.com')
       .then(res => {
         const corsi = res.data;
         this.setState({ corsi });
@@ -103,6 +104,7 @@ class Classi extends Component {
           <Col className="px-xl-5" xs={12} sm={12} md={6} key={this.state.corsi[i + 1].id} onClick={() => this.state.changeCorso(this.state.corsi[i + 1].id)}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i + 1].name, anno: this.state.corsi[i + 1].start_year + "-" + this.state.corsi[i + 1].end_year })} >
               <div className="chart-wrapper">
+
 
                 <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
               </div>
