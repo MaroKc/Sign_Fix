@@ -10,37 +10,69 @@ import { MDBDataTable, MDBBtn  } from 'mdbreact';
 
 
 //data="http://localhost:8080/listStudents"
-const App = (props) => {
-const studente = props.studenti
-  return(
-          <div>
-            {console.log(studente.email)}
-            <Card>
-          <Row>
-              <Col className="text-left font-weight-bold m-5">
-              <h5>Nome: </h5>
-              <h5>Cognome: </h5>
-              <h5>Email: </h5>
-              <h5>Residenza: </h5>
-              <h5>Percentuale: </h5>     
-              <h5>hoursOfLessons: </h5>
+// const App = (props) => {
+
+// const studente = props.studenti 
+// const getStudents = () => {
+//     return(<Studenti />)
+// }
+//   return(
+//           <div>
+//             {console.log(studente.email)}
+//             <Card>
+//           <Row>
+//               <Col className="text-left font-weight-bold m-5">
+//               <h5>Nome: </h5>
+//               <h5>Cognome: </h5>
+//               <h5>Email: </h5>
+//               <h5>Residenza: </h5>
+//               <h5>Percentuale: </h5>     
+//               <h5>hoursOfLessons: </h5>
    
-              </Col>
-              <Col className="m-5">
+//               </Col>
+//               <Col className="m-5">
 
-              <h5>{studente.firstName}</h5>
-              <h5>{studente.lastName}</h5>
-              <h5>{studente.email}</h5>
-              <h5>{studente.residence}</h5>
-              <h5>{studente.percentage}</h5>
-              <h5>{studente.hoursOfLessons}</h5>
+//               <h5>{studente.firstName}</h5>
+//               <h5>{studente.lastName}</h5>
+//               <h5>{studente.email}</h5>
+//               <h5>{studente.residence}</h5>
+//               <h5>{studente.percentage}</h5>
+//               <h5>{studente.hoursOfLessons}</h5>
 
-              </Col>
-          </Row>
-          <button className="btn btn-outline-primary" > Indietro</button>
-          </Card>
-          </div>
-  )
+//               </Col>
+//           </Row>
+//           <button className="btn btn-outline-primary" onClick={getStudents()}> Indietro</button>
+//           </Card>
+//           </div>
+//   )
+// }
+
+function MyVerticallyCenteredModal(props) {
+  return (
+    <Modal
+      {...props}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Modal heading
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <h4>Centered Modal</h4>
+        <p>
+          Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+          dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
+          consectetur ac, vestibulum at eros.
+        </p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={props.onHide}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+  );
 }
 
 
