@@ -23,6 +23,7 @@ connection.connect();
 const idCalendar='qqm2jgu3mkl1hu7l987als4eto@group.calendar.google.com';
 
 app.use(function(req, res, next) {
+   res.header('Access-Control-Allow-Methods', 'DELETE, PUT');
    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
    next();
@@ -96,6 +97,44 @@ app.get('/listStudents', function (req, res) {
     return res.send(JSON.stringify(data));
    });
 });
+
+app.put('/updateStudent/:email', function (req, res) {
+   var email = req.params.email;
+
+   var first_name = req.body.first_name
+   var last_name = req.body.last_name
+   var date_of_birth = req.body.date_of_birth
+   var residence = req.body.residence
+   var fiscal_code = req.body.fiscal_code
+
+   if (!email) {
+      res.status(400).send({ error: email, message: 'Email is not valid' });
+   }
+   else{
+   var query = "UPDATE `students` SET `first_name`=?,`last_name`=?,`date_of_birth`=?,`residence`=?,`fiscal_code`=? WHERE `email` = ?";
+   connection.query(query,[first_name,last_name,date_of_birth,residence,fiscal_code,email], function (error, results, fields) {
+      if (error) throw error;
+         res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+    });
+   }
+   });
+
+   app.put('/retireStudent/:email', function (req, res) {
+      var email = req.params.email;
+   
+      var ritirato = req.body.ritirato
+   
+      if (!email) {
+         res.status(400).send({ error: email, message: 'Email is not valid' });
+      }
+      else{
+      var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
+      connection.query(query,[ritirato,email], function (error, results, fields) {
+         if (error) throw error;
+            res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+       });
+      }
+      });
 
 
 app.get('/calendar/listLessons', function (req, res) {

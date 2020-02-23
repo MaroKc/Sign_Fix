@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Col, Row} from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, Row, Button, Alert, TabPane } from 'reactstrap';
+import { AppSidebarToggler } from '@coreui/react';
 import axios from 'axios'
 import { MDBDataTable, MDBBtn  } from 'mdbreact';
 import InfoStudente from './InfoStudente'
@@ -9,6 +10,7 @@ import InfoStudente from './InfoStudente'
 
 
 //data="http://localhost:8080/listStudents"
+
 
 
 
@@ -43,7 +45,6 @@ class Studenti extends Component {
           ritirato: item.ritirato,         
           clickEvent: () => this.displayCard(item.email)
         }));
-        console.log(studenti)
 
         this.setState({ studenti });
       })
@@ -132,23 +133,27 @@ class Studenti extends Component {
     )
   }
 
+
   displayCard = (e) => {
     this.setState({
-      displayCard: e
+        displayCard: e
     });
   }
 
+
   render() {
-
-    if (this.state.displayCard) {
-      return(
-        <div><InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} displayCard={this.state.displayCard}/></div>)}
-
-
-
+if(this.state.displayCard){
+  return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)}  />
+}else{
+  return this.tabPane()
+}
     return (
       <>
-          {this.tabPane()}
+        <div>
+            {this.tabPane()}   
+        </div>
+        );
+
       </>
     );
   }
