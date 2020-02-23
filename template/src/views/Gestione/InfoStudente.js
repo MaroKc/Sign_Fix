@@ -61,11 +61,11 @@ class infoStudente extends React.Component {
       return(
         <div  className="m-5 w-auto">
           <h5> {this.state.email} </h5>
-          <input id="infoNome"  name='firstName'  onChange={this.handleChange}  value={this.state.firstName} />
-          <input id="infoCognome" name='lastName' onChange={this.handleChange} value={this.state.lastName} />
-          <input id="infoResidenza" name='residence' onChange={this.handleChange} value={this.state.residence} />
-          <input id="infoDataNascita" name='dateOfBirth' onChange={this.handleChange} value={this.state.dateOfBirth} />
-          <input id="infoCodice" name='fiscalCode' onChange={this.handleChange} value={this.state.fiscalCode} />
+          <input id="infoNome"  name='firstName'  onChange={this.handleChange}  value={this.state.firstName}  required minLength="3" />
+          <input id="infoCognome" name='lastName' onChange={this.handleChange} value={this.state.lastName} required />
+          <input id="infoResidenza" name='residence' onChange={this.handleChange} value={this.state.residence} required />
+          <input id="infoDataNascita" name='dateOfBirth' onChange={this.handleChange} value={this.state.dateOfBirth} required />
+          <input id="infoCodice" name='fiscalCode' onChange={this.handleChange} value={this.state.fiscalCode} required />
         </div>
       )
     }
