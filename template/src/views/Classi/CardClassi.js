@@ -1,6 +1,3 @@
-/* Fare i componenti widget per i vari corsi fitstic ( turing, ...) */
-
-
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
