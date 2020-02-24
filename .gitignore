@@ -1,2 +1,5 @@
 /nodeMySql/connectionDB.js
 **/node_modules
+nodeMySql/credentials.json
+nodeMySql/google_auth.html
+nodeMySql/outh2.key.json
