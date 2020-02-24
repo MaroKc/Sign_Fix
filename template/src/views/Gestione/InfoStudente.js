@@ -16,8 +16,8 @@ class infoStudente extends React.Component {
       ritirato: this.props.studente.ritirato,
       changeInfo: false,
       warning: false,
+      displayCard: this.props.displayCard,
     }
-    console.log(this.state.tabPane)
   }
 
 
@@ -50,7 +50,7 @@ class infoStudente extends React.Component {
       .catch(err => {
         return console.log(err);
       });
-    this.refresh();
+    window.location.reload();
   }
 
   handleChange = (event) => {
@@ -67,7 +67,8 @@ class infoStudente extends React.Component {
   }
 
   refresh = () => {
-    window.location.reload();
+    this.props.getsStudents();
+    this.props.displayTable()
   }
 
   onclickModifyState = () => {

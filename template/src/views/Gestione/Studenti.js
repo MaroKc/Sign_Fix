@@ -54,6 +54,12 @@ class Studenti extends Component {
     });
   }
 
+  displayTable = () => {
+    this.setState({
+      displayCard: null
+    });
+  }
+
   tabPane() {
     const DatatablePage = () => {
       const data = {
@@ -86,7 +92,6 @@ class Studenti extends Component {
       const ritirato = this.state.studenti.filter(el => el.ritirato === 1)
 
       if (ritirato != 0) {
-        console.log(ritirato)
         return (
           <div>
           <Card>
@@ -145,9 +150,9 @@ class Studenti extends Component {
         )
       }
     }
-    if(this.state.displayCard){
-      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)}/>
-    }else{
+    if(this.state.displayCard ){
+      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} displayTable={this.displayTable} getsStudents={this.getStudents}/>
+    }else {
       return (
         <>
           {DatatablePage()}
