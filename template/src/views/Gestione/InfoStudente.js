@@ -50,7 +50,7 @@ class infoStudente extends React.Component {
       .catch(err => {
         return console.log(err);
       });
-    window.location.reload();
+      window.location.reload();
   }
 
   handleChange = (event) => {
@@ -60,6 +60,7 @@ class infoStudente extends React.Component {
       [name]: val,
     });
   }
+
   toggleWarning = () => {
     this.setState({
       warning: !this.state.warning,
@@ -67,8 +68,8 @@ class infoStudente extends React.Component {
   }
 
   refresh = () => {
-    this.props.getsStudents();
-    this.props.displayTable()
+    this.props.getStudents();
+    this.props.DisplayTable()
   }
 
   onclickModifyState = () => {
@@ -119,8 +120,8 @@ class infoStudente extends React.Component {
       const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
       const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
       const validationResidence = residence.length > 2 
-      const validationDateOfBirth = dateOfBirth.length ==10 && regexData.test(dateOfBirth)
-      const validationFiscalCode = fiscalCode.length == 16 && regexFiscalCode.test(fiscalCode)
+      const validationDateOfBirth = dateOfBirth.length === 10 && regexData.test(dateOfBirth)
+      const validationFiscalCode = fiscalCode.length === 16 && regexFiscalCode.test(fiscalCode)
       return (
         <Table borderless responsive>
           <tbody>
@@ -159,7 +160,7 @@ class infoStudente extends React.Component {
     const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
     const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
     const { firstName, lastName, residence, fiscalCode, dateOfBirth } = this.state
-    const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName) && residence.length > 2 && dateOfBirth.length == 10 && regexData.test(dateOfBirth) && fiscalCode.length == 16 && regexFiscalCode.test(fiscalCode)
+    const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName) && residence.length > 2 && dateOfBirth.length === 10 && regexData.test(dateOfBirth) && fiscalCode.length === 16 && regexFiscalCode.test(fiscalCode)
     
     if (this.state.ritirato === 0) {
       if (!changeInfo) {

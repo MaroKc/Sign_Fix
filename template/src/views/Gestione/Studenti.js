@@ -150,9 +150,9 @@ class Studenti extends Component {
         )
       }
     }
-    if(this.state.displayCard ){
-      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} displayTable={this.displayTable} getsStudents={this.getStudents}/>
-    }else {
+    if(this.state.displayCard){
+      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} DisplayTable={this.DisplayTable}/>
+    }else{
       return (
         <>
           {DatatablePage()}
