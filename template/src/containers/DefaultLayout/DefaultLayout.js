@@ -54,11 +54,11 @@ class DefaultLayout extends Component {
     return (
       <div className="app">
 
-        {/* <AppHeader fixed>
+        <AppHeader fixed>
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} />
           </Suspense>
-        </AppHeader> */}
+        </AppHeader>
 
         <div className="app-body">
 

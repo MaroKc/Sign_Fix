@@ -3,6 +3,7 @@ var path = require('path');
 var app = express();
 var bodyParser = require('body-parser');
 var Sync = require('sync');
+const { OAuth2Client } = require('google-auth-library');
 
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
@@ -10,7 +11,7 @@ app.use(bodyParser.json());
 
 const fs = require('fs');
 const readline = require('readline');
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 const tools = require('./tools');
 
 var errorDataInsert = [];
@@ -20,14 +21,12 @@ const connection = connectionDB.createConnectionDB();
 connection.connect();
 
 
-const idCalendar='qqm2jgu3mkl1hu7l987als4eto@group.calendar.google.com';
-
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
    next();
- });
- 
+});
+
 
 //CONTROLLO UTENTE e JWT
 async function chekUser(email) {
@@ -41,45 +40,113 @@ async function chekUser(email) {
       ruolo = results[0].responsible_level;
 
       return ruolo;
-  });
+   });
 }
+
+app.post('/tokensignin', function (req, res) {
+
+   const code = req.body.code;
+   const keys = require('./outh2.key.json');
+
+   async function verify() {
+      /*
+         //const token = req.body.idtoken;
+         const CLIENT_ID = '122931835616-is0f';
+         const client = new OAuth2Client(CLIENT_ID);
+         const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+            // Or, if multiple clients access the backend:
+            //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+         });
+         const payload = ticket.getPayload();
+         const userid = payload['sub'];
+         // If request specified a G Suite domain:
+         //const domain = payload['hd'];
+         console.log("ticket");
+         console.log(ticket);
+         console.log("payload");
+         console.log(payload);
+         console.log("userid");
+         console.log(userid);
+         var request = require('request');
+         request('https://oauth2.googleapis.com/tokeninfo?id_token='+token, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+               console.log(body) // Print the google web page.
+            }
+         })
+      */
+      const oAuth2Client = new OAuth2Client(
+         keys.web.client_id,
+         keys.web.client_secret,
+         keys.web.redirect_uris[0]
+      );
+      const restInfo = await oAuth2Client.getToken(code);
+      const tokenInfo = restInfo.tokens;
+      oAuth2Client.setCredentials({ access_token: tokenInfo.getAccessToken, refresh_token: tokenInfo.refresh_token });
+      const oauth2 = google.oauth2({ version: 'v2', auth: oAuth2Client });
+      oauth2.userinfo.get((err, resu) => {
+         if (err) {
+            console.log('The API returned an error: ' + err);
+            return res.send({ error: true, data: err, message: 'The API returned an error' });
+         }
+         //console.log(resu.data);
+         const email = resu.data.email;
+
+         const insertToken = email + '","' + tokenInfo.access_token + '","' + tokenInfo.refresh_token + '","' + tokenInfo.scope + '","' + tokenInfo.token_type + '","' + tokenInfo.expiry_date;
+         const updateToken = 'access_token = "' + tokenInfo.access_token + '", refresh_token = "' + tokenInfo.refresh_token + '", scope = "' + tokenInfo.scope + '", token_type = "' + tokenInfo.token_type + '", expiry_date = "' + tokenInfo.expiry_date + '"';
+         const query = 'INSERT INTO google_token (email, access_token, refresh_token, scope, token_type, expiry_date) VALUES("' + insertToken + '") ON DUPLICATE KEY UPDATE ' + updateToken;
+
+         connection.query(query, function (error, items, fields) {
+            if (error) throw error;
+            return (
+               res.send({ error: false, data: items, message: 'Calendar added' }),
+               console.log({ error: error, data: items, message: 'Calendar added' })
+            );
+         });
+      });
+
+   }
+   verify().catch(console.error);
+});
+
 
 app.post('/auth', function (req, res) {
 
    connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(req.body.email) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
-       if (error) throw error;
-       //return res.send({ email: req.body.email, ruolo: results[0].responsible_level });
-       res.send({ email: req.body.email, ruolo: results });
-       console.log({ email: req.body.email, ruolo: results[0].responsible_level })
+      if (error) throw error;
+      //return res.send({ email: req.body.email, ruolo: results[0].responsible_level });
+      res.send({ email: req.body.email, ruolo: results });
+      console.log({ email: req.body.email, ruolo: results[0].responsible_level })
    });
 });
 
-app.get('/getCourses/:email', function(req, res){
+app.get('/getCourses/:email', function (req, res) {
 
    //var ruolo = 1;
    ruolo = chekUser(req.params.email);
-   if(ruolo) {
+   if (ruolo) {
       if (ruolo == 1) {
          connection.query('SELECT id, name, start_year, end_year, token_calendar FROM courses', function (error, results, fields) {
             if (error) throw error;
             res.send(JSON.stringify(results));
-        });
+         });
 
       } else {
          connection.query('SELECT id ,name, start_year, end_year, token_calendar FROM supervisors s JOIN courses c ON s.id_course = c.id WHERE email_responsible  = ' + connection.escape(req.params.email), function (error, results, fields) {
             if (error) throw error;
             res.send(JSON.stringify(results));
-        });
+         });
       }
    }
-}) 
+})
 
 app.get('/listStudents', function (req, res) {
    var data = [];
    connection.query('SELECT first_name,last_name,email,residence,hours_of_lessons,lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student', function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
-         var percentage= ((results[i].hours_of_lessons - results[i].lost_hours)*100)/results[i].hours_of_lessons
+         var percentage = ((results[i].hours_of_lessons - results[i].lost_hours) * 100) / results[i].hours_of_lessons
          data.push(
             {
                firstName: results[i].first_name,
@@ -89,87 +156,54 @@ app.get('/listStudents', function (req, res) {
                dateOfBirth: results[i].date_of_birth,
                residence: results[i].residence,
                hoursOfLessons: (results[i].hours_of_lessons) ? (results[i].hours_of_lessons) : '0',
-               percentage: (percentage) ? (percentage)+" %" : '0',
+               percentage: (percentage) ? (percentage) + " %" : '0',
                ritirato: results[i].ritirato
             })
       }
-    return res.send(JSON.stringify(data));
+      return res.send(JSON.stringify(data));
    });
 });
 
+//const idCalendar='qqm2jgu3mkl1hu7l987als4eto@group.calendar.google.com';
 
 app.get('/calendar/listLessons', function (req, res) {
    connection.query('SELECT * FROM lessons', function (error, items, fields) {
-       if (error) throw error;
-       return res.send({ error: false, items: items, message: 'users list.' });
+      if (error) throw error;
+      return res.send({ error: false, items: items, message: 'users list.' });
    });
 });
 
-app.get('/calendar/importLessons', function (req, res) {
-   // If modifying these scopes, delete token.json.
-   const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
-   // The file token.json stores the user's access and refresh tokens, and is
-   // created automatically when the authorization flow completes for the first
-   // time.
-   const TOKEN_PATH = 'token.json';
+app.post('/calendar/importLessons', function (req, res) {
+
+   //const email = connection.escape(req.body.email);
+   const email = 'daniele.marocchi.studio@fitstic-edu.com';
+   const idCalendar = req.body.token;
 
    // Load client secrets from a local file.
    fs.readFile('credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
-         // Authorize a client with credentials, then call the Google Calendar API.
-         authorize(JSON.parse(content), listEvents);
+      // Authorize a client with credentials, then call the Google Calendar API.
+      authorize(JSON.parse(content), listEvents);
    });
 
-   /**
-    * Create an OAuth2 client with the given credentials, and then execute the
-    * given callback function.
-    * @param {Object} credentials The authorization client credentials.
-    * @param {function} callback The callback to call with the authorized client.
-    */
    function authorize(credentials, callback) {
-      const {client_secret, client_id, redirect_uris} = credentials.installed;
+
+      const { client_secret, client_id, redirect_uris } = credentials.installed;
       const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
-      // Check if we have previously stored a token.
-      fs.readFile(TOKEN_PATH, (err, token) => {
-         if (err) return getAccessToken(oAuth2Client, callback);
-         oAuth2Client.setCredentials(JSON.parse(token));
+      const query = 'SELECT * FROM google_token WHERE email = ' + connection.escape(email);
+      connection.query(query, function (error, results, fields) {
+         if (error) throw error;
+         if (results.length == 0) {
+            console.log('Token Non Trovato');
+            return res.send({ error: false, data: error, message: 'Token Non Trovat' });
+         }
+         const tokenInfo = results[0];
+         oAuth2Client.setCredentials({ access_token: tokenInfo.access_token, refresh_token: tokenInfo.refresh_token });
          callback(oAuth2Client);
       });
    }
 
-   /**
-    * Get and store new token after prompting for user authorization, and then
-    * execute the given callback with the authorized OAuth2 client.
-    * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
-    * @param {getEventsCallback} callback The callback for the authorized client.
-    */
-   function getAccessToken(oAuth2Client, callback) {
-      const authUrl = oAuth2Client.generateAuthUrl({
-         access_type: 'offline',
-         scope: SCOPES,
-      });
-      console.log('Authorize this app by visiting this url:', authUrl);
-      const rl = readline.createInterface({
-         input: process.stdin,
-         output: process.stdout,
-      });
-      rl.question('Enter the code from that page here: ', (code) => {
-         rl.close();
-
-         oAuth2Client.getToken(code, (err, token) => {
-            if (err) return console.error('Error retrieving access token', err);
-            
-            oAuth2Client.setCredentials(token);
-            // Store the token to disk for later program executions
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-               if (err) return console.error(err);
-               console.log('Token stored to', TOKEN_PATH);
-            });
-         callback(oAuth2Client);
-         });
-      });
-   }
 
    /**
     * Lists the next 10 events on the user's primary calendar.
@@ -177,7 +211,8 @@ app.get('/calendar/importLessons', function (req, res) {
     */
 
    function listEvents(auth) {
-      const calendar = google.calendar({version: 'v3', auth});
+
+      const calendar = google.calendar({ version: 'v3', auth });
       calendar.events.list({
          calendarId: idCalendar,
          timeMin: (new Date()).toISOString(),
@@ -191,16 +226,16 @@ app.get('/calendar/importLessons', function (req, res) {
             console.log('Upcoming 10 events:');
             events.map((event, i) => {
 
-               try{
-                  const classroom =tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[0]));
+               try {
+                  const classroom = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[0]));
                   const teacher = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[1].split(',')[0]));
-                  const lessontype =tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[1].split(',')[1]));
-                  
-                  const dateStart= new Date(event.start.dateTime);
-                  const dateEnd =new Date(event.end.dateTime);
+                  const lessontype = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[1].split(',')[1]));
 
-                  const timeStart = dateStart.getHours() + dateStart.getMinutes()/60;
-                  const timeEnd = dateEnd.getHours() + dateEnd.getMinutes()/60;
+                  const dateStart = new Date(event.start.dateTime);
+                  const dateEnd = new Date(event.end.dateTime);
+
+                  const timeStart = dateStart.getHours() + dateStart.getMinutes() / 60;
+                  const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
 
                   const totalHours = timeEnd - timeStart;
 
@@ -215,25 +250,26 @@ app.get('/calendar/importLessons', function (req, res) {
                   INSERT INTO `lessons`(`id`, `lesson`, `email_responsible`, `classroom`, `id_course`, 
                   `date`, `start_time`, `end_time`, `total_hours`, `creation_date`, `modify_date`, 
                   `email_supervisor_create`, `email_supervisor_modify`)*/
-                  
-                  
+
+                  /*
                   const query = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`)' +
                   'VALUES ("'+lessontype+'","'+teacher+'","'+classroom+'",1,"'+tools.formattedDate(dateStart)+'","'+timeStart+'","'+timeEnd+'","'+totalHours +'","'+tools.formattedDate()+'")';
                   
                   connection.query(query, function (error, items, fields) {
                      if (error) throw error;
                      return res.send({ error: false, data: items, message: 'Calendar added' });
-                  });
-               } catch(err){
-                  errorDataInsert.push(event.summary+" "+event.start.dateTime.split("T")[0]);
+                  });*/
+                  console.log("cered si")
+               } catch (err) {
+                  errorDataInsert.push(event.summary + " " + event.start.dateTime.split("T")[0]);
                   console.log("I seguenti dati non sono stati inseriti correttamente: ");
                   console.log(JSON.stringify(errorDataInsert));
-                  }
-         });
-      } else {
-         console.log('No upcoming events found.');
-      }
-   });
+               }
+            });
+         } else {
+            console.log('No upcoming events found.');
+         }
+      });
    }
    res.end();
 });

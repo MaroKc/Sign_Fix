@@ -5,7 +5,6 @@ import CardClassi from './CardClassi';
 import axios from 'axios';
 
 
-
 const rdn = () => {
 
   const numb = []
@@ -16,7 +15,7 @@ const rdn = () => {
 }
 
 // Brand Card Chart
-const makeSocialBoxData = (dataSetNo) => {
+const makeSocialBoxData = () => {
 
   const dataset = rdn();
   const data = {
@@ -80,7 +79,7 @@ class Classi extends Component {
       .then(res => {
         const corsi = res.data;
         this.setState({ corsi });
-      })
+    })
   }
 
 
@@ -92,7 +91,7 @@ class Classi extends Component {
       items.push(
 
         <Row key={i} className="mx-lg-5">
-          <Col className="px-xl-5" xs={12} sm={12} md={6} key={this.state.corsi[i].id} onClick={() => this.state.changeCorso(this.state.corsi[i].id)}>
+          <Col className="px-xl-5" xs={12} sm={12} md={6} key={this.state.corsi[i].id} onClick={() => this.state.changeCorso(this.state.corsi[i])}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i].end_year })} >
               <div className="chart-wrapper">
 
@@ -101,7 +100,7 @@ class Classi extends Component {
             </CardClassi>
           </Col>
 
-          <Col className="px-xl-5" xs={12} sm={12} md={6} key={this.state.corsi[i + 1].id} onClick={() => this.state.changeCorso(this.state.corsi[i + 1].id)}>
+          <Col className="px-xl-5" xs={12} sm={12} md={6} key={this.state.corsi[i + 1].id} onClick={() => this.state.changeCorso(this.state.corsi[i + 1])}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i + 1].name, anno: this.state.corsi[i + 1].start_year + "-" + this.state.corsi[i + 1].end_year })} >
               <div className="chart-wrapper">
 
