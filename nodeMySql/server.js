@@ -164,7 +164,34 @@ app.get('/listStudents', function (req, res) {
    });
 });
 
-//const idCalendar='qqm2jgu3mkl1hu7l987als4eto@group.calendar.google.com';
+app.put('/updateStudent/:email', function (req, res) {
+
+   var email = req.params.email
+   var first_name = req.body.first_name
+   var last_name = req.body.last_name
+   var date_of_birth = req.body.date_of_birth
+   var residence = req.body.residence
+   var fiscal_code = req.body.fiscal_code
+
+   var query = "UPDATE `students` SET `first_name`=?,`last_name`=?,`date_of_birth`=?,`residence`=?,`fiscal_code`=? WHERE `email` = ?";
+   connection.query(query, [first_name, last_name, date_of_birth, residence, fiscal_code, email], function (error, results, fields) {
+      if (error) throw error;
+      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+   });
+});
+
+app.put('/retireStudent/:email', function (req, res) {
+   var email = req.params.email;
+
+   var ritirato = req.body.ritirato
+
+   var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
+   connection.query(query, [ritirato, email], function (error, results, fields) {
+      if (error) throw error;
+      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+   });
+});
+
 
 app.get('/calendar/listLessons', function (req, res) {
    connection.query('SELECT * FROM lessons', function (error, items, fields) {
@@ -172,6 +199,7 @@ app.get('/calendar/listLessons', function (req, res) {
       return res.send({ error: false, items: items, message: 'users list.' });
    });
 });
+
 
 app.post('/calendar/importLessons', function (req, res) {
 

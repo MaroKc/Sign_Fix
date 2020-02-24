@@ -94,7 +94,6 @@ class Classi extends Component {
           <Col className="px-xl-5" xs={12} sm={12} md={6} key={this.state.corsi[i].id} onClick={() => this.state.changeCorso(this.state.corsi[i])}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i].end_year })} >
               <div className="chart-wrapper">
-
                 <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
               </div>
             </CardClassi>
@@ -103,12 +102,11 @@ class Classi extends Component {
           <Col className="px-xl-5" xs={12} sm={12} md={6} key={this.state.corsi[i + 1].id} onClick={() => this.state.changeCorso(this.state.corsi[i + 1])}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i + 1].name, anno: this.state.corsi[i + 1].start_year + "-" + this.state.corsi[i + 1].end_year })} >
               <div className="chart-wrapper">
-
-
                 <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
               </div>
             </CardClassi>
           </Col>
+          
         </Row>
       )
     }
