@@ -1,29 +1,26 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Col, Row, Button, Alert, TabPane } from 'reactstrap';
-import { AppSidebarToggler } from '@coreui/react';
+import { Card, CardBody, CardHeader } from 'reactstrap';
 import axios from 'axios'
-import { MDBDataTable, MDBBtn  } from 'mdbreact';
+import { MDBDataTable } from 'mdbreact';
 import InfoStudente from './InfoStudente'
+
+// import { AppSidebarToggler } from '@coreui/react';
+
 
 //https://mdbootstrap.com/docs/react/tables/search/
 
 
 
-//data="http://localhost:8080/listStudents"
-
-
-
-
 class Studenti extends Component {
-  constructor(props){
+  constructor(props) {
     super(props)
     this.state = {
       studenti: [],
       displayCard: null
     }
-
   }
-  
+
+
   componentDidMount() {
     this.getStudents();
   }
@@ -39,10 +36,10 @@ class Studenti extends Component {
           email: item.email,
           dateOfBirth: item.dateOfBirth,
           residence: item.residence,
-          fiscalCode: item.fiscalCode,         
+          fiscalCode: item.fiscalCode,
           hoursOfLessons: item.hoursOfLessons,
-          percentage: item.percentage, 
-          ritirato: item.ritirato,         
+          percentage: item.percentage,
+          ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
         }));
 
@@ -51,8 +48,12 @@ class Studenti extends Component {
       .catch(err => console.error(err));
   }
 
+  displayCard = (e) => {
+    this.setState({
+      displayCard: e
+    });
+  }
 
-  
   tabPane() {
     const DatatablePage = () => {
       const data = {
@@ -84,7 +85,45 @@ class Studenti extends Component {
       const nonRitirato = this.state.studenti.filter(el => el.ritirato === 0)
       const ritirato = this.state.studenti.filter(el => el.ritirato === 1)
 
-      if (ritirato != null)
+      if (ritirato != 0) {
+        console.log(ritirato)
+        return (
+          <div>
+          <Card>
+            <CardHeader >
+              <div className="text-center font-weight-bold">STUDENTI</div>
+            </CardHeader>
+            <CardBody>
+              <MDBDataTable
+                responsive
+                hover
+                data={{ columns: data.columns, rows: nonRitirato }}
+                searching={false}
+                paging={false}
+                noBottomColumns={true}
+              />
+            </CardBody>
+          </Card>
+          <Card>
+            <CardHeader >
+              <div className="text-center font-weight-bold">STUDENTI  RITIRATI</div>
+            </CardHeader>
+            <CardBody>
+              <MDBDataTable
+                responsive
+                hover
+                data={{ columns: data.columns, rows: ritirato }}
+                searching={false}
+                paging={false}
+                noBottomColumns={true}
+              // autoWidth={true}
+              // refresh
+              />
+            </CardBody>
+          </Card>
+        </div>
+        );
+      } else {
         return (
           <div>
             <Card>
@@ -99,64 +138,28 @@ class Studenti extends Component {
                   searching={false}
                   paging={false}
                   noBottomColumns={true}
-                // autoWidth={true}
-                // refresh
                 />
               </CardBody>
             </Card>
-
-            <Card>
-              <CardHeader >
-                <div className="text-center font-weight-bold">STUDENTI  RITIRATI</div>
-              </CardHeader>
-              <CardBody>
-                <MDBDataTable
-                  responsive
-                  hover
-                  data={{ columns: data.columns, rows: ritirato }}
-                  searching={false}
-                  paging={false}
-                  noBottomColumns={true}
-                // autoWidth={true}
-                // refresh
-                />
-              </CardBody>
-            </Card>
-
           </div>
-        );
+        )
+      }
     }
-    return (
-      <>
-        {DatatablePage()}
-      </>
-    )
-  }
-
-
-  displayCard = (e) => {
-    this.setState({
-        displayCard: e
-    });
+    if(this.state.displayCard){
+      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)}/>
+    }else{
+      return (
+        <>
+          {DatatablePage()}
+        </>
+      )
+    }
   }
 
 
   render() {
-if(this.state.displayCard){
-  return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)}  />
-}else{
-  return this.tabPane()
-}
-    return (
-      <>
-        <div>
-            {this.tabPane()}   
-        </div>
-        );
-
-      </>
-    );
+      return this.tabPane()
+    }
   }
-}
 
 export default Studenti;
