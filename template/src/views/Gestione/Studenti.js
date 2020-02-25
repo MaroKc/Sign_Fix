@@ -151,7 +151,7 @@ class Studenti extends Component {
       }
     }
     if(this.state.displayCard){
-      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} DisplayTable={this.DisplayTable}/>
+      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable}/>
     }else{
       return (
         <>

@@ -69,7 +69,7 @@ class infoStudente extends React.Component {
 
   refresh = () => {
     this.props.getStudents();
-    this.props.DisplayTable()
+    this.props.displayTable()
   }
 
   onclickModifyState = () => {
