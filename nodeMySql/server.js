@@ -179,6 +179,9 @@ app.get('/lessons/:date', function (req, res) {
             {
                id: results[i].id,
                lesson: results[i].lesson,
+               email: results[i].email_signature,
+               classroom: results[i].classroom,
+               startTime: results[i].start_time,
                endTime: results[i].end_time
             })
       }

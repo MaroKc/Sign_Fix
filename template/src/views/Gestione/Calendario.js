@@ -31,6 +31,7 @@ class Calendario extends Component {
         console.log(res);
         console.log(res.data);
       })
+      this.button()
   }
 
   changeToken(e) {
@@ -40,7 +41,7 @@ class Calendario extends Component {
   button() {
     if(!this.state.collapse){
       return(
-        <CardFooter>
+        <CardFooter className="text-center">
         <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;<b>Importa nuovo calendario</b></Button>
       </CardFooter>
       )
@@ -56,7 +57,6 @@ class Calendario extends Component {
           <Col>
             <Card>
               <CardBody>
-
                 {this.state.calendario && (
                   <Iframe
                     url={"https://calendar.google.com/calendar/embed?src=" + this.state.calendario + "&ctz=Europe%2FRome"}
