@@ -173,7 +173,7 @@ class infoStudente extends React.Component {
     if (this.state.ritirato === 0) {
       if (!changeInfo) {
         return (
-          <>
+          <> 
             <Button id="modifica" color="ghost-dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4"></i>&nbsp;<p>modifica</p></Button>
             <Button color="ghost-danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
           </>
@@ -186,12 +186,7 @@ class infoStudente extends React.Component {
           </>
         )
       }
-    } else {
-      return (
-        <>
-        </>
-      )
-    }
+    } 
   }
 
   openModal = () => {
@@ -218,16 +213,16 @@ class infoStudente extends React.Component {
     return (
       <div className="d-flex justify-content-center mt-5">
         <Card className="w-75">
-          <CardHeader className="text-center">
+          {/* <CardHeader className="text-center">
             <b>{this.state.firstName}  {this.state.lastName}</b>
-          </CardHeader>
+          </CardHeader> */}
           <Row>
-            <Col>
+            <Col className="">
               <div className="m-5" xs="auto">
                 {this.changeInfo(this.state.changeInfo)}
               </div>
             </Col>
-            <Col xs="auto" className="my-auto m-5">
+            <Col xs="auto" className="my-auto mx-auto pr-5">
               {this.renderButtons(this.state.changeInfo)}
               {this.openModal()}
             </Col>

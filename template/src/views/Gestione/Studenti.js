@@ -42,7 +42,6 @@ class Studenti extends Component {
           ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
         }));
-
         this.setState({ studenti });
       })
       .catch(err => console.error(err));
@@ -98,7 +97,7 @@ class Studenti extends Component {
             <CardHeader >
               <div className="text-center font-weight-bold">STUDENTI</div>
             </CardHeader>
-            <CardBody>
+            <CardBody className="ml-4 mr-4">
               <MDBDataTable
                 responsive
                 hover
@@ -168,3 +167,5 @@ class Studenti extends Component {
   }
 
 export default Studenti;
+
+

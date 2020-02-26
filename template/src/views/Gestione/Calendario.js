@@ -31,12 +31,22 @@ class Calendario extends Component {
         console.log(res);
         console.log(res.data);
       })
+      this.button()
   }
 
   changeToken(e) {
     this.setState({ token: e.target.value });
   }
 
+  button() {
+    if(!this.state.collapse){
+      return(
+        <CardFooter className="text-center">
+        <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;<b>Importa nuovo calendario</b></Button>
+      </CardFooter>
+      )
+    }
+  }
 
   render() {
     const classe = this.state.classe;
@@ -47,7 +57,6 @@ class Calendario extends Component {
           <Col>
             <Card>
               <CardBody>
-
                 {this.state.calendario && (
                   <Iframe
                     url={"https://calendar.google.com/calendar/embed?src=" + this.state.calendario + "&ctz=Europe%2FRome"}
@@ -74,9 +83,7 @@ class Calendario extends Component {
                   </InputGroup>
                 </CardBody>
               </Collapse>
-              <CardFooter>
-                <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;Impostazioni</Button>
-              </CardFooter>
+              {this.button()}
             </Card>
           </Col>
         </Row>
