@@ -1,0 +1,235 @@
+import React from 'react';
+import { Card, CardBody, CardHeader, Button, Collapse, Row, Col } from 'reactstrap';
+import axios from 'axios'
+import DatePicker from 'react-datepicker'
+import { MDBDataTable } from 'mdbreact';
+import format from "date-fns/format";
+
+import 'react-datepicker/dist/react-datepicker.css';
+// import { MDBDataTable } from 'mdbreact';
+
+
+class Lezioni extends React.Component {
+    constructor(props){
+        super(props)
+        this.state = {
+            lezioni: [],
+            studenti: [],
+            startDate: new Date(),
+            collapse: false,
+            accordion: [false, false],
+        }
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange = (date) => {
+        this.setState({
+            startDate: date
+        },() =>this.getLessons())
+      };
+
+      componentDidMount() {
+        this.getLessons();
+      }
+
+    getLessons = () => {
+        const sceltaData =new Intl.DateTimeFormat('it', {year: 'numeric',day: '2-digit', month: '2-digit'}).format(this.state.startDate)
+        const variableABC = sceltaData.replace(/[.*+?^${}/()|[\]\\]/g, '-')
+        // console.log(variableABC)
+        axios.get('http://localhost:8080/lessons/'+variableABC)
+          .then(res => res.data)
+          .then((data) => {
+            const lezioni = [];
+            data.map((item) => lezioni.push({
+              id: item.id,
+              lesson: item.lesson,
+              endTime: item.endTime
+            }));
+            this.setState({ lezioni });
+          })
+          .catch(err => console.error(err));  
+
+          axios.get('http://localhost:8080/listStudents')
+          .then(res => res.data)
+          .then((data) => {
+            const studenti = [];
+            data.map(item => studenti.push({
+              firstName: item.firstName,
+              lastName: item.lastName,
+              email: item.email,
+            }));
+            this.setState({ studenti });
+          })
+          .catch(err => console.error(err));
+      }
+
+  lezioneMattina = () => {
+    let nomeLezione;
+    let idLezione;
+    this.state.lezioni.map((mapItem) => {
+      if (mapItem.endTime < 13) {
+        nomeLezione = mapItem.lesson;
+        idLezione = mapItem.id;
+      }
+    });
+    if (nomeLezione) {
+      return <>
+        <Card className="m-4 ">
+          <CardHeader id="headingOne">
+            <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
+              <Row>
+                <Col className="my-auto col-sm-4">
+                  <h5 className="ml-4">mattina</h5>
+                </Col>
+                <Col className="col-sm-8">
+                  {nomeLezione}
+                </Col>
+              </Row>
+            </Button>
+          </CardHeader>
+          <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
+            <CardBody>
+              {this.tabPane()}
+            </CardBody>
+          </Collapse>
+        </Card>
+      </>
+    }
+  }
+
+  lezionePomeriggio = () => {
+    let nomeLezione;
+    let idLezione;
+    this.state.lezioni.map((mapItem) => {
+      if (mapItem.endTime >= 13) {
+        nomeLezione = mapItem.lesson;
+        idLezione = mapItem.id;
+      }
+    });
+    if (nomeLezione) {
+      return <>
+        <Card className="m-4 ">
+          <CardHeader id="headingOne">
+            <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
+              <Row>
+                <Col className="my-auto col-sm-4">
+                  <h5 className="ml-4">pomeriggio</h5>
+                </Col>
+                <Col className="col-sm-8">
+                  {nomeLezione}
+                </Col>
+              </Row>
+            </Button>
+          </CardHeader>
+          <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
+            <CardBody>
+              {this.tabPane()}
+            </CardBody>
+          </Collapse>
+        </Card>
+      </>
+    }
+  }
+
+    
+    // getSignatures = () => {
+    //     axios.get('http://localhost:8080/listStudents')
+    //       .then(res => res.data)
+    //       .then((data) => {
+    //         const studenti = [];
+    //         data.map(item => studenti.push({
+    //           firstName: item.firstName,
+    //           lastName: item.lastName,
+    //           email: item.email,
+    //         }));
+    //         this.setState({ studenti });
+    //       })
+    //       .catch(err => console.error(err));
+    //   }
+
+
+
+    toggleAccordion = (tab) => {
+        const prevState = this.state.accordion;
+        const state = prevState.map((x, index) => tab === index ? !x : false);
+        this.setState({
+          accordion: state,
+        });
+      }
+
+
+
+    tabPane() {
+      const DatatablePage = () => {
+        const data = {
+          columns: [
+            {
+              label: 'Nome',
+              field: 'firstName',
+            },
+            {
+              label: 'Cognome',
+              field: 'lastName',
+            },
+            {
+              label: 'Entrata',
+              field: 'email',
+            },
+            {
+              label: 'Uscita',
+              field: 'hoursOfLessons',
+            },
+          ],
+          rows: this.state.studenti,
+        };
+          return (
+            <div>
+            <Card>
+              <CardBody>
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={{ columns: data.columns, rows: this.state.studenti }}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                />
+              </CardBody>
+            </Card>
+          </div>
+          );
+      }
+        return (
+          <>
+            {DatatablePage()}
+          </>
+        )
+    }
+
+
+    render() {
+        return (
+            <>
+                <Card>
+                    <CardHeader className="text-center">
+                        <b>LEZIONI</b>
+                    </CardHeader>
+                    <CardBody>
+                        <div className="d-flex justify-content-center">
+                            <DatePicker
+                                selected={this.state.startDate}
+                                onChange ={this.handleChange}
+                                dateFormat="dd/MM/yyyy"
+                                className="border border-dark rounded text-center"
+                            />
+                        </div>
+                        {this.lezioneMattina()}
+                        {this.lezionePomeriggio()}
+                    </CardBody>
+                </Card>
+            </>
+        );
+    }
+}
+
+export default Lezioni

@@ -122,6 +122,22 @@ app.post('/auth', function (req, res) {
    });
 });
 
+/*
+fa il totale delle ore sulla tabella lessons a cominciare dalla data odierna meno un giorno.
+
+app.get('/totalHours', function (req, res) {
+   var totalHours =[]
+   var datetimeNow = new Date();
+   tools.formattedDate(datetime)
+   connection.query("SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date < '"+tools.formattedDate(datetimeNow)+"'", function (error, results, fields) {
+      if (error) throw error;
+      totalHours.push({
+         totalHours : results[0].total_hours
+      })
+   });
+});
+*/
+
 app.get('/getCourses/:email', function (req, res) {
 
    //var ruolo = 1;
@@ -142,12 +158,50 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
-app.get('/listStudents', function (req, res) {
+app.get('/listTeachers',function(req,res){
+   var data =[]
+   connection.query("SELECT first_name,last_name,teachers.companies_id,signatures_teachers.email_responsible,sum(signatures_teachers.hours_of_lessons) FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
+      if (error) throw error;
+      data = results
+   return res.send(JSON.stringify(data));
+
+   });
+});
+
+app.get('/lessons/:date', function (req, res) {
    var data = [];
-   connection.query('SELECT first_name,last_name,email,residence,hours_of_lessons,lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student', function (error, results, fields) {
+   var date = req.params.date 
+   variableABC = date.replace(/-/g, '/')
+   connection.query("SELECT * FROM lessons WHERE date= '" + variableABC + "'", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
-         var percentage = ((results[i].hours_of_lessons - results[i].lost_hours) * 100) / results[i].hours_of_lessons
+         data.push(
+            {
+               id: results[i].id,
+               lesson: results[i].lesson,
+               endTime: results[i].end_time
+            })
+      }
+      res.send(JSON.stringify(data));
+   });
+});
+
+app.get('/listStudents', function (req, res) {
+   var data = [];
+   var totalHours =[]
+   var datetimeNow = new Date();
+   connection.query("SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date < '"+tools.formattedDate(datetimeNow)+"'", function (error, results, fields) {
+      if (error) throw error;
+      totalHours.push({
+         totalHours : results[0].total_hours
+      })
+   });
+   connection.query('SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students join signatures_students on students.email=signatures_students.email_student GROUP BY email_student', function (error, results, fields) {
+      if (error) throw error;
+      for (let i = 0; i < results.length; i++) {
+         var hoursDecimalAppoggio = (results[i].hours_of_lessons.toString()).split('.')
+         var hourDecimal= hoursDecimalAppoggio[1] > 0 ? hoursDecimalAppoggio[0] +'.'+ hoursDecimalAppoggio[1]*0.60 : hoursDecimalAppoggio[0]
+         var percentage = ((results[i].hours_of_lessons  * 100) / totalHours[0].totalHours).toFixed(0)      
          data.push(
             {
                firstName: results[i].first_name,
@@ -156,7 +210,7 @@ app.get('/listStudents', function (req, res) {
                fiscalCode: results[i].fiscal_code,
                dateOfBirth: results[i].date_of_birth,
                residence: results[i].residence,
-               hoursOfLessons: (results[i].hours_of_lessons) ? (results[i].hours_of_lessons) : '0',
+               hoursOfLessons: hourDecimal ? hourDecimal : '0',
                percentage: (percentage) ? (percentage) + " %" : '0',
                ritirato: results[i].ritirato
             })

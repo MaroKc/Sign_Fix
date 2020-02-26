@@ -56,9 +56,17 @@ class infoStudente extends React.Component {
   handleChange = (event) => {
     let name = event.target.name;
     let val = event.target.value;
-    this.setState({
-      [name]: val,
-    });
+    if(name =="fiscalCode"){
+      this.setState({
+        [name]: val.toUpperCase(),
+      });
+    }
+    else{
+      this.setState({
+        [name]: val,
+      });
+    }
+    
   }
 
   toggleWarning = () => {
@@ -69,7 +77,7 @@ class infoStudente extends React.Component {
 
   refresh = () => {
     this.props.getStudents();
-    this.props.DisplayTable()
+    this.props.displayTable()
   }
 
   onclickModifyState = () => {
@@ -147,7 +155,7 @@ class infoStudente extends React.Component {
             </tr>
             <tr>
               <td><h5>Codice fiscale:</h5></td>
-              <td><Input id="infoCodice" name='fiscalCode' onChange={this.handleChange} value={this.state.fiscalCode} valid={validationFiscalCode} invalid={!validationFiscalCode} /></td>
+              <td><Input id="infoCodice" name='fiscalCode' onChange={this.handleChange} value={this.state.fiscalCode.toUpperCase()} valid={validationFiscalCode} invalid={!validationFiscalCode} /></td>
             </tr>
           </tbody>
         </Table>
