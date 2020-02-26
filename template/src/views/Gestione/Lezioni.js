@@ -3,7 +3,6 @@ import { Card, CardBody, CardHeader, Button, Collapse, Row, Col } from 'reactstr
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import { MDBDataTable } from 'mdbreact';
-import format from "date-fns/format";
 
 import 'react-datepicker/dist/react-datepicker.css';
 // import { MDBDataTable } from 'mdbreact';
@@ -19,23 +18,23 @@ class Lezioni extends React.Component {
             collapse: false,
             accordion: [false, false],
         }
-        this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange = (date) => {
-        this.setState({
-            startDate: date
-        },() =>this.getLessons())
-      };
+    handleChange = date => {
+      this.setState({
+        startDate: date
+      }, () => this.getLessons())
+    }
 
       componentDidMount() {
         this.getLessons();
       }
+  
 
-    getLessons = () => {
+      getLessons = () => {
         const sceltaData =new Intl.DateTimeFormat('it', {year: 'numeric',day: '2-digit', month: '2-digit'}).format(this.state.startDate)
         const variableABC = sceltaData.replace(/[.*+?^${}/()|[\]\\]/g, '-')
-        // console.log(variableABC)
+        console.log(variableABC)
         axios.get('http://localhost:8080/lessons/'+variableABC)
           .then(res => res.data)
           .then((data) => {
@@ -49,18 +48,21 @@ class Lezioni extends React.Component {
           })
           .catch(err => console.error(err));  
 
-          axios.get('http://localhost:8080/listStudents')
-          .then(res => res.data)
-          .then((data) => {
-            const studenti = [];
-            data.map(item => studenti.push({
-              firstName: item.firstName,
-              lastName: item.lastName,
-              email: item.email,
-            }));
-            this.setState({ studenti });
-          })
-          .catch(err => console.error(err));
+          var data_appoggio =new Intl.DateTimeFormat('it', {year: 'numeric',day: '2-digit', month: '2-digit'}).format(this.state.startDate)
+          var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
+          axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta)
+            .then(res => res.data)
+            .then((data) => {
+              const studenti = [];
+              data.map(item => studenti.push({
+                firstName: item.firstName,
+                lastName: item.lastName,
+                startTime: item.startTime,
+                endTime: item.endTime
+              }));
+              this.setState({ studenti });
+            })
+            .catch(err => console.error(err));
       }
 
   lezioneMattina = () => {
@@ -131,24 +133,6 @@ class Lezioni extends React.Component {
     }
   }
 
-    
-    // getSignatures = () => {
-    //     axios.get('http://localhost:8080/listStudents')
-    //       .then(res => res.data)
-    //       .then((data) => {
-    //         const studenti = [];
-    //         data.map(item => studenti.push({
-    //           firstName: item.firstName,
-    //           lastName: item.lastName,
-    //           email: item.email,
-    //         }));
-    //         this.setState({ studenti });
-    //       })
-    //       .catch(err => console.error(err));
-    //   }
-
-
-
     toggleAccordion = (tab) => {
         const prevState = this.state.accordion;
         const state = prevState.map((x, index) => tab === index ? !x : false);
@@ -173,11 +157,11 @@ class Lezioni extends React.Component {
             },
             {
               label: 'Entrata',
-              field: 'email',
+              field: 'startTime',
             },
             {
               label: 'Uscita',
-              field: 'hoursOfLessons',
+              field: 'endTime',
             },
           ],
           rows: this.state.studenti,
@@ -218,7 +202,7 @@ class Lezioni extends React.Component {
                         <div className="d-flex justify-content-center">
                             <DatePicker
                                 selected={this.state.startDate}
-                                onChange ={this.handleChange}
+                                onChange={this.handleChange}
                                 dateFormat="dd/MM/yyyy"
                                 className="border border-dark rounded text-center"
                             />

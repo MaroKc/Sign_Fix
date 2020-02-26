@@ -170,19 +170,54 @@ app.get('/listTeachers',function(req,res){
 
 app.get('/lessons/:date', function (req, res) {
    var data = [];
-   var date = req.params.date 
-   variableABC = date.replace(/-/g, '/')
-   connection.query("SELECT * FROM lessons WHERE date= '" + variableABC + "'", function (error, results, fields) {
+   var date_appoggio = req.params.date 
+   var data_Scelta = date_appoggio.replace(/-/g, '/')
+   connection.query("SELECT * FROM lessons WHERE date= '" + data_Scelta + "'", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
+         var end_time_appoggio = (results[i].end_time.toString()).split('.')
+         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60 : end_time_appoggio[0]
+         
+         var start_time_appoggio = (results[i].start_time.toString()).split('.')
+         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60 : start_time_appoggio[0]
+         
          data.push(
             {
                id: results[i].id,
                lesson: results[i].lesson,
-               endTime: results[i].end_time
+               startTime:start_time_float ? start_time_float : '0',
+               endTime: end_time_float ? end_time_float : '0'
             })
       }
       res.send(JSON.stringify(data));
+   });
+});
+
+app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
+   var data = []
+   var date_appoggio = req.params.data_scelta
+   var dataScelta = date_appoggio.replace(/-/g, '/')
+   console.log(dataScelta)
+   connection.query("SELECT final_start_time,final_end_time,first_name,last_name from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataScelta+"' and ritirato=0", function (error, results, fields) {
+      if (error) throw error;
+      for (let i = 0; i < results.length; i++) {
+         
+         var end_time_appoggio = (results[i].final_end_time.toString()).split('.')
+         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60 : end_time_appoggio[0]
+         
+         var start_time_appoggio = (results[i].final_start_time.toString()).split('.')
+         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60 : start_time_appoggio[0]
+         
+         data.push(
+            {
+               firstName: results[i].first_name,
+               lastName: results[i].last_name,
+               
+               startTime: start_time_float !=1 ? start_time_float : 'assente',
+               endTime: end_time_float !=1 ? end_time_float : 'assente'
+            })
+      }
+      return res.send(JSON.stringify(data));
    });
 });
 
@@ -190,7 +225,7 @@ app.get('/listStudents', function (req, res) {
    var data = [];
    var totalHours =[]
    var datetimeNow = new Date();
-   connection.query("SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date < '"+tools.formattedDate(datetimeNow)+"'", function (error, results, fields) {
+   connection.query("SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date <= '"+tools.formattedDate(datetimeNow)+"'", function (error, results, fields) {
       if (error) throw error;
       totalHours.push({
          totalHours : results[0].total_hours
