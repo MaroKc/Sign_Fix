@@ -24,38 +24,17 @@ class Lezioni extends React.Component {
   handleChange = date => {
     this.setState({
       startDate: date
-    }, () => this.getLessons())
-  }
+    }, () => this.getLessons()
+    )}
 
   componentDidMount() {
-    this.getStudents();
     this.getLessons();
   }
 
-
-  getStudents = () => {
-    var data_appoggio =new Intl.DateTimeFormat('it', {year: 'numeric',day: '2-digit', month: '2-digit'}).format(this.state.startDate)
-    var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
-    axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta)
-      .then(res => res.data)
-      .then((data) => {
-        const studenti = [];
-        data.map(item => studenti.push({
-          firstName: item.firstName,
-          lastName: item.lastName,
-          startTime: item.startTime,
-          endTime: item.endTime
-        }));
-        this.setState({ studenti });
-      })
-      .catch(err => console.error(err));
-  }
-
   getLessons = () => {
-    const sceltaData = new Intl.DateTimeFormat('it', { year: 'numeric', day: '2-digit', month: '2-digit' }).format(this.state.startDate)
-    const variableABC = sceltaData.replace(/[.*+?^${}/()|[\]\\]/g, '-')
-    console.log(variableABC)
-    axios.get('http://localhost:8080/lessons/' + variableABC)
+    var data_appoggio = new Intl.DateTimeFormat('it', { year: 'numeric', day: '2-digit', month: '2-digit' }).format(this.state.startDate)
+    var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
+    axios.get('http://localhost:8080/lessons/' + data_scelta)
       .then(res => res.data)
       .then((data) => {
         const lezioni = [];
@@ -70,6 +49,22 @@ class Lezioni extends React.Component {
         this.setState({ lezioni });
       })
       .catch(err => console.error(err));
+
+      var data_appoggio =new Intl.DateTimeFormat('it', {year: 'numeric',day: '2-digit', month: '2-digit'}).format(this.state.startDate)
+      var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
+      axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta)
+        .then(res => res.data)
+        .then((data) => {
+          const studenti = [];
+          data.map(item => studenti.push({
+            firstName: item.firstName,
+            lastName: item.lastName,
+            startTime: item.startTime,
+            endTime: item.endTime
+          }));
+          this.setState({ studenti });
+        })
+        .catch(err => console.error(err));
   }
 
   lezioneMattina = () => {
@@ -182,11 +177,11 @@ class Lezioni extends React.Component {
           },
           {
             label: 'Entrata',
-            field: 'email',
+            field: 'startTime',
           },
           {
             label: 'Uscita',
-            field: 'hoursOfLessons',
+            field: 'endTime',
           },
         ],
         rows: this.state.studenti,

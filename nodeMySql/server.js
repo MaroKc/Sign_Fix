@@ -183,6 +183,8 @@ app.get('/lessons/:date', function (req, res) {
          
          data.push(
             {
+               email: results[i].email_signature,
+               classroom: results[i].classroom,
                id: results[i].id,
                lesson: results[i].lesson,
                startTime:start_time_float ? start_time_float : '0',
