@@ -37,6 +37,15 @@ class Calendario extends Component {
     this.setState({ token: e.target.value });
   }
 
+  button() {
+    if(!this.state.collapse){
+      return(
+        <CardFooter>
+        <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;<b>Importa nuovo calendario</b></Button>
+      </CardFooter>
+      )
+    }
+  }
 
   render() {
     const classe = this.state.classe;
@@ -69,14 +78,12 @@ class Calendario extends Component {
                     </InputGroupAddon>
                     <Input className="col-lg-5" onChange={this.changeToken} placeholder={classe.token ? classe.token : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
                     <InputGroupAddon addonType="append">
-                      <Button onClick={() => this.importCalendar()} type="button" color="secondary">{classe.token ? "Aggiorna" : "Salva"}</Button>
+                      <Button onClick={() => this.importCalendar()} type="button" color="secondary">{classe.token ? "Aggiorna" : "Importa calendario"}</Button>
                     </InputGroupAddon>
                   </InputGroup>
                 </CardBody>
               </Collapse>
-              <CardFooter>
-                <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;Impostazioni</Button>
-              </CardFooter>
+              {this.button()}
             </Card>
           </Col>
         </Row>
