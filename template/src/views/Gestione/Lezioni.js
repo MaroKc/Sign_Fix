@@ -24,16 +24,19 @@ class Lezioni extends React.Component {
   handleChange = date => {
     this.setState({
       startDate: date
-    }, () => this.getLessons()
-    )}
+    }, ()=> this.getLessons());
+    
+  }
 
   componentDidMount() {
     this.getLessons();
   }
 
+
   getLessons = () => {
     var data_appoggio = new Intl.DateTimeFormat('it', { year: 'numeric', day: '2-digit', month: '2-digit' }).format(this.state.startDate)
     var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
+
     axios.get('http://localhost:8080/lessons/' + data_scelta)
       .then(res => res.data)
       .then((data) => {
@@ -46,12 +49,10 @@ class Lezioni extends React.Component {
           startTime: item.startTime,
           endTime: item.endTime
         }));
-        this.setState({ lezioni });
+        this.setState({ lezioni :lezioni });
       })
       .catch(err => console.error(err));
 
-      var data_appoggio =new Intl.DateTimeFormat('it', {year: 'numeric',day: '2-digit', month: '2-digit'}).format(this.state.startDate)
-      var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
       axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta)
         .then(res => res.data)
         .then((data) => {
@@ -62,7 +63,7 @@ class Lezioni extends React.Component {
             startTime: item.startTime,
             endTime: item.endTime
           }));
-          this.setState({ studenti });
+          this.setState({ studenti:studenti });
         })
         .catch(err => console.error(err));
   }
@@ -73,7 +74,6 @@ class Lezioni extends React.Component {
     let fineLezione;
     let classe;
     let email;
-
     this.state.lezioni.map((mapItem) => {
       if (mapItem.endTime < 13) {
         nomeLezione = mapItem.lesson;
@@ -227,6 +227,7 @@ class Lezioni extends React.Component {
                 className="border border-dark rounded text-center"
               />
             </div>
+
             {this.lezioneMattina()}
             {this.lezionePomeriggio()}
           </CardBody>
