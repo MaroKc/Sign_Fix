@@ -8,7 +8,7 @@ class Calendario extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
+
     this.changeToken = this.changeToken.bind(this);
 
     this.state = {
@@ -19,7 +19,7 @@ class Calendario extends Component {
     };
   }
 
-  toggle() {
+  toggle = ()=> {
     this.setState({ collapse: !this.state.collapse });
   }
 
@@ -69,8 +69,8 @@ class Calendario extends Component {
                 )}
               </CardBody>
               <Collapse isOpen={this.state.collapse}>
-                <CardBody>
-                  <InputGroup>
+                <CardBody className="my-auto mx-auto ">
+                  <InputGroup className="w-auto">
                     <InputGroupAddon addonType="prepend">
                       <InputGroupText>
                         <i className="fa fa-calendar-check-o"></i>

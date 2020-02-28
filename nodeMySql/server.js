@@ -160,13 +160,50 @@ app.get('/getCourses/:email', function (req, res) {
 
 app.get('/listTeachers',function(req,res){
    var data =[]
-   connection.query("SELECT first_name,last_name,teachers.companies_id,signatures_teachers.email_responsible,sum(signatures_teachers.hours_of_lessons) FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
+   connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id,signatures_teachers.email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
       if (error) throw error;
       data = results
    return res.send(JSON.stringify(data));
 
    });
 });
+
+app.put('/updateTeacher/:email', function (req, res) {
+
+   var email = req.params.email
+   var first_name = req.body.first_name
+   var last_name = req.body.last_name
+
+   var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
+   connection.query(query, [first_name, last_name,email], function (error, results, fields) {
+      if (error) throw error;
+      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+   });
+});
+
+app.put('/retireTeacher/:email', function (req, res) {
+   var email = req.params.email;
+
+   var ritirato = req.body.ritirato
+
+   var query = "UPDATE `teachers` SET `ritirato` = ? WHERE `email_responsible` = ?";
+   connection.query(query, [ritirato, email], function (error, results, fields) {
+      if (error) throw error;
+      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+   });
+});
+
+app.get('/teachersDetails',function (req,res){
+   var data= []
+   var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
+   connection.query(query, function (err, result, fields) {
+      if (err) throw err;
+      data=result
+      res.send(JSON.stringify(data));
+   });
+   
+});
+
 
 app.get('/lessons/:date', function (req, res) {
    var data = [];
@@ -187,8 +224,8 @@ app.get('/lessons/:date', function (req, res) {
                classroom: results[i].classroom,
                id: results[i].id,
                lesson: results[i].lesson,
-               startTime:start_time_float ? start_time_float : '0',
-               endTime: end_time_float ? end_time_float : '0'
+               startTime:start_time_float ? start_time_float : 'errore',
+               endTime: end_time_float ? end_time_float : 'errore'
             })
       }
       res.send(JSON.stringify(data));
@@ -199,8 +236,7 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
    var data = []
    var date_appoggio = req.params.data_scelta
    var dataScelta = date_appoggio.replace(/-/g, '/')
-   console.log(dataScelta)
-   connection.query("SELECT final_start_time,final_end_time,first_name,last_name from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataScelta+"' and ritirato=0", function (error, results, fields) {
+   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataScelta+"' and ritirato=0", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          
@@ -212,9 +248,10 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
          
          data.push(
             {
+               mattinaPomeriggio: results[i].mattinaPomeriggio,
                firstName: results[i].first_name,
                lastName: results[i].last_name,
-               
+               idLesson :  results[i].id_lesson,
                startTime: start_time_float !=1 ? start_time_float : 'assente',
                endTime: end_time_float !=1 ? end_time_float : 'assente'
             })
@@ -271,6 +308,8 @@ app.put('/updateStudent/:email', function (req, res) {
       res.send({ error: false, data: results, message: 'user has been updated successfully.' });
    });
 });
+
+
 
 app.put('/retireStudent/:email', function (req, res) {
    var email = req.params.email;
