@@ -42,7 +42,6 @@ class Studenti extends Component {
           ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
         }));
-
         this.setState({ studenti });
       })
       .catch(err => console.error(err));
@@ -51,6 +50,12 @@ class Studenti extends Component {
   displayCard = (e) => {
     this.setState({
       displayCard: e
+    });
+  }
+
+  displayTable = () => {
+    this.setState({
+      displayCard: null
     });
   }
 
@@ -86,14 +91,13 @@ class Studenti extends Component {
       const ritirato = this.state.studenti.filter(el => el.ritirato === 1)
 
       if (ritirato != 0) {
-        console.log(ritirato)
         return (
           <div>
           <Card>
             <CardHeader >
               <div className="text-center font-weight-bold">STUDENTI</div>
             </CardHeader>
-            <CardBody>
+            <CardBody className="ml-4 mr-4">
               <MDBDataTable
                 responsive
                 hover
@@ -146,7 +150,7 @@ class Studenti extends Component {
       }
     }
     if(this.state.displayCard){
-      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)}/>
+      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable}/>
     }else{
       return (
         <>
@@ -163,3 +167,5 @@ class Studenti extends Component {
   }
 
 export default Studenti;
+
+

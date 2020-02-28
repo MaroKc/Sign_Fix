@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Col, Row, CardHeader, Modal, ModalBody, ModalFooter, ModalHeader, Button, Input, Table } from 'reactstrap';
+import { Card, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader, Button, Input, Table } from 'reactstrap';
 import axios from 'axios'
 
 
@@ -16,8 +16,8 @@ class infoStudente extends React.Component {
       ritirato: this.props.studente.ritirato,
       changeInfo: false,
       warning: false,
+      displayCard: this.props.displayCard,
     }
-    console.log(this.state.tabPane)
   }
 
 
@@ -50,16 +50,25 @@ class infoStudente extends React.Component {
       .catch(err => {
         return console.log(err);
       });
-    this.refresh();
+      window.location.reload();
   }
 
   handleChange = (event) => {
     let name = event.target.name;
     let val = event.target.value;
-    this.setState({
-      [name]: val,
-    });
+    if(name =="fiscalCode"){
+      this.setState({
+        [name]: val.toUpperCase(),
+      });
+    }
+    else{
+      this.setState({
+        [name]: val,
+      });
+    }
+    
   }
+
   toggleWarning = () => {
     this.setState({
       warning: !this.state.warning,
@@ -67,7 +76,8 @@ class infoStudente extends React.Component {
   }
 
   refresh = () => {
-    window.location.reload();
+    this.props.getStudents();
+    this.props.displayTable()
   }
 
   onclickModifyState = () => {
@@ -118,8 +128,8 @@ class infoStudente extends React.Component {
       const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
       const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
       const validationResidence = residence.length > 2 
-      const validationDateOfBirth = dateOfBirth.length ==10 && regexData.test(dateOfBirth)
-      const validationFiscalCode = fiscalCode.length == 16 && regexFiscalCode.test(fiscalCode)
+      const validationDateOfBirth = dateOfBirth.length === 10 && regexData.test(dateOfBirth)
+      const validationFiscalCode = fiscalCode.length === 16 && regexFiscalCode.test(fiscalCode)
       return (
         <Table borderless responsive>
           <tbody>
@@ -145,7 +155,7 @@ class infoStudente extends React.Component {
             </tr>
             <tr>
               <td><h5>Codice fiscale:</h5></td>
-              <td><Input id="infoCodice" name='fiscalCode' onChange={this.handleChange} value={this.state.fiscalCode} valid={validationFiscalCode} invalid={!validationFiscalCode} /></td>
+              <td><Input id="infoCodice" name='fiscalCode' onChange={this.handleChange} value={this.state.fiscalCode.toUpperCase()} valid={validationFiscalCode} invalid={!validationFiscalCode} /></td>
             </tr>
           </tbody>
         </Table>
@@ -158,12 +168,12 @@ class infoStudente extends React.Component {
     const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
     const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
     const { firstName, lastName, residence, fiscalCode, dateOfBirth } = this.state
-    const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName) && residence.length > 2 && dateOfBirth.length == 10 && regexData.test(dateOfBirth) && fiscalCode.length == 16 && regexFiscalCode.test(fiscalCode)
+    const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName) && residence.length > 2 && dateOfBirth.length === 10 && regexData.test(dateOfBirth) && fiscalCode.length === 16 && regexFiscalCode.test(fiscalCode)
     
     if (this.state.ritirato === 0) {
       if (!changeInfo) {
         return (
-          <>
+          <> 
             <Button id="modifica" color="ghost-dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4"></i>&nbsp;<p>modifica</p></Button>
             <Button color="ghost-danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
           </>
@@ -176,12 +186,7 @@ class infoStudente extends React.Component {
           </>
         )
       }
-    } else {
-      return (
-        <>
-        </>
-      )
-    }
+    } 
   }
 
   openModal = () => {
@@ -208,16 +213,16 @@ class infoStudente extends React.Component {
     return (
       <div className="d-flex justify-content-center mt-5">
         <Card className="w-75">
-          <CardHeader className="text-center">
+          {/* <CardHeader className="text-center">
             <b>{this.state.firstName}  {this.state.lastName}</b>
-          </CardHeader>
+          </CardHeader> */}
           <Row>
-            <Col>
+            <Col className="">
               <div className="m-5" xs="auto">
                 {this.changeInfo(this.state.changeInfo)}
               </div>
             </Col>
-            <Col xs="auto" className="my-auto m-5">
+            <Col xs="auto" className="my-auto mx-auto pr-5">
               {this.renderButtons(this.state.changeInfo)}
               {this.openModal()}
             </Col>
