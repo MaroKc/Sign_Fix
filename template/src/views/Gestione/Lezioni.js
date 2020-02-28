@@ -37,11 +37,11 @@ class Lezioni extends React.Component {
       axios.get('http://localhost:8080/lessons/' + data_scelta)
       .then(res => res.data)
       .then((data) => {
-        var lezioniMattina = [];
-        var lezioniPomeriggio = [];
+        const lezioniMattina = [];
+        const lezioniPomeriggio = [];
 
         data.map((item) => {
-        if(item.startTime < 13){
+        if(item.startTime < 12){
         lezioniMattina.push({
           id: item.id,
           lesson: item.lesson,
@@ -72,11 +72,11 @@ class Lezioni extends React.Component {
       axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta)
         .then(res => res.data)
         .then((data) => {
-          var studentiMattina = [];
-          var studentiPomeriggio = [];
+          const studentiMattina = [];
+          const studentiPomeriggio = [];
 
           data.map(item => {
-            if(item.mattinaPomeriggio===0){
+            if(item.mattinaPomeriggio === 0){
               studentiMattina.push({
                 idLesson: item.idLesson,
                 firstName: item.firstName,
@@ -85,7 +85,7 @@ class Lezioni extends React.Component {
                 endTime: item.endTime
               })
             }
-            else if(item.mattinaPomeriggio===1){
+            else if(item.mattinaPomeriggio === 1){
               studentiPomeriggio.push({
                 idLesson: item.idLesson,
                 firstName: item.firstName,
@@ -111,7 +111,7 @@ class Lezioni extends React.Component {
     let fineLezione;
     let classe;
     let email;
-
+    
     this.state.lezioniMattina.map((mapItem) => {
         nomeLezione = mapItem.lesson;
         inizioLezione = mapItem.startTime;
@@ -119,6 +119,19 @@ class Lezioni extends React.Component {
         classe = mapItem.classroom;
         email = mapItem.email.split('@')[0];
     });
+
+    let assenti = []
+
+    this.state.studentiMattina.map((item) => {
+      if(item.startTime === 'assente'){
+        assenti.push({
+          firstName: item.firstName,
+          lastName: item.lastName
+        })
+      }})
+   
+
+
     if (nomeLezione) {
       return <>
         <Card className="m-4 ">
@@ -126,13 +139,13 @@ class Lezioni extends React.Component {
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                  <h5 className="ml-4">mattina {inizioLezione} - {fineLezione}</h5>
+                  <h5 className="ml-4">mattina   {inizioLezione} - {fineLezione}</h5>
                 </Col>
                 <Col className="col-sm-8">
-                  Luogo: <b>{classe}</b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b>
+                   <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
                 </Col>
               </Row>
-              <div className="text-left">Assenti: <span className="text-danger">Paolo Calbatebii Paolo Calbatebii Paolo Calbatebii Paolo Calbatebii Paolo Calbatebii</span> </div>
+             {!assenti.length ? "" :  <div className="ml-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
@@ -160,6 +173,17 @@ class Lezioni extends React.Component {
         email = mapItem.email.split('@')[0];
     });
 
+    let assenti = []
+
+    this.state.studentiPomeriggio.map((item) => {
+      if(item.startTime === 'assente'){
+        assenti.push({
+          firstName: item.firstName,
+          lastName: item.lastName
+        })
+      }})
+
+
     if (nomeLezione) {
       return <>
         <Card className="m-4 ">
@@ -173,7 +197,7 @@ class Lezioni extends React.Component {
                    <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
                 </Col>
               </Row>
-              <div className="ml-4">Assenti: <span className="text-danger">Paolo Calbatebii Paolo Calbatebii Paolo Calbatebii Paolo Calbatebii Paolo CalbatebiiPaolo Calbatebii Paolo Calbatebii Paolo Calbatebii Paolo Calbatebii Paolo Calbatebii</span> </div>
+              {!assenti.length ? "" :  <div className="ml-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[1]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">

@@ -160,9 +160,21 @@ app.get('/getCourses/:email', function (req, res) {
 
 app.get('/listTeachers',function(req,res){
    var data =[]
-   connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id,signatures_teachers.email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
+   connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id as companies_id,signatures_teachers.email_responsible as email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
       if (error) throw error;
-      data = results
+      for (let i = 0; i < results.length; i++) {
+         var hours_appoggio = (results[i].hours_of_lessons.toString()).split('.')
+         var hours_of_lessonss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ hours_appoggio[1]*0.60 +'0' : hours_appoggio[0]
+         data.push(
+            {
+               first_name: results[i].first_name,
+               ritirato: results[i].ritirato,
+               last_name: results[i].last_name,
+               email_responsible: results[i].email_responsible,
+               companies_id: results[i].companies_id,
+               hours_of_lessons : hours_of_lessonss ? hours_of_lessonss : '0',
+            })
+      }
    return res.send(JSON.stringify(data));
 
    });
@@ -196,9 +208,19 @@ app.put('/retireTeacher/:email', function (req, res) {
 app.get('/teachersDetails',function (req,res){
    var data= []
    var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
-   connection.query(query, function (err, result, fields) {
+   connection.query(query, function (err, results, fields) {
       if (err) throw err;
-      data=result
+      for (let i = 0; i < results.length; i++) {
+         var hours_appoggio = (results[i].total_hours.toString()).split('.')
+         var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ hours_appoggio[1]*0.60+'0' : hours_appoggio[0]
+         data.push(
+            {
+               company_name: results[i].company_name,
+               company_id: results[i].company_id,
+               total_hours: total_hourss ? total_hourss : '0',
+               lesson: results[i].lesson,
+            })
+      }
       res.send(JSON.stringify(data));
    });
    
@@ -213,10 +235,10 @@ app.get('/lessons/:date', function (req, res) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          var end_time_appoggio = (results[i].end_time.toString()).split('.')
-         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60 : end_time_appoggio[0]
+         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60+'0' : end_time_appoggio[0]
          
          var start_time_appoggio = (results[i].start_time.toString()).split('.')
-         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60 : start_time_appoggio[0]
+         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60+'0' : start_time_appoggio[0]
          
          data.push(
             {
@@ -241,10 +263,10 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
       for (let i = 0; i < results.length; i++) {
          
          var end_time_appoggio = (results[i].final_end_time.toString()).split('.')
-         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60 : end_time_appoggio[0]
+         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60+'0' : end_time_appoggio[0]
          
          var start_time_appoggio = (results[i].final_start_time.toString()).split('.')
-         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60 : start_time_appoggio[0]
+         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60+'0' : start_time_appoggio[0]
          
          data.push(
             {
@@ -274,7 +296,7 @@ app.get('/listStudents', function (req, res) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          var hoursDecimalAppoggio = (results[i].hours_of_lessons.toString()).split('.')
-         var hourDecimal= hoursDecimalAppoggio[1] > 0 ? hoursDecimalAppoggio[0] +'.'+ hoursDecimalAppoggio[1]*0.60 : hoursDecimalAppoggio[0]
+         var hourDecimal= hoursDecimalAppoggio[1] > 0 ? hoursDecimalAppoggio[0] +'.'+ hoursDecimalAppoggio[1]*0.60+'0' : hoursDecimalAppoggio[0]
          var percentage = ((results[i].hours_of_lessons  * 100) / totalHours[0].totalHours).toFixed(0)      
          data.push(
             {

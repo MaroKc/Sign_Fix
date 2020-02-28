@@ -86,15 +86,19 @@ changeInfo = (changeInfo) => {
                         <td><h5 name="lastName">{this.props.docente.lastName}</h5></td>
                     </tr>
                     <tr>
-                        <td><h5>Nome Azienda:</h5></td>
+                        <td><h5>Nome azienda:</h5></td>
                         <td><h5>{this.props.details.companyName}</h5> </td>
                     </tr>
                     <tr>
-                        <td><h5>Lezione</h5></td>
+                        <td><h5>Lezione:</h5></td>
                         <td><h5>{this.props.details.lessonName}</h5></td>
                     </tr>
                     <tr>
-                        <td><h5>Ore Lezione</h5></td>
+                        <td><h5>Ore fatte:</h5></td>
+                        <td><h5>{this.props.docente.hoursOfLessons}</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore di lezione:</h5></td>
                         <td><h5>{this.props.details.totalHours}</h5></td>
                     </tr>
                 </tbody>
@@ -118,7 +122,7 @@ changeInfo = (changeInfo) => {
                         <td><Input name='lastName' onChange={this.handleChange} value={this.props.docente.lastName} valid={validationLastName} invalid={!validationLastName} /></td>
                     </tr>
                     <tr>
-                        <td><h5>Nome Azienda: </h5></td>
+                        <td><h5>Nome azienda:</h5></td>
                         <td><h5>{this.props.details.companyName}</h5></td>
                     </tr>
                     <tr>
@@ -126,7 +130,11 @@ changeInfo = (changeInfo) => {
                         <td><h5>{this.props.details.lessonName}</h5></td>
                     </tr>
                     <tr>
-                        <td><h5>Ore Lezione:</h5></td>
+                        <td><h5>Ore fatte</h5></td>
+                        <td><h5>{this.props.docente.hoursOfLessons}</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore di lezione:</h5></td>
                         <td><h5>{this.props.details.totalHours}</h5></td>
                     </tr>
                 </tbody>

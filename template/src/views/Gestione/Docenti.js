@@ -12,7 +12,8 @@ class Docenti extends Component {
     this.state = {
       docenti: [],
       dettagliDocente: [],
-      displayCard: null
+      displayCard: null,
+      displayDetails: null
     }
   }
 
@@ -32,7 +33,8 @@ class Docenti extends Component {
           emailDocente: item.email_responsible,
           companiesId: item.companies_id,
           ritirato: item.ritirato,
-          clickEvent: () => this.displayCard(item.companies_id)
+          hoursOfLessons: item.hours_of_lessons,
+          clickEvent: () => this.displayCard(item.email_responsible,item.companies_id)
         }));
         this.setState({ docenti });
       })
@@ -59,15 +61,17 @@ teacherDetails = () => {
   }
 
 
-  displayCard = (e) => {
+  displayCard = (e,f) => {
     this.setState({
-      displayCard: e
+      displayCard: e,
+      displayDetails: f
     });
   }
 
   displayTable = () => {
     this.setState({
-      displayCard: null
+      displayCard: null,
+      displayDetails: null
     })
   }
 
@@ -154,7 +158,7 @@ teacherDetails = () => {
       }
     }
     if(this.state.displayCard){
-      return <InfoDocente docente={this.state.docenti.find((docente) => docente.companiesId === this.state.displayCard)} details={this.state.dettagliDocente.find((docente) => docente.companyId === this.state.displayCard)} getTeachers={this.getTeachers} displayTable={this.displayTable}/>
+      return <InfoDocente docente={this.state.docenti.find((docente) => docente.emailDocente === this.state.displayCard)} details={this.state.dettagliDocente.find((docente) => docente.companyId === this.state.displayDetails)} getTeachers={this.getTeachers} displayTable={this.displayTable}/>
     }else{
       return (
         <>

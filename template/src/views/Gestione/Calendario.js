@@ -14,7 +14,7 @@ class Calendario extends Component {
     this.state = {
       collapse: props.classe.token ? false : true,
       classe: props.classe,
-      token: null,
+      token: '',
       calendario: false
     };
   }
@@ -49,8 +49,8 @@ class Calendario extends Component {
   }
 
   render() {
-    const classe = this.state.classe;
-
+   // const classe = this.state.classe;
+    const validationCalendar = this.state.token.length === 52
     return (
       <div className="animated fadeIn">
         <Row>
@@ -78,7 +78,7 @@ class Calendario extends Component {
                     </InputGroupAddon>
                     <Input className="col-lg-5" onChange={this.changeToken} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
                     <InputGroupAddon addonType="append">
-                      <Button onClick={() => this.importCalendar()} type="button" color="secondary">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
+                      <Button onClick={() => this.importCalendar()} disabled={!validationCalendar} type="button" color="secondary">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
                     </InputGroupAddon>
                   </InputGroup>
                 </CardBody>
