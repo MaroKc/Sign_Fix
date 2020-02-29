@@ -33,7 +33,7 @@ class Docenti extends Component {
           emailDocente: item.email_responsible,
           companiesId: item.companies_id,
           ritirato: item.ritirato,
-          hoursOfLessons: item.hours_of_lessons,
+          hoursOfLessons: this.formatHours(item.hours_of_lessons),
           clickEvent: () => this.displayCard(item.email_responsible,item.companies_id)
         }));
         this.setState({ docenti });
@@ -50,7 +50,7 @@ teacherDetails = () => {
           dettagliDocente.push({
               companyName: item.company_name,
               lessonName: item.lesson,
-              totalHours: item.total_hours,
+              totalHours: this.formatHours(item.total_hours),
               companyId: item.company_id
           })
       );
@@ -59,6 +59,21 @@ teacherDetails = () => {
       })
       .catch(err => console.error(err));
   }
+
+
+  formatHours (hours){
+    var startLessonAppoggio= (hours.toString()).split('.')
+    var startLesson= ''
+
+    if(startLessonAppoggio[1]){
+      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+      startLesson= startLessonAppoggio[0]+'. '+startLessonSecondaParte
+      return startLesson
+    }
+    else{
+      return startLessonAppoggio[0]
+    }
+}
 
 
   displayCard = (e,f) => {

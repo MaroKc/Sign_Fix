@@ -124,7 +124,6 @@ app.post('/auth', function (req, res) {
 
 /*
 fa il totale delle ore sulla tabella lessons a cominciare dalla data odierna meno un giorno.
-
 app.get('/totalHours', function (req, res) {
    var totalHours =[]
    var datetimeNow = new Date();
@@ -164,7 +163,7 @@ app.get('/listTeachers',function(req,res){
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          var hours_appoggio = (results[i].hours_of_lessons.toString()).split('.')
-         var hours_of_lessonss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ hours_appoggio[1]*0.60 +'0' : hours_appoggio[0]
+         var hours_of_lessonss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
          data.push(
             {
                first_name: results[i].first_name,
@@ -212,7 +211,7 @@ app.get('/teachersDetails',function (req,res){
       if (err) throw err;
       for (let i = 0; i < results.length; i++) {
          var hours_appoggio = (results[i].total_hours.toString()).split('.')
-         var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ hours_appoggio[1]*0.60+'0' : hours_appoggio[0]
+         var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
          data.push(
             {
                company_name: results[i].company_name,
@@ -235,10 +234,10 @@ app.get('/lessons/:date', function (req, res) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          var end_time_appoggio = (results[i].end_time.toString()).split('.')
-         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60+'0' : end_time_appoggio[0]
+         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ (end_time_appoggio[1]*0.60).toFixed(0) : end_time_appoggio[0]
          
          var start_time_appoggio = (results[i].start_time.toString()).split('.')
-         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60+'0' : start_time_appoggio[0]
+         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ (start_time_appoggio[1]*0.60).toFixed(0) : start_time_appoggio[0]
          
          data.push(
             {
@@ -263,10 +262,10 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
       for (let i = 0; i < results.length; i++) {
          
          var end_time_appoggio = (results[i].final_end_time.toString()).split('.')
-         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ end_time_appoggio[1]*0.60+'0' : end_time_appoggio[0]
+         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ (end_time_appoggio[1]*0.60).toFixed(0) : end_time_appoggio[0]
          
          var start_time_appoggio = (results[i].final_start_time.toString()).split('.')
-         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ start_time_appoggio[1]*0.60+'0' : start_time_appoggio[0]
+         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ (start_time_appoggio[1]*0.60).toFixed(0) : start_time_appoggio[0]
          
          data.push(
             {
@@ -296,7 +295,7 @@ app.get('/listStudents', function (req, res) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          var hoursDecimalAppoggio = (results[i].hours_of_lessons.toString()).split('.')
-         var hourDecimal= hoursDecimalAppoggio[1] > 0 ? hoursDecimalAppoggio[0] +'.'+ hoursDecimalAppoggio[1]*0.60+'0' : hoursDecimalAppoggio[0]
+         var hourDecimal= hoursDecimalAppoggio[1] > 0 ? hoursDecimalAppoggio[0] +'.'+ (hoursDecimalAppoggio[1]*0.60).toFixed(0) : hoursDecimalAppoggio[0]
          var percentage = ((results[i].hours_of_lessons  * 100) / totalHours[0].totalHours).toFixed(0)      
          data.push(
             {
