@@ -67,7 +67,7 @@ teacherDetails = () => {
 
     if(startLessonAppoggio[1]){
       var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-      startLesson= startLessonAppoggio[0]+'. '+startLessonSecondaParte
+      startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
       return startLesson
     }
     else{

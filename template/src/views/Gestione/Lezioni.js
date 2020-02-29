@@ -114,6 +114,9 @@ class Lezioni extends React.Component {
         startLesson= startLessonPrimaParte+': '+startLessonSecondaParte
         return startLesson
       }
+      else if(startLessonAppoggio[0]=='assente' ){
+        return startLessonAppoggio[0]
+      }
       else{
         startLesson= startLessonPrimaParte+': 00'
         return startLesson
