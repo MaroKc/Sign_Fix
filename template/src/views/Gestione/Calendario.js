@@ -67,6 +67,7 @@ class Calendario extends Component {
                     scrolling="no"
                   />
                 )}
+                
               </CardBody>
               <Collapse isOpen={this.state.collapse}>
                 <CardBody className="my-auto mx-auto ">
