@@ -2,7 +2,7 @@
 
 Per far partire il sito: 
 
-##Cartella template:
+## Cartella template:
 
 - npm install
 
@@ -10,7 +10,8 @@ Per far partire il sito:
 
 -->npm start (avvio)
 
-##Cartella nodeMysql:
+## Cartella nodeMysql:
+
 -Aggiungere i 2 file di credenziali (credentials.json, outh2.key.json)
 
 -npm i google-auth-library --save
