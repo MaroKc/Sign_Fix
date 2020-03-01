@@ -1,10 +1,8 @@
 var express = require('express');
-var path = require('path');
 var app = express();
 var bodyParser = require('body-parser');
-var Sync = require('sync');
 const { OAuth2Client } = require('google-auth-library');
-
+const csv = require('csv-parser');
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
@@ -157,6 +155,17 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
+app.get('/importCsv',function(req,res){
+   fs.createReadStream('data.csv')
+      .pipe(csv())
+      .on('data', (row) => {
+         console.log(row);
+   })
+   .on('end', () => {
+      console.log('CSV file successfully processed');
+   });
+});
+
 app.get('/listTeachers',function(req,res){
    var data =[]
    connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id as companies_id,signatures_teachers.email_responsible as email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
@@ -226,11 +235,14 @@ app.get('/teachersDetails',function (req,res){
 });
 
 
-app.get('/lessons/:date', function (req, res) {
+app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
    var date_appoggio = req.params.date 
-   var data_Scelta = date_appoggio.replace(/-/g, '/')
-   connection.query("SELECT * FROM lessons WHERE date= '" + data_Scelta + "'", function (error, results, fields) {
+   var id_course = req.params.id_course 
+
+   var data_Scelta = date_appoggio.split('-');
+   var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
+   connection.query("SELECT * FROM lessons WHERE date= '" + (dataFinale) + "' and id_course="+ id_course+"", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          var end_time_appoggio = (results[i].end_time.toString()).split('.')
@@ -256,8 +268,10 @@ app.get('/lessons/:date', function (req, res) {
 app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
    var data = []
    var date_appoggio = req.params.data_scelta
-   var dataScelta = date_appoggio.replace(/-/g, '/')
-   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataScelta+"' and ritirato=0", function (error, results, fields) {
+   var data_Scelta = date_appoggio.split('-');
+   var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
+
+   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          
@@ -281,19 +295,22 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
    });
 });
 
-app.get('/listStudents', function (req, res) {
+app.get('/listStudents/:id_course', function (req, res) {
    var data = [];
    var totalHours =[]
    var datetimeNow = new Date();
-   connection.query("SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date <= '"+tools.formattedDate(datetimeNow)+"'", function (error, results, fields) {
+   var id_course = req.params.id_course
+   var query= "SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date <= '"+tools.formattedDate(datetimeNow)+"' and id_course= "+id_course+"";
+   connection.query(query, function (error, results, fields) {
       if (error) throw error;
       totalHours.push({
          totalHours : results[0].total_hours
       })
    });
-   connection.query('SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students join signatures_students on students.email=signatures_students.email_student GROUP BY email_student', function (error, results, fields) {
+   connection.query("SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students join signatures_students on students.email=signatures_students.email_student where id_course= "+id_course+" GROUP BY email_student", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
+
          var hoursDecimalAppoggio = (results[i].hours_of_lessons.toString()).split('.')
          var hourDecimal= hoursDecimalAppoggio[1] > 0 ? hoursDecimalAppoggio[0] +'.'+ (hoursDecimalAppoggio[1]*0.60).toFixed(0) : hoursDecimalAppoggio[0]
          var percentage = ((results[i].hours_of_lessons  * 100) / totalHours[0].totalHours).toFixed(0)      

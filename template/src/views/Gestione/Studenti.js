@@ -26,7 +26,7 @@ class Studenti extends Component {
   }
 
   getStudents = () => {
-    axios.get('http://localhost:8080/listStudents')
+    axios.get('http://localhost:8080/listStudents/'+this.props.classe["id"])
       .then(res => res.data)
       .then((data, index) => {
         const studenti = [];

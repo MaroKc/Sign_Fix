@@ -31,10 +31,9 @@ class Lezioni extends React.Component {
   }
 
   getLessons = () => {
-      var data_appoggio = new Intl.DateTimeFormat('it', { year: 'numeric', day: '2-digit', month: '2-digit' }).format(this.state.startDate)
+      var data_appoggio = new Intl.DateTimeFormat('usa', { year: 'numeric', month: '2-digit', day: '2-digit'}).format(this.state.startDate)
       var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
-      
-      axios.get('http://localhost:8080/lessons/' + data_scelta)
+      axios.get('http://localhost:8080/lessons/' + data_scelta+'/'+this.props.classe["id"])
       .then(res => res.data)
       .then((data) => {
         const lezioniMattina = [];
