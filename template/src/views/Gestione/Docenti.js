@@ -1,8 +1,19 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Button } from 'reactstrap';
 import axios from 'axios'
-import { MDBDataTable, MDBBtn } from 'mdbreact';
+import { MDBDataTable } from 'mdbreact';
 import InfoDocente from './InfoDocente';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Table,
+  Row,
+  Col,
+  FormGroup,
+  Input,
+  Label,
+} from 'reactstrap';
 
 //https://mdbootstrap.com/docs/react/tables/search/
 
@@ -13,7 +24,13 @@ class Docenti extends Component {
       docenti: [],
       dettagliDocente: [],
       displayCard: null,
-      displayDetails: null
+      displayDetails: null,
+      displayForm: null,
+      firstName: '',
+      lastName: '',
+      email: '',
+      companyName: '',
+      idCorso: '',
     }
   }
 
@@ -40,6 +57,10 @@ class Docenti extends Component {
       })
       .catch(err => console.error(err));
   }
+
+  // postTeacher = () => {
+  //   axios.post
+  // }
 
 teacherDetails = () => {
   axios.get('http://localhost:8080/teachersDetails')
@@ -83,10 +104,17 @@ teacherDetails = () => {
     });
   }
 
+  displayForm =() => {
+    this.setState({
+      displayForm: !this.state.displayForm
+    })
+  }
+
   displayTable = () => {
     this.setState({
       displayCard: null,
-      displayDetails: null
+      displayDetails: null,
+      displayForm: null
     })
   }
 
@@ -154,8 +182,9 @@ teacherDetails = () => {
         return (
           <div>
             <Card>
-              <CardHeader >
-                <div className="text-center font-weight-bold">DOCENTI</div>
+              <CardHeader className="d-flex justify-content-between">
+                <span value="docenti"></span><span className="text-center font-weight-bold">DOCENTI</span>
+                <span> <Button color="ghost-success"  className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i>  </Button> </span>
               </CardHeader>
               <CardBody>
                 <MDBDataTable
@@ -166,6 +195,7 @@ teacherDetails = () => {
                   paging={false}
                   noBottomColumns={true}
                 />
+               
               </CardBody>
             </Card>
           </div>
@@ -183,8 +213,98 @@ teacherDetails = () => {
     }
   }
 
-  render() {
-    return this.tabPane()
+refresh = () => {
+  this.getTeachers();
+  this.displayTable()
+}
+
+handleChange = (event) => {
+  let name = event.target.name;
+  let val = event.target.value;
+    this.setState({
+      [name]: val,
+    });
+  }
+
+createTeacher = (event) => {
+
+  axios.post('http://localhost:8080/createTeacher/', { 
+    firstName: this.state.firstName,
+    lastName: this.state.lastName,
+    email: this.state.email,
+    companyName: this.state.companyName, 
+    idCorso: this.props.classe["id"]
+   })
+    .then(res=>{
+      console.log(res);
+
+      this.refresh()
+      // window.location.reload()
+    })
+}
+
+
+  formDocente(){
+    // const regexLettere = /^[a-zA-Z]*$/;
+    // const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
+    // const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
+    // const {firstName, lastName, residence, fiscalCode, dateOfBirth} = this.state
+    // const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
+    // const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
+    // const validationResidence = residence.length > 2 
+    // const validationDateOfBirth = dateOfBirth.length === 10 && regexData.test(dateOfBirth)
+    // const validationFiscalCode = fiscalCode.length === 16 && regexFiscalCode.test(fiscalCode)
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <Card className="w-75">
+          <CardHeader className="text-center">
+            <b>Aggiungi docente</b>
+          </CardHeader>
+          <CardBody>
+            <Row>
+              <Col className="">
+                <div className="ml-4 mr-4" xs="auto">
+                  <Table borderless responsive>
+                    <tbody>
+                      <tr>
+                        <td><h5>Nome:</h5></td>
+                        <td><Input id="infoNome" name='firstName' onChange={this.handleChange} value={this.state.firstName} /></td>
+                      </tr>
+                      <tr>
+                        <td><h5>Cognome:</h5></td>
+                        <td><Input id="infoCognome" name='lastName' onChange={this.handleChange} value={this.state.lastName}/></td>
+                      </tr>
+                      <tr>
+                        <td><h5>Email:</h5></td>
+                        <td><Input id="infoEmail" name='email' onChange={this.handleChange} value={this.state.email}/></td>
+                      </tr>
+                      <tr>
+                        <td><h5>Compagnia:</h5></td>
+                        <td><Input id="infoCompanyName" name='companyName' onChange={this.handleChange} value={this.state.companyName}/></td>
+                      </tr>
+                    </tbody>
+                  </Table>
+                </div>
+              </Col>
+              <Col xs="auto" className="my-auto mx-auto pr-5">
+                <Button outline color="dark"> <i className="cui-check icons font-2xl d-block mt-2" onClick={this.createTeacher}></i>conferma <br /> modifica</Button>
+              </Col>
+            </Row>
+          </CardBody>
+          <Button onClick={this.refresh} outline color="dark"> Indietro </Button>
+        </Card>
+      </div>
+    )
+  }
+
+  render() 
+  {
+    if(this.state.displayForm){
+    return this.formDocente()
+    }else{
+      return this.tabPane()
+    }
+    
   }
 }
 

@@ -195,7 +195,7 @@ render() {
             </CardHeader> */}
                 <Row>
                     <Col className="">
-                        <div className="m-5" xs="auto">
+                        <div className="m-4" xs="auto">
                             {this.changeInfo(this.state.changeInfo)}
                         </div>
                     </Col>

@@ -8,14 +8,14 @@ Per far partire il sito:
 
 - npm install react-datepicker
 
--->npm start (avvio)
+--> npm start (avvio)
 
 ## Cartella nodeMysql:
 
--Aggiungere i 2 file di credenziali (credentials.json, outh2.key.json)
+- Aggiungere i 2 file di credenziali (credentials.json, outh2.key.json)
 
--npm i google-auth-library --save
+- npm i google-auth-library --save
 
--npm install csv-parser
+- npm install csv-parser
 
--->node server.js (avvio)
+--> node server.js (avvio)
