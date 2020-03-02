@@ -387,21 +387,22 @@ app.put('/retireStudent/:email', function (req, res) {
 
 
 
-app.get('/createTeacher', function (req, res) {
+app.post('/createTeacher', function (req, res) {
 
-   /*
+
    var firstName = req.body.firstName
    var lastName = req.body.lastName
    var email = req.body.email
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
-   */
+   /*
   var firstName = "Paolo"
    var lastName = "Valmori"
    var email = "paolino@info.com"
    var idCorso = 1
    var companyName = "fateBeneFratelli"
-   var ritirato = 0
+   */
+
    var company=[]
 
    connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {

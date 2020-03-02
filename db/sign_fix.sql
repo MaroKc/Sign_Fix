@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 01, 2020 at 04:59 PM
+-- Generation Time: Mar 02, 2020 at 07:21 PM
 -- Server version: 8.0.19-0ubuntu0.19.10.3
 -- PHP Version: 7.3.11-0ubuntu0.19.10.3
 
@@ -78,7 +78,8 @@ CREATE TABLE `companies` (
 INSERT INTO `companies` (`id`, `name`) VALUES
 (1, 'flowing'),
 (2, 'matteo@info.com'),
-(3, 'brizio@info.com');
+(3, 'brizio@info.com'),
+(27, 'niccolo@info');
 
 -- --------------------------------------------------------
 
@@ -180,7 +181,8 @@ INSERT INTO `lessons` (`id`, `lesson`, `email_signature`, `companies_id`, `class
 (118, 'php', 'matteo@info.com', 2, 'comandini', 1, '2020-02-13', 14, 17, 3, '07/02/2020', NULL, NULL, NULL),
 (119, 'database', 'brizio@info.com', 3, 'comandini', 1, '2020-02-12', 14, 18, 4, '07/02/2020', NULL, NULL, NULL),
 (120, 'php', 'matteo@info.com', 2, 'comandini', 1, '2020-02-11', 9, 13, 4, '07/02/2020', NULL, NULL, NULL),
-(121, 'metodologia agile', 'michele@info.com', 1, 'maggioli', 1, '2020-02-11', 14, 17, 3, '07/02/2020', NULL, NULL, NULL);
+(121, 'metodologia agile', 'michele@info.com', 1, 'maggioli', 1, '2020-02-11', 14, 17, 3, '07/02/2020', NULL, NULL, NULL),
+(123, 'python', 'niccolo@info', 27, 'maggioli', 1, '2020-03-02', 14, 17, 3, '07/02/2020', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -578,7 +580,7 @@ INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`,
 CREATE TABLE `signatures_teachers` (
   `id` int NOT NULL,
   `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `date` varchar(10) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `date` date DEFAULT NULL,
   `current_start_time` timestamp NULL DEFAULT NULL,
   `current_end_time` timestamp NULL DEFAULT NULL,
   `final_start_time` float DEFAULT NULL,
@@ -607,7 +609,8 @@ INSERT INTO `signatures_teachers` (`id`, `email_responsible`, `date`, `current_s
 (10, 'matteo@info.com', '2020-02-18', NULL, NULL, 9, 13, 111, 4, NULL, NULL, NULL),
 (11, 'brizio@info.com', '2020-02-18', NULL, NULL, 14, 18, 112, 4, NULL, NULL, NULL),
 (12, 'michele@info.com', '2020-02-19', NULL, NULL, 9, 13, 4, 4, NULL, NULL, NULL),
-(13, 'michele@info.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, NULL, NULL);
+(13, 'michele@info.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, NULL, NULL),
+(14, 'niccolo@info', '2020-03-02', NULL, NULL, 14, 17, 123, 3, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -699,6 +702,7 @@ INSERT INTO `teachers` (`email_responsible`, `first_name`, `last_name`, `id_cour
 ('brizio@info.com', 'brizio', 'rossi', 1, 3, 0),
 ('matteo@info.com', 'matteo', 'morandi', 1, 2, 0),
 ('michele@info.com', 'michele', 'lampada', 1, 1, 0),
+('niccolo@info', 'niccolo', 'zona', 1, 27, 0),
 ('simone@info.com', 'simone', 'd\'amico', 1, 1, 0);
 
 --
@@ -800,6 +804,12 @@ ALTER TABLE `anagrafica`
   MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `companies`
+--
+ALTER TABLE `companies`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
@@ -815,7 +825,7 @@ ALTER TABLE `judgments`
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 
 --
 -- AUTO_INCREMENT for table `questionnaires`
@@ -833,7 +843,7 @@ ALTER TABLE `signatures_students`
 -- AUTO_INCREMENT for table `signatures_teachers`
 --
 ALTER TABLE `signatures_teachers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
