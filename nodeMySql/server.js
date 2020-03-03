@@ -182,38 +182,43 @@ try {
          if (error) throw error;
          });
       }
+      
    // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
-      return res.send({ message: 'ok' });
+      return res.send({ error: true, message: 'ok' });
 
    } catch (err) {
-      console.error(err);
+      return res.send({ error: true, data: err, message: 'ko' });
+
       }
 });
 
 app.get('/listTeachers',function(req,res){
-   var data =[]
-   connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id as companies_id,signatures_teachers.email_responsible as email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
-      if (error) throw error;
-      for (let i = 0; i < results.length; i++) {
-         var hours_appoggio = (results[i].hours_of_lessons.toString()).split('.')
-         var hours_of_lessonss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
-         data.push(
-            {
-               first_name: results[i].first_name,
-               ritirato: results[i].ritirato,
-               last_name: results[i].last_name,
-               email_responsible: results[i].email_responsible,
-               companies_id: results[i].companies_id,
-               hours_of_lessons : hours_of_lessonss ? hours_of_lessonss : '0',
-            })
-      }
-   return res.send(JSON.stringify(data));
-
-   });
+   try {
+      var data =[]
+      connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id as companies_id,signatures_teachers.email_responsible as email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
+         if (error) throw error;
+         for (let i = 0; i < results.length; i++) {
+            var hours_appoggio = (results[i].hours_of_lessons.toString()).split('.')
+            var hours_of_lessonss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
+            data.push(
+               {
+                  first_name: results[i].first_name,
+                  ritirato: results[i].ritirato,
+                  last_name: results[i].last_name,
+                  email_responsible: results[i].email_responsible,
+                  companies_id: results[i].companies_id,
+                  hours_of_lessons : hours_of_lessonss ? hours_of_lessonss : '0',
+               })
+         }
+      return res.send({error: true, data:data, message: 'ok'});   
+      });
+   } catch (error) {
+      return res.send({ error: true,data:error,message:'ko' });
+   }
 });
 
 app.put('/updateTeacher/:email', function (req, res) {
-
+try {
    var email = req.params.email
    var first_name = req.body.first_name
    var last_name = req.body.last_name
@@ -221,41 +226,52 @@ app.put('/updateTeacher/:email', function (req, res) {
    var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
    connection.query(query, [first_name, last_name,email], function (error, results, fields) {
       if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+      res.send({ error: true, data: results, message: 'ok' });
    });
+} catch (error) {
+   res.send({ error: true, data: error, message: 'ko' });
+}
+   
 });
 
 app.put('/retireTeacher/:email', function (req, res) {
-   var email = req.params.email;
-
-   var ritirato = req.body.ritirato
-
-   var query = "UPDATE `teachers` SET `ritirato` = ? WHERE `email_responsible` = ?";
-   connection.query(query, [ritirato, email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
-   });
+   
+   try {
+      var email = req.params.email
+      var ritirato = req.body.ritirato
+   
+      var query = "UPDATE `teachers` SET `ritirato` = ? WHERE `email_responsible` = ?";
+      connection.query(query, [ritirato, email], function (error, results, fields) {
+         if (error) throw error;
+         res.send({ error: false, data: results, message: 'ok' });
+      });
+   } catch (error) {
+      res.send({ error: false, data: error, message: 'ko' });
+   }
 });
 
 app.get('/teachersDetails',function (req,res){
-   var data= []
-   var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
-   connection.query(query, function (err, results, fields) {
-      if (err) throw err;
-      for (let i = 0; i < results.length; i++) {
-         var hours_appoggio = (results[i].total_hours.toString()).split('.')
-         var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
-         data.push(
-            {
-               company_name: results[i].company_name,
-               company_id: results[i].company_id,
-               total_hours: total_hourss ? total_hourss : '0',
-               lesson: results[i].lesson,
-            })
-      }
-      res.send(JSON.stringify(data));
-   });
-   
+   try {
+      var data= []
+      var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
+      connection.query(query, function (err, results, fields) {
+         if (err) throw err;
+         for (let i = 0; i < results.length; i++) {
+            var hours_appoggio = (results[i].total_hours.toString()).split('.')
+            var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
+            data.push(
+               {
+                  company_name: results[i].company_name,
+                  company_id: results[i].company_id,
+                  total_hours: total_hourss ? total_hourss : '0',
+                  lesson: results[i].lesson,
+               })
+         }
+         res.send({ error: false, data: data, message: 'ok' });
+      });
+   } catch (error) {
+      res.send({ error: false, data: error, message: 'ko' });
+   } 
 });
 
 
