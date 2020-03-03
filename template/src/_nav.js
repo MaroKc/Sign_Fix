@@ -5,11 +5,13 @@ export default {
       title: true,
       name: '',
     },
+    /*
     {
       name: 'Home',
       url:'/',
       icon:'icon-pie-chart',           // optional class names space delimited list for title item ex: "text-center"
     },
+    */
     {
       name: 'Classi',
       url: '/classi',
@@ -59,6 +61,7 @@ export default {
       url: '/calendario',
       icon: 'icon-pie-chart',
     },
+    /*
       {
         name: 'Impostazioni',
         url: '/impostazioni',
@@ -76,12 +79,6 @@ export default {
           attributes: { target: '_blank', rel: "noopener" },
         },
 
-
-
-
-
-
-    
     {
       name: 'Colors',
       url: '/theme/colors',
@@ -327,7 +324,7 @@ export default {
     },
 
 
-
+*/
 
     /*
     {

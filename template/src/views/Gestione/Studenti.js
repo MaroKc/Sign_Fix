@@ -26,7 +26,7 @@ class Studenti extends Component {
   }
 
   getStudents = () => {
-    axios.get('http://localhost:8080/listStudents')
+    axios.get('http://localhost:8080/listStudents/'+this.props.classe["id"])
       .then(res => res.data)
       .then((data, index) => {
         const studenti = [];
@@ -37,7 +37,7 @@ class Studenti extends Component {
           dateOfBirth: item.dateOfBirth,
           residence: item.residence,
           fiscalCode: item.fiscalCode,
-          hoursOfLessons: item.hoursOfLessons,
+          hoursOfLessons: this.formatHours(item.hoursOfLessons),
           percentage: item.percentage,
           ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
@@ -46,6 +46,20 @@ class Studenti extends Component {
       })
       .catch(err => console.error(err));
   }
+
+  formatHours (hours){
+    var startLessonAppoggio= (hours.toString()).split('.')
+    var startLesson= ''
+
+    if(startLessonAppoggio[1]){
+      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+      startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
+      return startLesson
+    }
+    else{
+      return startLessonAppoggio[0]
+    }
+}
 
   displayCard = (e) => {
     this.setState({

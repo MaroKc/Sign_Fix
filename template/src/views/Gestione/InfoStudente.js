@@ -53,6 +53,7 @@ class infoStudente extends React.Component {
       window.location.reload();
   }
 
+
   handleChange = (event) => {
     let name = event.target.name;
     let val = event.target.value;

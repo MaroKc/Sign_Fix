@@ -77,15 +77,9 @@ class Calendario extends Component {
                         <i className="fa fa-calendar-check-o"></i>
                       </InputGroupText>
                     </InputGroupAddon>
-<<<<<<< HEAD
-                    <Input className="col-lg-5" onChange={this.changeToken} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
-                    <InputGroupAddon addonType="append">
-                      <Button onClick={() => this.importCalendar()} type="button" color="secondary">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
-=======
-                    <Input className="col-lg-5" onChange={this.changeToken} invalid={!validationCalendar} valid={validationCalendar} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
+                    <Input className="col-lg-5" onChange={this.changeToken} valid={validationCalendar} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
                     <InputGroupAddon addonType="append">
                       <Button onClick={() => this.importCalendar()} disabled={!validationCalendar} type="button" color="secondary">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
->>>>>>> 85e255db548b680369f04bc23f7d40e4a24156ff
                     </InputGroupAddon>
                   </InputGroup>
                 </CardBody>

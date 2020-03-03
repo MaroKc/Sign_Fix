@@ -31,10 +31,9 @@ class Lezioni extends React.Component {
   }
 
   getLessons = () => {
-      var data_appoggio = new Intl.DateTimeFormat('it', { year: 'numeric', day: '2-digit', month: '2-digit' }).format(this.state.startDate)
+      var data_appoggio = new Intl.DateTimeFormat('usa', { year: 'numeric', month: '2-digit', day: '2-digit'}).format(this.state.startDate)
       var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
-      
-      axios.get('http://localhost:8080/lessons/' + data_scelta)
+      axios.get('http://localhost:8080/lessons/' + data_scelta+'/'+this.props.classe["id"])
       .then(res => res.data)
       .then((data) => {
         const lezioniMattina = [];
@@ -81,8 +80,8 @@ class Lezioni extends React.Component {
                 idLesson: item.idLesson,
                 firstName: item.firstName,
                 lastName: item.lastName,
-                startTime: item.startTime,
-                endTime: item.endTime
+                startTime: this.formatHours(item.startTime),
+                endTime: this.formatHours(item.endTime)
               })
             }
             else if(item.mattinaPomeriggio === 1){
@@ -90,8 +89,8 @@ class Lezioni extends React.Component {
                 idLesson: item.idLesson,
                 firstName: item.firstName,
                 lastName: item.lastName,
-                startTime: item.startTime,
-                endTime: item.endTime
+                startTime: this.formatHours(item.startTime),
+                endTime: this.formatHours(item.endTime)
               })
             }
           });
@@ -104,6 +103,24 @@ class Lezioni extends React.Component {
 
     }
   
+  formatHours (hours){
+      var startLessonAppoggio= (hours.toString()).split('.')
+      var startLesson= ''
+
+      var startLessonPrimaParte=  startLessonAppoggio[0].length == 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
+      if(startLessonAppoggio[1]){
+        var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+        startLesson= startLessonPrimaParte+': '+startLessonSecondaParte
+        return startLesson
+      }
+      else if(startLessonAppoggio[0]=='assente' ){
+        return startLessonAppoggio[0]
+      }
+      else{
+        startLesson= startLessonPrimaParte+': 00'
+        return startLesson
+      }
+  }
 
   lezioneMattina = () => {
     let nomeLezione;
@@ -133,13 +150,14 @@ class Lezioni extends React.Component {
 
 
     if (nomeLezione) {
+      
       return <>
         <Card className="m-4 ">
           <CardHeader id="headingOne">
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                  <h5 className="ml-4">mattina   {inizioLezione} - {fineLezione}</h5>
+                  <h5 className="ml-4">mattina   {this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
                 <Col className="col-sm-8">
                    <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
@@ -191,7 +209,7 @@ class Lezioni extends React.Component {
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(1)} aria-expanded={this.state.accordion[1]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                  <h5 className="ml-4">pomeriggio   {inizioLezione} - {fineLezione}</h5>
+                  <h5 className="ml-4">pomeriggio   {this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
                 <Col className="col-sm-8">
                    <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
