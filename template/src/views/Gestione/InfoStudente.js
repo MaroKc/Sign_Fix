@@ -202,7 +202,7 @@ class infoStudente extends React.Component {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" onClick={this.cretateTeacher}>Continua</Button>{' '}
+          <Button color="danger" onClick={this.callForRetire}>Continua</Button>{' '}
           <Button color="secondary" onClick={this.toggleWarning}>Cancella</Button>
         </ModalFooter>
       </Modal>
