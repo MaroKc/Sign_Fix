@@ -8,6 +8,8 @@ Per far partire il sito:
 
 - npm install react-datepicker
 
+- npm install -S react-toasts
+
 --> npm start (avvio)
 
 ## Cartella nodeMysql:
@@ -17,5 +19,7 @@ Per far partire il sito:
 - npm i google-auth-library --save
 
 - npm install csv-parser
+
+- npm install line-reader
 
 --> node server.js (avvio)
