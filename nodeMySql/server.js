@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
-const csv = require('csv-parser');
+const lineReader = require('line-reader');
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
@@ -156,14 +156,38 @@ app.get('/getCourses/:email', function (req, res) {
 })
 
 app.get('/importCsv',function(req,res){
-   fs.createReadStream('data.csv')
-      .pipe(csv())
-      .on('data', (row) => {
-         console.log(row);
-   })
-   .on('end', () => {
-      console.log('CSV file successfully processed');
-   });
+   
+try {
+   // read contents of the file
+   const data = fs.readFileSync('data.csv', 'UTF-8');
+
+   // split the contents by new line
+   const lines = data.split(/\r?\n/);
+   persone=[]
+   idCorso=2
+  
+   for (let i = 0; i < lines.length-1; i++) {
+
+      // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
+      const lineaSplittata= lines[i].split(',')
+      const email = tools.stringLowerCase(tools.stringTrim(lineaSplittata[22]));
+      const firstName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[7]));
+      const lastName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[8]));
+      const birth = tools.stringLowerCase(tools.stringTrim(lineaSplittata[10]));
+      const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
+      const fiscalCode = lineaSplittata[3];
+      var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES ("+email+","+firstName+","+lastName+","+birth+","+residence+","+fiscalCode+","+ idCorso+",0)";
+      
+      connection.query(query, function (error, results, fields) {
+         if (error) throw error;
+         });
+      }
+   // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
+      return res.send({ message: 'ok' });
+
+   } catch (err) {
+      console.error(err);
+      }
 });
 
 app.get('/listTeachers',function(req,res){
@@ -427,6 +451,66 @@ app.put('/retireStudent/:email', function (req, res) {
       res.send({ error: false, data: results, message: 'user has been updated successfully.' });
    });
 });
+
+
+
+app.post('/createTeacher', function (req, res) {
+
+
+   var firstName = req.body.firstName
+   var lastName = req.body.lastName
+   var email = req.body.email
+   var idCorso = req.body.idCorso
+   var companyName = req.body.companyName
+   /*
+  var firstName = "Paolo"
+   var lastName = "Valmori"
+   var email = "paolino@info.com"
+   var idCorso = 1
+   var companyName = "fateBeneFratelli"
+   */
+
+   var company=[]
+
+   connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
+      if (error) throw error;
+      if (items.length >0){
+         for (let i = 0; i < items.length; i++) {
+            company.push(
+               {
+                  id: items[i].id,
+                  name: items[i].name,
+               })
+         }
+         connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+email+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+            if (error) throw error;
+               return res.send({ error: false, result: result, message: 'ok' });
+            });
+      }else{
+         connection.query("INSERT INTO `companies` (`name`) VALUES ('"+companyName +"')", function (error, result, fields) {
+            if (error) throw error;
+            });
+         connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, results, fields) {
+            if (error) throw error;
+            if (results.length >0){
+               for (let i = 0; i < results.length; i++) {
+                  company.push(
+                     {
+                        id: results[i].id,
+                        name: results[i].name,
+                     })
+               }
+               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+email+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+                  if (error) throw error;
+                     return res.send({ error: false, result: result, message: 'ok' });
+                  });
+            }
+            });
+      }
+   });
+   
+});
+
 
 
 app.get('/calendar/listLessons', function (req, res) {

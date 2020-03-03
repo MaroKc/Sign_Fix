@@ -232,14 +232,22 @@ createTeacher = () => {
     firstName: this.state.firstName,
     lastName: this.state.lastName,
     email: this.state.email,
+<<<<<<< HEAD
     companyName: this.state.companyName === null ? this.state.email : this.state.companyName, 
+=======
+    companyName: this.state.companyName === "" ? this.state.email : this.state.companyName , 
+>>>>>>> ed509fabf04b31660468b769e8f09d58398eb44f
     idCorso: this.props.classe["id"]
    })
     .then(res=>{
       console.log(res);
 
       // this.refresh()
+<<<<<<< HEAD
       window.location.reload()
+=======
+       window.location.reload()
+>>>>>>> ed509fabf04b31660468b769e8f09d58398eb44f
     })
 }
 
