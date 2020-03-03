@@ -57,10 +57,6 @@ class Docenti extends Component {
       .catch(err => console.error(err));
   }
 
-  // postTeacher = () => {
-  //   axios.post
-  // }
-
 teacherDetails = () => {
   axios.get('http://localhost:8080/teachersDetails')
       .then(res => {
@@ -79,21 +75,37 @@ teacherDetails = () => {
       .catch(err => console.error(err));
   }
 
+  createTeacher = () => {
 
-  formatHours (hours){
-    var startLessonAppoggio= (hours.toString()).split('.')
-    var startLesson= ''
+    axios.post('http://localhost:8080/createTeacher/', { 
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      companyName: this.state.companyName === "" ? this.state.email : this.state.companyName , 
+      idCorso: this.props.classe["id"]
+     })
+      .then(res=>{
+        console.log(res);
+  
+        // this.refresh()
+        window.location.reload()
+      })
+  }
+  
 
-    if(startLessonAppoggio[1]){
-      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-      startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
-      return startLesson
-    }
-    else{
-      return startLessonAppoggio[0]
-    }
+formatHours (hours){
+  var startLessonAppoggio= (hours.toString()).split('.')
+  var startLesson= ''
+
+  if(startLessonAppoggio[1]){
+    var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+    startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
+    return startLesson
+  }
+  else{
+    return startLessonAppoggio[0]
+  }
 }
-
 
   displayCard = (e,f) => {
     this.setState({
@@ -114,6 +126,19 @@ teacherDetails = () => {
       displayDetails: null,
       displayForm: null
     })
+  }
+  
+refresh = () => {
+  this.getTeachers();
+  this.displayTable()
+}
+
+handleChange = (event) => {
+  let name = event.target.name;
+  let val = event.target.value;
+    this.setState({
+      [name]: val,
+    });
   }
 
   tabPane() {
@@ -211,36 +236,6 @@ teacherDetails = () => {
     }
   }
 
-refresh = () => {
-  this.getTeachers();
-  this.displayTable()
-}
-
-handleChange = (event) => {
-  let name = event.target.name;
-  let val = event.target.value;
-    this.setState({
-      [name]: val,
-    });
-  }
-
-createTeacher = () => {
-
-  axios.post('http://localhost:8080/createTeacher/', { 
-    firstName: this.state.firstName,
-    lastName: this.state.lastName,
-    email: this.state.email,
-    companyName: this.state.companyName === "" ? this.state.email : this.state.companyName , 
-    idCorso: this.props.classe["id"]
-   })
-    .then(res=>{
-      console.log(res);
-
-      // this.refresh()
-      window.location.reload()
-    })
-}
-
 
   formDocente(){
     // const regexLettere = /^[a-zA-Z]*$/;
@@ -285,7 +280,7 @@ createTeacher = () => {
                 </div>
               </Col>
               <Col xs="auto" className="my-auto mx-auto pr-5">
-                <Button outline color="dark"> <i className="cui-check icons font-2xl d-block mt-2" onClick={this.createTeacher}></i>conferma <br /> modifica</Button>
+                <Button onClick={this.createTeacher} outline color="dark"> <i className="cui-check icons font-2xl d-block mt-2" ></i>conferma <br /> modifica</Button>
               </Col>
             </Row>
           </CardBody>
