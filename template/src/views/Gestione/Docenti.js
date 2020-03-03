@@ -41,10 +41,9 @@ class Docenti extends Component {
 
   getTeachers = () => {
     axios.get('http://localhost:8080/listTeachers')
-      .then(res => res.data)
-      .then((data, index) => {
+      .then(res =>  {
         const docenti = [];
-        data.map(item => docenti.push({
+        res.data.data.map(item => docenti.push({
           firstName: item.first_name,
           lastName: item.last_name,
           emailDocente: item.email_responsible,
@@ -65,7 +64,7 @@ class Docenti extends Component {
 teacherDetails = () => {
   axios.get('http://localhost:8080/teachersDetails')
       .then(res => {
-      const dettagli = res.data;
+      const dettagli = res.data.data;
       var dettagliDocente = [];
       dettagli.map(item =>
           dettagliDocente.push({
@@ -75,8 +74,7 @@ teacherDetails = () => {
               companyId: item.company_id
           })
       );
-      this.setState({dettagliDocente: dettagliDocente})
-
+        this.setState({dettagliDocente: dettagliDocente})
       })
       .catch(err => console.error(err));
   }

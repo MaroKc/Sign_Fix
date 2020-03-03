@@ -1,6 +1,7 @@
 import React from 'react'
 import { Card, Col, Row,  Modal, ModalBody, ModalFooter, ModalHeader, Button, Input, Table } from 'reactstrap';
 import axios from 'axios'
+import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 class InfoDocente extends React.Component {
     constructor(props) {
@@ -9,19 +10,26 @@ class InfoDocente extends React.Component {
             changeInfo: false,
             warning: false,
             displayCard: this.props.displayCard,
-        
+            firstName: this.props.docente.firstName,
+            lastName: this.props.docente.lastName,
+            emailDocente: this.props.docente.emailDocente,
+            hoursOfLessons: this.props.docente.hoursOfLessons,
+            ritirato: this.props.docente.ritirato,
+            companyName: this.props.details.companyName,
+            lessonName: this.props.details.lessonName,
+            totalHours: this.props.details.totalHours,         
+            companyId: this.props.details.companyId,           
         }
     }
 
-
-callForUpdate = () => {
+    callForUpdate = () => {
         axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
             first_name: this.state.firstName,
-            last_name: this.state.lastName,
-
+            last_name: this.state.lastName
         })
-            .then(response => {
-                return console.log(response);
+            .then(res => {
+                if (res.data.message === "ok") ToastsStore.success("La modifica è stata effettuata con successo!")
+                else if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
             })
             .catch(err => {
                 return console.log(err);
@@ -31,12 +39,14 @@ callForUpdate = () => {
         })
     }
 
-callForRetire = () => {
+
+    callForRetire = () => {
+
         axios.put('http://localhost:8080/retireTeacher/' + this.state.emailDocente, {
             ritirato: 1,
         })
-            .then(response => {
-                return console.log(response);
+            .then(res => {
+                if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
             })
             .catch(err => {
                 return console.log(err);
@@ -79,27 +89,27 @@ changeInfo = (changeInfo) => {
                 <tbody>
                     <tr>
                         <td><h5>Nome:</h5></td>
-                        <td><h5 name="firstName">{this.props.docente.firstName}</h5></td>
+                        <td><h5 name="firstName">{this.state.firstName}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Cognome: </h5></td>
-                        <td><h5 name="lastName">{this.props.docente.lastName}</h5></td>
+                        <td><h5 name="lastName">{this.state.lastName}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Nome azienda:</h5></td>
-                        <td><h5>{this.props.details.companyName}</h5> </td>
+                        <td><h5>{this.state.companyName}</h5> </td>
                     </tr>
                     <tr>
                         <td><h5>Lezione:</h5></td>
-                        <td><h5>{this.props.details.lessonName}</h5></td>
+                        <td><h5>{this.state.lessonName}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Ore fatte:</h5></td>
-                        <td><h5>{this.props.docente.hoursOfLessons}</h5></td>
+                        <td><h5>{this.state.hoursOfLessons}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.props.details.totalHours}</h5></td>
+                        <td><h5>{this.state.totalHours}</h5></td>
                     </tr>
                 </tbody>
             </Table>
@@ -107,7 +117,7 @@ changeInfo = (changeInfo) => {
     }
     else {
         const regexLettere = /^[a-zA-Z\\']*$/;
-        const { firstName, lastName } = this.props.docente
+        const { firstName, lastName } = this.state
         const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
         const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
         return (
@@ -115,27 +125,27 @@ changeInfo = (changeInfo) => {
                 <tbody>
                     <tr>
                         <td><h5>Nome:</h5></td>
-                        <td><Input name='firstName' onChange={this.handleChange} value={this.props.docente.firstName} valid={validationFirstName} invalid={!validationFirstName} /></td>
+                        <td><Input name='firstName' onChange={this.handleChange} value={this.state.firstName} valid={validationFirstName} invalid={!validationFirstName} /></td>
                     </tr>
                     <tr>
                         <td><h5>Cognome:</h5></td>
-                        <td><Input name='lastName' onChange={this.handleChange} value={this.props.docente.lastName} valid={validationLastName} invalid={!validationLastName} /></td>
+                        <td><Input name='lastName' onChange={this.handleChange} value={this.state.lastName} valid={validationLastName} invalid={!validationLastName} /></td>
                     </tr>
                     <tr>
                         <td><h5>Nome azienda:</h5></td>
-                        <td><h5>{this.props.details.companyName}</h5></td>
+                        <td><h5>{this.state.companyName}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Lezione:</h5></td>
-                        <td><h5>{this.props.details.lessonName}</h5></td>
+                        <td><h5>{this.state.lessonName}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Ore fatte</h5></td>
-                        <td><h5>{this.props.docente.hoursOfLessons}</h5></td>
+                        <td><h5>{this.state.hoursOfLessons}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.props.details.totalHours}</h5></td>
+                        <td><h5>{this.state.totalHours}</h5></td>
                     </tr>
                 </tbody>
             </Table>
@@ -145,7 +155,7 @@ changeInfo = (changeInfo) => {
 
 renderButtons = (changeInfo) => {
     const regexLettere = /^[a-zA-Z\\' ]*$/;
-    const { firstName, lastName } = this.props.docente
+    const { firstName, lastName } = this.state
     const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName)
 
     if (this.props.docente.ritirato === 0) {
@@ -206,6 +216,7 @@ render() {
                 </Row>
                 <Button onClick={this.refresh} outline color="dark"> Indietro </Button>
             </Card>
+            <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
         </div>
     )}
 }
