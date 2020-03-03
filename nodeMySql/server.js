@@ -278,10 +278,14 @@ app.post('/createTeacher', function (req, res) {
 
    var firstName = req.body.firstName
    var lastName = req.body.lastName
-   var email = req.body.email
+   var emailDocente = req.body.emailDocente
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
+<<<<<<< HEAD
 
+=======
+   var ritirato = 0
+>>>>>>> a49e40e6966e368945c5905fe14a930efc7574d4
    var company=[]
 
    connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
@@ -294,7 +298,7 @@ app.post('/createTeacher', function (req, res) {
                   name: items[i].name,
                })
          }
-         connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+email+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+         connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
             if (error) throw error;
                return res.send({ error: false, result: result, message: 'ok' });
             });
@@ -312,7 +316,7 @@ app.post('/createTeacher', function (req, res) {
                         name: results[i].name,
                      })
                }
-               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+email+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                   if (error) throw error;
                      return res.send({ error: false, result: result, message: 'ok' });
                   });

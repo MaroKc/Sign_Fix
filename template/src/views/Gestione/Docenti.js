@@ -28,7 +28,7 @@ class Docenti extends Component {
       displayForm: null,
       firstName: '',
       lastName: '',
-      email: '',
+      emailDocente: '',
       companyName: '',
       idCorso: '',
     }
@@ -76,12 +76,11 @@ teacherDetails = () => {
   }
 
   createTeacher = () => {
-
     axios.post('http://localhost:8080/createTeacher/', { 
       firstName: this.state.firstName,
       lastName: this.state.lastName,
-      email: this.state.email,
-      companyName: this.state.companyName === "" ? this.state.email : this.state.companyName , 
+      emailDocente: this.state.emailDocente,
+      companyName: this.state.companyName === "" ? this.state.emailDocente : this.state.companyName , 
       idCorso: this.props.classe["id"]
      })
       .then(res=>{
@@ -141,6 +140,19 @@ handleChange = (event) => {
     });
   }
 
+  refresh = () => {
+    this.getTeachers();
+    this.displayTable()
+  }
+  
+  handleChange = (event) => {
+    let name = event.target.name;
+    let val = event.target.value;
+      this.setState({
+        [name]: val,
+      });
+    }
+
   tabPane() {
     const DatatablePage = () => {
       const data = {
@@ -167,22 +179,22 @@ handleChange = (event) => {
       if (ritirato != 0) {
         return (
           <div>
-          <Card>
-            <CardHeader >
-              <div className="text-center font-weight-bold">DOCENTI</div>
-            </CardHeader>
-            <CardBody className="ml-4 mr-4">
-              <MDBDataTable
-                responsive
-                hover
-                data={{ columns: data.columns, rows: nonRitirato }}
-                searching={false}
-                paging={false}
-                noBottomColumns={true}
-              />
-            </CardBody>
-          </Card>
-          <Card>
+            <Card>
+              <CardHeader className="d-flex justify-content-between">
+                <span value="docenti"></span><span className="text-center font-weight-bold">DOCENTI</span>
+                <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i>  </Button> </span>
+              </CardHeader>
+              <CardBody>
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={{ columns: data.columns, rows: nonRitirato }}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                />
+              </CardBody>
+            
             <CardHeader >
               <div className="text-center font-weight-bold">DOCENTI ARCHIVIATI</div>
             </CardHeader>
@@ -238,15 +250,13 @@ handleChange = (event) => {
 
 
   formDocente(){
-    // const regexLettere = /^[a-zA-Z]*$/;
-    // const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
-    // const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
-    // const {firstName, lastName, residence, fiscalCode, dateOfBirth} = this.state
-    // const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
-    // const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
-    // const validationResidence = residence.length > 2 
-    // const validationDateOfBirth = dateOfBirth.length === 10 && regexData.test(dateOfBirth)
-    // const validationFiscalCode = fiscalCode.length === 16 && regexFiscalCode.test(fiscalCode)
+    const regexLettere = /^[a-zA-Z]*$/;
+    const regexEmail =	/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+    const {firstName, lastName, emailDocente, companyName} = this.state
+    const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
+    const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
+    const validationEmail = emailDocente.length > 4 && regexEmail.test(emailDocente)
+
     return (
       <div className="d-flex justify-content-center mt-5">
         <Card className="w-75">
@@ -261,15 +271,15 @@ handleChange = (event) => {
                     <tbody>
                       <tr>
                         <td><h5>Nome:</h5></td>
-                        <td><Input id="infoNome" name='firstName' onChange={this.handleChange} value={this.state.firstName} /></td>
+                        <td><Input id="infoNome" name='firstName' onChange={this.handleChange} value={this.state.firstName} valid={validationFirstName}/></td>
                       </tr>
                       <tr>
                         <td><h5>Cognome:</h5></td>
-                        <td><Input id="infoCognome" name='lastName' onChange={this.handleChange} value={this.state.lastName}/></td>
+                        <td><Input id="infoCognome" name='lastName' onChange={this.handleChange} value={this.state.lastName} valid={validationLastName}/></td>
                       </tr>
                       <tr>
                         <td><h5>Email:</h5></td>
-                        <td><Input id="infoEmail" name='email' onChange={this.handleChange} value={this.state.email}/></td>
+                        <td><Input id="infoEmail" name='emailDocente' onChange={this.handleChange} value={this.state.emailDocente} valid={validationEmail}/></td>
                       </tr>
                       <tr>
                         <td><h5>Compagnia:</h5></td>
@@ -280,7 +290,7 @@ handleChange = (event) => {
                 </div>
               </Col>
               <Col xs="auto" className="my-auto mx-auto pr-5">
-                <Button onClick={this.createTeacher} outline color="dark"> <i className="cui-check icons font-2xl d-block mt-2" ></i>conferma <br /> modifica</Button>
+                <Button outline color="dark" disabled={!validationFirstName, !validationLastName, !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
               </Col>
             </Row>
           </CardBody>
