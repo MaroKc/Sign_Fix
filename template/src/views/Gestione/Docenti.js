@@ -226,20 +226,20 @@ handleChange = (event) => {
     });
   }
 
-createTeacher = (event) => {
+createTeacher = () => {
 
   axios.post('http://localhost:8080/createTeacher/', { 
     firstName: this.state.firstName,
     lastName: this.state.lastName,
     email: this.state.email,
-    companyName: this.state.companyName, 
+    companyName: this.state.companyName === null ? this.state.email : this.state.companyName, 
     idCorso: this.props.classe["id"]
    })
     .then(res=>{
       console.log(res);
 
-      this.refresh()
-      // window.location.reload()
+      // this.refresh()
+      window.location.reload()
     })
 }
 

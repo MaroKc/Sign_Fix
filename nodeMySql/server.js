@@ -189,47 +189,114 @@ app.get('/listTeachers',function(req,res){
 });
 
 app.put('/updateTeacher/:email', function (req, res) {
-
-   var email = req.params.email
-   var first_name = req.body.first_name
-   var last_name = req.body.last_name
-
-   var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
-   connection.query(query, [first_name, last_name,email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
+   try {
+      var email = req.params.email
+      var first_name = req.body.first_name
+      var last_name = req.body.last_name
+   
+      var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
+      connection.query(query, [first_name, last_name,email], function (error, results, fields) {
+         if (error) throw error;
+         res.send({ error: true, data: results, message: 'ok' });
+      });
+   } catch (error) {
+      res.send({ error: true, data: error, message: 'ko' });
+   }
+      
    });
-});
 
-app.put('/retireTeacher/:email', function (req, res) {
-   var email = req.params.email;
-
-   var ritirato = req.body.ritirato
-
-   var query = "UPDATE `teachers` SET `ritirato` = ? WHERE `email_responsible` = ?";
-   connection.query(query, [ritirato, email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
-   });
-});
-
-app.get('/teachersDetails',function (req,res){
-   var data= []
-   var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
-   connection.query(query, function (err, results, fields) {
-      if (err) throw err;
-      for (let i = 0; i < results.length; i++) {
-         var hours_appoggio = (results[i].total_hours.toString()).split('.')
-         var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
-         data.push(
-            {
-               company_name: results[i].company_name,
-               company_id: results[i].company_id,
-               total_hours: total_hourss ? total_hourss : '0',
-               lesson: results[i].lesson,
-            })
+   app.put('/retireTeacher/:email', function (req, res) {
+   
+      try {
+         var email = req.params.email
+         var ritirato = req.body.ritirato
+      
+         var query = "UPDATE `teachers` SET `ritirato` = ? WHERE `email_responsible` = ?";
+         connection.query(query, [ritirato, email], function (error, results, fields) {
+            if (error) throw error;
+            res.send({ error: false, data: results, message: 'ok' });
+         });
+      } catch (error) {
+         res.send({ error: false, data: error, message: 'ko' });
       }
-      res.send(JSON.stringify(data));
+   });
+
+   app.get('/teachersDetails',function (req,res){
+      try {
+         var data= []
+         var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
+         connection.query(query, function (err, results, fields) {
+            if (err) throw err;
+            for (let i = 0; i < results.length; i++) {
+               var hours_appoggio = (results[i].total_hours.toString()).split('.')
+               var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
+               data.push(
+                  {
+                     company_name: results[i].company_name,
+                     company_id: results[i].company_id,
+                     total_hours: total_hourss ? total_hourss : '0',
+                     lesson: results[i].lesson,
+                  })
+            }
+            res.send({ error: false, data: data, message: 'ok' });
+         });
+      } catch (error) {
+         res.send({ error: false, data: error, message: 'ko' });
+      } 
+   });
+
+app.post('/createTeacher', function (req, res) {
+
+   var firstName = req.body.firstName
+   var lastName = req.body.lastName
+   var email = req.body.email
+   var idCorso = req.body.idCorso
+   var companyName = req.body.companyName
+   
+   // var firstName = "Paolo"
+   // var lastName = "Valmori"
+   // var email = "paolino@info.com"
+   // var idCorso = 1
+   // var companyName = "fateBeneFratelli"
+
+   var ritirato = 0
+   var company=[]
+
+   connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
+      if (error) throw error;
+      if (items.length >0){
+         for (let i = 0; i < items.length; i++) {
+            company.push(
+               {
+                  id: items[i].id,
+                  name: items[i].name,
+               })
+         }
+         connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+email+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+            if (error) throw error;
+               return res.send({ error: false, result: result, message: 'ok' });
+            });
+      }else{
+         connection.query("INSERT INTO `companies` (`name`) VALUES ('"+companyName +"')", function (error, result, fields) {
+            if (error) throw error;
+            });
+         connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, results, fields) {
+            if (error) throw error;
+            if (results.length >0){
+               for (let i = 0; i < results.length; i++) {
+                  company.push(
+                     {
+                        id: results[i].id,
+                        name: results[i].name,
+                     })
+               }
+               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+email+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+                  if (error) throw error;
+                     return res.send({ error: false, result: result, message: 'ok' });
+                  });
+            }
+            });
+      }
    });
    
 });
