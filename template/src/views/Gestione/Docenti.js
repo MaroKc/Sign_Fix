@@ -41,11 +41,7 @@ class Docenti extends Component {
 
   getTeachers = () => {
     axios.get('http://localhost:8080/listTeachers')
-<<<<<<< HEAD
       .then(res =>  {
-=======
-      .then(res => {
->>>>>>> 5a624f8b5ecc56fdfc22d2cb93139d48d79d60e7
         const docenti = [];
         res.data.data.map(item => docenti.push({
           firstName: item.first_name,
