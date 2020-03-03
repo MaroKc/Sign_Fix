@@ -22,7 +22,6 @@ class InfoDocente extends React.Component {
         }
     }
 
-
     callForUpdate = () => {
         axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
             first_name: this.state.firstName,
