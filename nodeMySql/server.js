@@ -281,11 +281,7 @@ app.post('/createTeacher', function (req, res) {
    var emailDocente = req.body.emailDocente
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
-<<<<<<< HEAD
-
-=======
    var ritirato = 0
->>>>>>> a49e40e6966e368945c5905fe14a930efc7574d4
    var company=[]
 
    connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
@@ -364,7 +360,7 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
    var data_Scelta = date_appoggio.split('-');
    var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
 
-   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
+   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          
@@ -380,6 +376,7 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
                firstName: results[i].first_name,
                lastName: results[i].last_name,
                idLesson :  results[i].id_lesson,
+               emailStudent : results[i].email,
                startTime: start_time_float !=1 ? start_time_float : 'assente',
                endTime: end_time_float !=1 ? end_time_float : 'assente'
             })
