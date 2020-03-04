@@ -322,6 +322,25 @@ app.post('/createTeacher', function (req, res) {
    
 });
 
+app.put('/updateSignature/:id_lesson',function(req,res){
+
+   try {
+      var data =[]
+      var email = req.body.email
+      var id_lesson = req.params.id_lesson
+      var startTime = req.bosy.startTime
+      var endTime = req.body.endTime
+      var dateOfModify= tools.formattedDate(new Date())
+      var query = "UPDATE `signatures_students` SET `final_start_time`=?,`final_end_time`=?,`modify_date`=? WHERE `id_lesson`= '"+id_lesson+"'  and `email_student`='"+email+"'"
+      connection.query(query,[startTime,endTime,dateOfModify], function (error, results, fields){
+         if (error) throw error;
+         data=results
+         return res.send({ error: false, data: data, message: 'ok' });
+      });
+   } catch (error) {
+      return res.send({ error: false, data: error, message: 'ko' });
+   }
+});
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
@@ -359,7 +378,7 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
    var data_Scelta = date_appoggio.split('-');
    var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
 
-   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
+   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,email,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          
@@ -374,6 +393,7 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
                mattinaPomeriggio: results[i].mattinaPomeriggio,
                firstName: results[i].first_name,
                lastName: results[i].last_name,
+               email: results[i].email,
                idLesson :  results[i].id_lesson,
                startTime: start_time_float !=1 ? start_time_float : 'assente',
                endTime: end_time_float !=1 ? end_time_float : 'assente'
