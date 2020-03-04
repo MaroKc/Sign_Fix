@@ -79,9 +79,10 @@ class Lezioni extends React.Component {
               studentiMattina.push({
                 idLesson: item.idLesson,
                 firstName: item.firstName,
+                email: item.email,
                 lastName: item.lastName,
                 startTime: this.formatHours(item.startTime),
-                endTime: this.formatHours(item.endTime)
+                endTime: this.formatHours(item.endTime),
               })
             }
             else if(item.mattinaPomeriggio === 1){
@@ -100,9 +101,9 @@ class Lezioni extends React.Component {
            });
         })
         .catch(err => console.error(err));
+  }
 
-    }
-  
+
   formatHours (hours){
       var startLessonAppoggio= (hours.toString()).split('.')
       var startLesson= ''
@@ -228,8 +229,6 @@ class Lezioni extends React.Component {
     }
   }
 
-
-
   toggleAccordion = (tab) => {
     const prevState = this.state.accordion;
     const state = prevState.map((x, index) => tab === index ? !x : false);
@@ -261,7 +260,7 @@ class Lezioni extends React.Component {
             field: 'endTime',
           },
         ],
-        rows: this.state.studentiMattina
+        rows:this.state.studentiMattina
       };
 
   return (
