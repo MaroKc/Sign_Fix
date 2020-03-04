@@ -4,12 +4,6 @@ import axios from 'axios'
 import { MDBDataTable } from 'mdbreact';
 import InfoStudente from './InfoStudente'
 
-// import { AppSidebarToggler } from '@coreui/react';
-
-
-//https://mdbootstrap.com/docs/react/tables/search/
-
-
 
 class Studenti extends Component {
   constructor(props) {
