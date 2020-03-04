@@ -8,18 +8,18 @@ class Calendario extends Component {
   constructor(props) {
     super(props);
 
-
+    this.toggle = this.toggle.bind(this);
     this.changeToken = this.changeToken.bind(this);
 
     this.state = {
       collapse: props.classe.token ? false : true,
       classe: props.classe,
-      token: '',
+      token: null,
       calendario: false
     };
   }
 
-  toggle = ()=> {
+  toggle() {
     this.setState({ collapse: !this.state.collapse });
   }
 
@@ -31,32 +31,23 @@ class Calendario extends Component {
         console.log(res);
         console.log(res.data);
       })
-      this.button()
   }
 
   changeToken(e) {
     this.setState({ token: e.target.value });
   }
 
-  button() {
-    if(!this.state.collapse){
-      return(
-        <CardFooter className="text-center">
-        <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;<b>Importa nuovo calendario</b></Button>
-      </CardFooter>
-      )
-    }
-  }
 
   render() {
-   // const classe = this.state.classe;
-    const validationCalendar = this.state.token.length === 52
+    const classe = this.state.classe;
+
     return (
       <div className="animated fadeIn">
         <Row>
           <Col>
             <Card>
               <CardBody>
+
                 {this.state.calendario && (
                   <Iframe
                     url={"https://calendar.google.com/calendar/embed?src=" + this.state.calendario + "&ctz=Europe%2FRome"}
@@ -70,21 +61,23 @@ class Calendario extends Component {
                 
               </CardBody>
               <Collapse isOpen={this.state.collapse}>
-                <CardBody className="my-auto mx-auto ">
-                  <InputGroup className="w-auto">
+                <CardBody>
+                  <InputGroup>
                     <InputGroupAddon addonType="prepend">
                       <InputGroupText>
                         <i className="fa fa-calendar-check-o"></i>
                       </InputGroupText>
                     </InputGroupAddon>
-                    <Input className="col-lg-5" onChange={this.changeToken} valid={validationCalendar} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
+                    <Input className="col-lg-5" onChange={this.changeToken} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
                     <InputGroupAddon addonType="append">
-                      <Button onClick={() => this.importCalendar()} disabled={!validationCalendar} type="button" color="secondary">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
+                      <Button onClick={() => this.importCalendar()} type="button" color="secondary">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
                     </InputGroupAddon>
                   </InputGroup>
                 </CardBody>
               </Collapse>
-              {this.button()}
+              <CardFooter>
+                <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;Impostazioni</Button>
+              </CardFooter>
             </Card>
           </Col>
         </Row>

@@ -281,7 +281,10 @@ app.post('/createTeacher', function (req, res) {
    var emailDocente = req.body.emailDocente
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
+<<<<<<< HEAD
    var ritirato = 0
+=======
+>>>>>>> 500e343fbebecb8eed21a7cec1fb5563649ecccf
    var company=[]
 
    connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
