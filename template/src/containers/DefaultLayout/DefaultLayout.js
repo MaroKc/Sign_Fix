@@ -29,15 +29,17 @@ class DefaultLayout extends Component {
   constructor(props) {
     super(props);
 
-    const cookieCorso = sessionStorage.getItem("corso");
+    const cookieCorso = JSON.parse(sessionStorage.getItem("corso"));
+    console.log(JSON.stringify(cookieCorso));
     this.state = {
-      classe: cookieCorso ? cookieCorso : 0
+      classe: cookieCorso ? cookieCorso : null
     }
   }
 
   changeCorso = (corso) => {
     this.setState({ classe: corso })
-    sessionStorage.setItem("corso", corso);
+    console.log(corso);
+    sessionStorage.setItem("corso", JSON.stringify(corso));
   }
 
 

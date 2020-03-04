@@ -67,7 +67,7 @@ class Classi extends Component {
 
   constructor(props) {
     super(props);
-    // Non chiamre this.setState() qui!
+
     this.state = {
       corsi: [],
       changeCorso: props.changeCorso
