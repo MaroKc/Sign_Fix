@@ -10,10 +10,10 @@ class Calendario extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.changeToken = this.changeToken.bind(this);
+    this.classe = props.classe;
 
     this.state = {
       collapse: props.classe.token ? false : true,
-      classe: props.classe,
       token: null,
       calendario: false
     };
@@ -26,7 +26,7 @@ class Calendario extends Component {
   importCalendar() {
     this.setState({ calendario: this.state.token });
     this.toggle();
-    axios.post('http://localhost:8080/calendar/importLessons', { token: this.state.token })
+    axios.post('http://localhost:8080/calendar/importLessons', { email: 'daniele.marocchi.studio@fitstic-edu.com', token: this.state.token, ccorso: this.classe.id})
       .then(res => {
         console.log(res);
         console.log(res.data);
@@ -39,7 +39,6 @@ class Calendario extends Component {
 
 
   render() {
-    const classe = this.state.classe;
 
     return (
       <div className="animated fadeIn">
