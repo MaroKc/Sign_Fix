@@ -3,9 +3,8 @@ import { Card, CardBody, CardHeader, Button, Collapse, Row, Col } from 'reactstr
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import { MDBDataTable } from 'mdbreact';
-
-
 import 'react-datepicker/dist/react-datepicker.css';
+
 // import { MDBDataTable } from 'mdbreact';
 
 
