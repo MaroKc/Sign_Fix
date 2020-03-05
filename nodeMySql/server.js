@@ -156,14 +156,25 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
+<<<<<<< HEAD
 app.get('/importCsv', function (req, res) {
 
    try {
+=======
+app.get('/importCsv/:id_course',function(req,res){
+   idCorso =req.params.id_course
+   connection.query("DELETE FROM `students` WHERE id_course="+idCorso, function (error, results, fields) {
+      if (error) throw error;
+      });
+   try {
+   
+>>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
       // read contents of the file
       const data = fs.readFileSync('data.csv', 'UTF-8');
 
       // split the contents by new line
       const lines = data.split(/\r?\n/);
+<<<<<<< HEAD
       persone = []
       idCorso = 2
 
@@ -171,12 +182,21 @@ app.get('/importCsv', function (req, res) {
 
          // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
          const lineaSplittata = lines[i].split(',')
+=======
+      persone=[]
+   
+      for (let i = 0; i < lines.length-1; i++) {
+
+         // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
+         const lineaSplittata= lines[i].split(',')
+>>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
          const email = tools.stringLowerCase(tools.stringTrim(lineaSplittata[22]));
          const firstName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[7]));
          const lastName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[8]));
          const birth = tools.stringLowerCase(tools.stringTrim(lineaSplittata[10]));
          const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
          const fiscalCode = lineaSplittata[3];
+<<<<<<< HEAD
          var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES (" + email + "," + firstName + "," + lastName + "," + birth + "," + residence + "," + fiscalCode + "," + idCorso + ",0)";
 
          connection.query(query, function (error, results, fields) {
@@ -186,11 +206,38 @@ app.get('/importCsv', function (req, res) {
 
       // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
       return res.send({ error: true, message: 'ok' });
+=======
+         var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES ("+email+","+firstName+","+lastName+","+birth+","+residence+","+fiscalCode+","+ idCorso+",0)";
+         
+         connection.query(query, function (error, results, fields) {
+            if (error) throw error;
+            });
+         }
+      // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
+         return res.send({ error: true, message: 'ok' });
+>>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
 
-   } catch (err) {
-      return res.send({ error: true, data: err, message: 'ko' });
+      } catch (err) {
+         return res.send({ error: true, data: err, message: 'ko' });
 
+<<<<<<< HEAD
    }
+=======
+         }
+});
+
+
+
+
+app.get('/listAllTeachers', function (req, res) {
+   var data = [];
+
+   connection.query("SELECT * from teachers", function (error, results, fields) {
+      if (error) throw error;
+      data= results
+      return res.send(JSON.stringify(data));
+   });
+>>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
 });
 
 app.get('/listTeachers', function (req, res) {
@@ -217,6 +264,7 @@ app.get('/listTeachers', function (req, res) {
       return res.send({ error: true, data: error, message: 'ko' });
    }
 });
+
 
 app.put('/updateTeacher/:email', function (req, res) {
    try {
@@ -360,7 +408,11 @@ app.get('/listSignaturesStudents/:data_scelta', function (req, res) {
    var data_Scelta = date_appoggio.split('-');
    var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
 
+<<<<<<< HEAD
    connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='" + dataFinale + "' and ritirato=0", function (error, results, fields) {
+=======
+   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
+>>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
 
@@ -375,9 +427,16 @@ app.get('/listSignaturesStudents/:data_scelta', function (req, res) {
                mattinaPomeriggio: results[i].mattinaPomeriggio,
                firstName: results[i].first_name,
                lastName: results[i].last_name,
+<<<<<<< HEAD
                idLesson: results[i].id_lesson,
                startTime: start_time_float != 1 ? start_time_float : 'assente',
                endTime: end_time_float != 1 ? end_time_float : 'assente'
+=======
+               idLesson :  results[i].id_lesson,
+               emailStudent : results[i].email,
+               startTime: start_time_float !=1 ? start_time_float : 'assente',
+               endTime: end_time_float !=1 ? end_time_float : 'assente'
+>>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
             })
       }
       return res.send(JSON.stringify(data));
@@ -420,34 +479,54 @@ app.get('/listStudents/:id_course', function (req, res) {
    });
 });
 
+app.get('/listAllStudents/:id_course', function (req, res) {
+   var data = [];
+   var id_course = req.params.id_course
+   connection.query("SELECT * from students where id_course= "+id_course, function (error, results, fields) {
+      if (error) throw error;
+      data= results
+      return res.send(JSON.stringify(data));
+   });
+});
+
 app.put('/updateStudent/:email', function (req, res) {
 
-   var email = req.params.email
-   var first_name = req.body.first_name
-   var last_name = req.body.last_name
-   var date_of_birth = req.body.date_of_birth
-   var residence = req.body.residence
-   var fiscal_code = req.body.fiscal_code
-
-   var query = "UPDATE `students` SET `first_name`=?,`last_name`=?,`date_of_birth`=?,`residence`=?,`fiscal_code`=? WHERE `email` = ?";
-   connection.query(query, [first_name, last_name, date_of_birth, residence, fiscal_code, email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
-   });
+   try {
+      var email = req.params.email
+      var first_name = req.body.first_name
+      var last_name = req.body.last_name
+      var date_of_birth = req.body.date_of_birth
+      var residence = req.body.residence
+      var fiscal_code = req.body.fiscal_code
+   
+      var query = "UPDATE `students` SET `first_name`=?,`last_name`=?,`date_of_birth`=?,`residence`=?,`fiscal_code`=? WHERE `email` = ?";
+      connection.query(query, [first_name, last_name, date_of_birth, residence, fiscal_code, email], function (error, results, fields) {
+         if (error) throw error;
+         res.send({ error: false, data: results, message: 'ok' });
+      });
+   } catch (error) {
+      res.send({ error: false, data: error, message: 'ko' });
+   }
+ 
 });
 
 
 
 app.put('/retireStudent/:email', function (req, res) {
-   var email = req.params.email;
+   
+   try {
+      var email = req.params.email;
 
-   var ritirato = req.body.ritirato
-
-   var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
-   connection.query(query, [ritirato, email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
-   });
+      var ritirato = req.body.ritirato
+   
+      var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
+      connection.query(query, [ritirato, email], function (error, results, fields) {
+         if (error) throw error;
+         res.send({ error: false, data: results, message: 'ok' });
+      });
+   } catch (error) {
+      res.send({ error: false, data: error, message: 'ko' });
+   }
 });
 
 app.get('/calendar/listLessons', function (req, res) {
