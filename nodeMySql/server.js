@@ -156,11 +156,6 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
-<<<<<<< HEAD
-app.get('/importCsv', function (req, res) {
-
-   try {
-=======
 app.get('/importCsv/:id_course',function(req,res){
    idCorso =req.params.id_course
    connection.query("DELETE FROM `students` WHERE id_course="+idCorso, function (error, results, fields) {
@@ -168,45 +163,23 @@ app.get('/importCsv/:id_course',function(req,res){
       });
    try {
    
->>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
       // read contents of the file
       const data = fs.readFileSync('data.csv', 'UTF-8');
 
       // split the contents by new line
       const lines = data.split(/\r?\n/);
-<<<<<<< HEAD
-      persone = []
-      idCorso = 2
-
-      for (let i = 0; i < lines.length - 1; i++) {
-
-         // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
-         const lineaSplittata = lines[i].split(',')
-=======
       persone=[]
    
       for (let i = 0; i < lines.length-1; i++) {
 
          // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
          const lineaSplittata= lines[i].split(',')
->>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
          const email = tools.stringLowerCase(tools.stringTrim(lineaSplittata[22]));
          const firstName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[7]));
          const lastName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[8]));
          const birth = tools.stringLowerCase(tools.stringTrim(lineaSplittata[10]));
          const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
          const fiscalCode = lineaSplittata[3];
-<<<<<<< HEAD
-         var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES (" + email + "," + firstName + "," + lastName + "," + birth + "," + residence + "," + fiscalCode + "," + idCorso + ",0)";
-
-         connection.query(query, function (error, results, fields) {
-            if (error) throw error;
-         });
-      }
-
-      // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
-      return res.send({ error: true, message: 'ok' });
-=======
          var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES ("+email+","+firstName+","+lastName+","+birth+","+residence+","+fiscalCode+","+ idCorso+",0)";
          
          connection.query(query, function (error, results, fields) {
@@ -215,14 +188,10 @@ app.get('/importCsv/:id_course',function(req,res){
          }
       // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
          return res.send({ error: true, message: 'ok' });
->>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
 
       } catch (err) {
          return res.send({ error: true, data: err, message: 'ko' });
 
-<<<<<<< HEAD
-   }
-=======
          }
 });
 
@@ -237,7 +206,6 @@ app.get('/listAllTeachers', function (req, res) {
       data= results
       return res.send(JSON.stringify(data));
    });
->>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
 });
 
 app.get('/listTeachers', function (req, res) {
@@ -408,11 +376,7 @@ app.get('/listSignaturesStudents/:data_scelta', function (req, res) {
    var data_Scelta = date_appoggio.split('-');
    var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
 
-<<<<<<< HEAD
-   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='" + dataFinale + "' and ritirato=0", function (error, results, fields) {
-=======
    connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
->>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
 
@@ -427,16 +391,10 @@ app.get('/listSignaturesStudents/:data_scelta', function (req, res) {
                mattinaPomeriggio: results[i].mattinaPomeriggio,
                firstName: results[i].first_name,
                lastName: results[i].last_name,
-<<<<<<< HEAD
-               idLesson: results[i].id_lesson,
-               startTime: start_time_float != 1 ? start_time_float : 'assente',
-               endTime: end_time_float != 1 ? end_time_float : 'assente'
-=======
                idLesson :  results[i].id_lesson,
                emailStudent : results[i].email,
                startTime: start_time_float !=1 ? start_time_float : 'assente',
                endTime: end_time_float !=1 ? end_time_float : 'assente'
->>>>>>> da2bf410f75dfaa9489d2db47fe98f32bc8d4228
             })
       }
       return res.send(JSON.stringify(data));
