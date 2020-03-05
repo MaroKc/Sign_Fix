@@ -10,9 +10,7 @@ import {
   Table,
   Row,
   Col,
-  FormGroup,
   Input,
-  Label,
 } from 'reactstrap';
 
 //https://mdbootstrap.com/docs/react/tables/search/
@@ -31,18 +29,22 @@ class Docenti extends Component {
       emailDocente: '',
       companyName: '',
       idCorso: '',
+      displayTab: false,
+      allTeachers: []
     }
   }
 
   componentDidMount() {
     this.getTeachers();
     this.teacherDetails();
+    this.getAllTeachers ();
+
   }
 
   getTeachers = () => {
     axios.get('http://localhost:8080/listTeachers')
       .then(res =>  {
-        const docenti = [];
+        let docenti = [];
         res.data.data.map(item => docenti.push({
           firstName: item.first_name,
           lastName: item.last_name,
@@ -53,6 +55,7 @@ class Docenti extends Component {
           clickEvent: () => this.displayCard(item.email_responsible,item.companies_id)
         }));
         this.setState({ docenti });
+        console.log(this.state.docenti)
       })
       .catch(err => console.error(err));
   }
@@ -84,13 +87,25 @@ teacherDetails = () => {
       idCorso: this.props.classe["id"]
      })
       .then(res=>{
-        console.log(res);
-  
         // this.refresh()
         window.location.reload()
       })
   }
-  
+
+  getAllTeachers = () => {
+    axios.get('http://localhost:8080/listAllTeachers/')
+    .then(res => res.data)
+    .then((data, index) => {
+      const allTeachers = [];
+      data.map(item => allTeachers.push({
+        firstName: item.first_name,
+        lastName: item.last_name,
+        email: item.email_responsible,
+      }));
+      this.setState({ allTeachers });
+    })
+    .catch(err => console.error(err));
+  }
 
 formatHours (hours){
   var startLessonAppoggio= (hours.toString()).split('.')
@@ -104,6 +119,12 @@ formatHours (hours){
   else{
     return startLessonAppoggio[0]
   }
+}
+
+displayTab = () => {
+  this.setState({
+    displayTab: !this.state.displayTab
+  })
 }
 
   displayCard = (e,f) => {
@@ -168,21 +189,31 @@ handleChange = (event) => {
           {
             label: 'Email',
             field: 'emailDocente',
-          }
-        ],
-        rows: this.state.docenti
+          },
+        ]
       };
+      
 
-      const nonRitirato = this.state.docenti.filter(el => el.ritirato === 0)
+
+      const nonRitirato =this.state.docenti.filter(el => el.ritirato === 0) 
       const ritirato = this.state.docenti.filter(el => el.ritirato === 1)
+
     
       if (ritirato != 0) {
         return (
           <div>
             <Card>
-              <CardHeader className="d-flex justify-content-between">
-                <span value="docenti"></span><span className="text-center font-weight-bold">DOCENTI</span>
-                <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i>  </Button> </span>
+            <CardHeader>
+                <Row>
+                  <Col sm="4">
+                  </Col>
+                  <Col sm="4" className="my-auto text-center">
+                    <span className="font-weight-bold"><h4>DOCENTI REGISTRATI</h4></span>
+                  </Col>
+                  <Col sm="4" className="text-right">
+                    <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
+                  </Col>
+                </Row>
               </CardHeader>
               <CardBody>
                 <MDBDataTable
@@ -194,7 +225,9 @@ handleChange = (event) => {
                   noBottomColumns={true}
                 />
               </CardBody>
-            
+              <Button outline color="dark" onClick={this.displayTab}>Visualizza tutti i docenti</Button>
+            </Card>
+            <Card>
             <CardHeader >
               <div className="text-center font-weight-bold">DOCENTI ARCHIVIATI</div>
             </CardHeader>
@@ -217,9 +250,17 @@ handleChange = (event) => {
         return (
           <div>
             <Card>
-              <CardHeader className="d-flex justify-content-between">
-                <span value="docenti"></span><span className="text-center font-weight-bold">DOCENTI</span>
-                <span> <Button color="ghost-success"  className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i>  </Button> </span>
+            <CardHeader>
+                <Row>
+                  <Col sm="4">
+                  </Col>
+                  <Col sm="4" className="my-auto text-center">
+                    <span className="font-weight-bold"><h4>DOCENTI REGISTRATI</h4></span>
+                  </Col>
+                  <Col sm="4" className="text-right">
+                    <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
+                  </Col>
+                </Row>
               </CardHeader>
               <CardBody>
                 <MDBDataTable
@@ -232,6 +273,7 @@ handleChange = (event) => {
                 />
                
               </CardBody>
+              <Button outline color="dark" onClick={this.displayTab}>Visualizza tutti i docenti</Button>
             </Card>
           </div>
         )
@@ -290,7 +332,7 @@ handleChange = (event) => {
                 </div>
               </Col>
               <Col xs="auto" className="my-auto mx-auto pr-5">
-                <Button outline color="dark" disabled={!validationFirstName, !validationLastName, !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
+                <Button outline color="success" disabled={!validationFirstName, !validationLastName, !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
               </Col>
             </Row>
           </CardBody>
@@ -300,10 +342,59 @@ handleChange = (event) => {
     )
   }
 
+  tabAllTeachers() {
+    const DatatablePage = () => {
+      const data = {
+        columns: [
+          {
+            label: 'Nome',
+            field: 'firstName',
+          },
+          {
+            label: 'Cognome',
+            field: 'lastName',
+          },
+          {
+            label: 'Email',
+            field: 'email',
+          }
+        ],
+        rows: this.state.allTeachers,
+      };
+        return (
+          <div>
+            <Card>
+              <CardHeader >
+                <div className="text-center font-weight-bold">DOCENTI </div>
+              </CardHeader>
+              <CardBody>
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={data}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                />
+              </CardBody>
+              <Button outline color="dark" onClick={this.displayTab}>Torna indietro</Button>
+            </Card>
+          </div>
+        )
+      }
+        return (
+          <>
+            {DatatablePage()}
+          </>
+        )
+    }
+
+
   render() 
   {
     if(this.state.displayForm){
     return this.formDocente()
+    }else if(this.state.displayTab){return this.tabAllTeachers()
     }else{
       return this.tabPane()
     }

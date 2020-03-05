@@ -1,6 +1,7 @@
 import React from 'react'
 import { Card, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader, Button, Input, Table } from 'reactstrap';
 import axios from 'axios'
+import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 
 class infoStudente extends React.Component {
@@ -29,9 +30,10 @@ class infoStudente extends React.Component {
       residence: this.state.residence,
       fiscal_code: this.state.fiscalCode
     })
-      .then(response => {
-        return console.log(response);
-      })
+    .then(res => {
+      if (res.data.message === "ok") ToastsStore.success("La modifica è stata effettuata con successo!")
+      else if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
+    })
       .catch(err => {
         return console.log(err);
       });
@@ -44,9 +46,6 @@ class infoStudente extends React.Component {
     axios.put('http://localhost:8080/retireStudent/' + this.state.email, {
       ritirato: 1,
     })
-      .then(response => {
-        return console.log(response);
-      })
       .catch(err => {
         return console.log(err);
       });
@@ -67,7 +66,6 @@ class infoStudente extends React.Component {
         [name]: val,
       });
     }
-    
   }
 
   toggleWarning = () => {
@@ -230,6 +228,7 @@ class infoStudente extends React.Component {
           </Row>
           <Button onClick={this.refresh} outline color="dark"> Indietro </Button>
         </Card>
+        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
       </div>
     )
   }

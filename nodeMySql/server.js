@@ -1,4 +1,5 @@
 var express = require('express');
+var Sync = require('sync');
 var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
@@ -194,6 +195,19 @@ app.get('/importCsv/:id_course',function(req,res){
          }
 });
 
+
+
+
+app.get('/listAllTeachers', function (req, res) {
+   var data = [];
+
+   connection.query("SELECT * from teachers", function (error, results, fields) {
+      if (error) throw error;
+      data= results
+      return res.send(JSON.stringify(data));
+   });
+});
+
 app.get('/listTeachers',function(req,res){
    try {
       var data =[]
@@ -219,15 +233,6 @@ app.get('/listTeachers',function(req,res){
    }
 });
 
-app.get('/listAllTeachers', function (req, res) {
-   var data = [];
-
-   connection.query("SELECT * from teachers", function (error, results, fields) {
-      if (error) throw error;
-      data= results
-      return res.send(JSON.stringify(data));
-   });
-});
 
 app.put('/updateTeacher/:email', function (req, res) {
 try {
@@ -390,7 +395,7 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
    var data_Scelta = date_appoggio.split('-');
    var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
 
-   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,email,id_lesson from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
+   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
       if (error) throw error;
       for (let i = 0; i < results.length; i++) {
          
@@ -407,6 +412,7 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
                lastName: results[i].last_name,
                email: results[i].email,
                idLesson :  results[i].id_lesson,
+               emailStudent : results[i].email,
                startTime: start_time_float !=1 ? start_time_float : 'assente',
                endTime: end_time_float !=1 ? end_time_float : 'assente'
             })
@@ -451,17 +457,15 @@ app.get('/listStudents/:id_course', function (req, res) {
    });
 });
 
-
 app.get('/listAllStudents/:id_course', function (req, res) {
    var data = [];
-
+   var id_course = req.params.id_course
    connection.query("SELECT * from students where id_course= "+id_course, function (error, results, fields) {
       if (error) throw error;
       data= results
       return res.send(JSON.stringify(data));
    });
 });
-
 
 app.put('/updateStudent/:email', function (req, res) {
 
@@ -511,11 +515,11 @@ app.get('/calendar/listLessons', function (req, res) {
 });
 
 
-app.post('/calendar/importLessons', function (req, res) {
+app.post('/calendar/importLessons', async function (req, res) {
 
-   //const email = connection.escape(req.body.email);
-   const email = 'daniele.marocchi.studio@fitstic-edu.com';
-   const idCalendar = req.body.token;
+   const email = escape(req.body.email);
+   const idCalendar = escape(req.body.token);
+   const courseID = escape(req.body.courseID);
 
    // Load client secrets from a local file.
    fs.readFile('credentials.json', (err, content) => {
@@ -530,16 +534,49 @@ app.post('/calendar/importLessons', function (req, res) {
       const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
       const query = 'SELECT * FROM google_token WHERE email = ' + connection.escape(email);
-      connection.query(query, function (error, results, fields) {
+      connection.query(query, async function (error, results, fields) {
          if (error) throw error;
          if (results.length == 0) {
             console.log('Token Non Trovato');
-            return res.send({ error: false, data: error, message: 'Token Non Trovat' });
+            return res.send({ error: false, data: error, message: 'Token Non Trovato' });
          }
+
          const tokenInfo = results[0];
-         oAuth2Client.setCredentials({ access_token: tokenInfo.access_token, refresh_token: tokenInfo.refresh_token });
+         const tokenExpire = new Date(parseInt(tokenInfo.expiry_date));
+         const accessToken = tokenInfo.access_token
+
+         /*if(tokenExpire < (new Date())) {
+
+            oAuth2Client.refreshAccessToken(function(err, token) {
+               if (err) throw err;
+
+               console.log(token);
+               
+               const query = "UPDATE google_token SET access_token = ? WHERE email = ?";
+               connection.query(query, [token, email], function (error, results, fields) {
+                  if (error) throw error;
+                  accessToken = token;
+                  console.log("Nuovo Token  : " + token);
+               });
+               
+
+            })
+         }*/
+         /*oAuth2Client.on('tokens', (tokenInfo) => {
+            console.log(tokenInfo);
+            if (tokenInfo.refresh_token) {
+              // store the refresh_token in my database!
+              console.log(tokenInfo.refresh_token);
+            }
+            console.log(tokenInfo.access_token);
+          });
+
+         
+         const pippo = oAuth2Client.getAccessToken().catch(console.error);
+         console.log(pippo);*/
+         oAuth2Client.setCredentials({ access_token: accessToken, refresh_token: tokenInfo.refresh_token });
          callback(oAuth2Client);
-      });
+      })
    }
 
 
@@ -554,15 +591,21 @@ app.post('/calendar/importLessons', function (req, res) {
       calendar.events.list({
          calendarId: idCalendar,
          timeMin: (new Date()).toISOString(),
-         maxResults: 10,
+         maxResults: 1,
          singleEvents: true,
          orderBy: 'startTime',
       }, (err, resu) => {
          if (err) return console.log('The API returned an error: ' + err);
          const events = resu.data.items;
+                     
+         const errori = [];
+         const datiInsert = [];
+
          if (events.length) {
-            console.log('Upcoming 10 events:');
-            events.map((event, i) => {
+
+            events.map( async (event, i) => {
+               const riga = {}
+
 
                try {
                   const classroom = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[0]));
@@ -574,39 +617,55 @@ app.post('/calendar/importLessons', function (req, res) {
 
                   const timeStart = dateStart.getHours() + dateStart.getMinutes() / 60;
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
-
+      
                   const totalHours = timeEnd - timeStart;
 
-                  //console.log(dateStart,dateEnd);
-                  //console.log("start at: " + timeStart,"end at: " + timeEnd + " Ore totali: " + totalHours);
-                  //console.log(`${event.summary}`);
+                  const queryProf = 'SELECT id FROM companies WHERE name like "%?%" ';
+                  await connection.query(queryProf, [teacher], Sync(function (errorProf, resultsProf, fields) {
+                     if (errorProf) { throw errorProf;}
+                     if (resultsProf.length == 0) { riga.prof = false; console.log("prof");}
+                  }));
 
-                  //console.log(classroom);
-                  //console.log(teacher);
-                  //console.log(lessontype);
-                  /*
-                  INSERT INTO `lessons`(`id`, `lesson`, `email_responsible`, `classroom`, `id_course`, 
-                  `date`, `start_time`, `end_time`, `total_hours`, `creation_date`, `modify_date`, 
-                  `email_supervisor_create`, `email_supervisor_modify`)*/
+                  const querySub = 'SELECT id FROM type_leasson WHERE name like "%?%" ';
+                  await connection.query(querySub, [lessontype], Sync(function (errorSub, resultsSub, fields) {
+                  if (errorSub) { throw errorSub;}
+                     if (resultsSub.length == 0) { riga.leasson = false; console.log("lezi");}
+                  }));
 
-                  /*
-                  const query = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`)' +
-                  'VALUES ("'+lessontype+'","'+teacher+'","'+classroom+'",1,"'+tools.formattedDate(dateStart)+'","'+timeStart+'","'+timeEnd+'","'+totalHours +'","'+tools.formattedDate()+'")';
-                  
-                  connection.query(query, function (error, items, fields) {
-                     if (error) throw error;
-                     return res.send({ error: false, data: items, message: 'Calendar added' });
-                  });*/
-                  console.log("cered si")
+                  if(Object.entries(riga).length !== 0) {
+                     riga.dataStart = dateStart;
+                     riga.dataEnd = dateEnd;
+                     errori.push(riga);
+                     console.log("push");
+                  } else {
+                     //datiInsert.push([resultsSub[0].id, resultsProf[0].id, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
+                     console.log("ok");
+                  }
+
                } catch (err) {
+                  console.log(err);
                   errorDataInsert.push(event.summary + " " + event.start.dateTime.split("T")[0]);
                   console.log("I seguenti dati non sono stati inseriti correttamente: ");
                   console.log(JSON.stringify(errorDataInsert));
                }
+
+               
             });
          } else {
             console.log('No upcoming events found.');
          }
+
+         if(errori.length === 0) {
+            
+            /*const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+            connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
+               if (errorIns) throw errorIns;
+               return res.send({ error: false, data: items, message: 'Calendar added' });
+            });*/
+         } else {
+            console.log(errori);
+         }
+
       });
    }
    res.end();

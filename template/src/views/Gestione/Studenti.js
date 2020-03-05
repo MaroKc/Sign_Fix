@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader } from 'reactstrap';
+import { Card, CardBody, CardHeader, Button, Row, Col, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import axios from 'axios'
 import { MDBDataTable } from 'mdbreact';
-import InfoStudente from './InfoStudente'
+import InfoStudente from './InfoStudente';
+import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 
 class Studenti extends Component {
@@ -10,17 +11,22 @@ class Studenti extends Component {
     super(props)
     this.state = {
       studenti: [],
-      displayCard: null
+      displayCard: null,
+      idCorso: this.props.classe["id"],
+      allStudenti: [],
+      displayTab: false,
+      warning: false
     }
   }
 
 
   componentDidMount() {
     this.getStudents();
+    this.getAllStudents();
   }
 
   getStudents = () => {
-    axios.get('http://localhost:8080/listStudents/'+this.props.classe["id"])
+    axios.get('http://localhost:8080/listStudents/'+this.state.idCorso)
       .then(res => res.data)
       .then((data, index) => {
         const studenti = [];
@@ -40,6 +46,40 @@ class Studenti extends Component {
       })
       .catch(err => console.error(err));
   }
+
+  getAllStudents = () => {
+    axios.get('http://localhost:8080/listAllStudents/'+this.state.idCorso)
+      .then(res => res.data)
+      .then((data, index) => {
+        const allStudenti = [];
+        data.map(item => allStudenti.push({
+          firstName: item.first_name,
+          lastName: item.last_name,
+          email: item.email,
+        }));
+        this.setState({ allStudenti });
+      })
+      .catch(err => console.error(err));
+  }
+
+  refresh() {
+    this.getAllStudents();
+    this.getStudents();
+
+  }
+
+  getCsv = () => {
+    axios.get('http://localhost:8080/importCsv/'+this.state.idCorso)
+    .then(res => res.data)
+    .then(res => {
+      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!")
+      else if (res.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
+    })
+    .catch(err => console.error(err));
+    this.refresh()
+    this.toggleWarning()
+  }
+
 
   formatHours (hours){
     var startLessonAppoggio= (hours.toString()).split('.')
@@ -65,6 +105,12 @@ class Studenti extends Component {
     this.setState({
       displayCard: null
     });
+  }
+
+  displayTab = () => {
+    this.setState({
+      displayTab: !this.state.displayTab
+    })
   }
 
   tabPane() {
@@ -102,9 +148,18 @@ class Studenti extends Component {
         return (
           <div>
           <Card>
-            <CardHeader >
-              <div className="text-center font-weight-bold">STUDENTI</div>
-            </CardHeader>
+          <CardHeader>
+                <Row>
+                  <Col sm="4">
+                  </Col>
+                  <Col sm="4" className="my-auto text-center">
+                    <span className="font-weight-bold"><h4>STUDENTI REGISTRATI</h4></span>
+                  </Col>
+                  <Col sm="4" className="text-right">
+                    <span> <Button color="ghost-success" className="mr-1"  onClick={this.toggleWarning}><i className="cui-user-follow icons font-2xl d-block"></i> Importa csv </Button> </span>
+                  </Col>
+                </Row>
+              </CardHeader>
             <CardBody className="ml-4 mr-4">
               <MDBDataTable
                 responsive
@@ -115,6 +170,7 @@ class Studenti extends Component {
                 noBottomColumns={true}
               />
             </CardBody>
+            <Button outline color="dark" onClick={this.displayTab}>Visualizza tutti gli studenti</Button>
           </Card>
           <Card>
             <CardHeader >
@@ -139,8 +195,17 @@ class Studenti extends Component {
         return (
           <div>
             <Card>
-              <CardHeader >
-                <div className="text-center font-weight-bold">STUDENTI</div>
+              <CardHeader>
+                <Row>
+                  <Col sm="4">
+                  </Col>
+                  <Col sm="4" className="my-auto text-center">
+                    <span className="font-weight-bold"><h4>STUDENTI REGISTRATI</h4></span>
+                  </Col>
+                  <Col sm="4" className="text-right">
+                    <span> <Button color="ghost-success" className="mr-1" onClick={this.toggleWarning}><i className="cui-user-follow icons font-2xl d-block"></i> Importa csv </Button> </span>
+                  </Col>
+                </Row>
               </CardHeader>
               <CardBody>
                 <MDBDataTable
@@ -152,6 +217,7 @@ class Studenti extends Component {
                   noBottomColumns={true}
                 />
               </CardBody>
+              <Button  outline color="dark" onClick={this.displayTab}>Visualizza tutti gli studenti</Button>
             </Card>
           </div>
         )
@@ -167,11 +233,99 @@ class Studenti extends Component {
       )
     }
   }
+  
 
+  tabAllStudents() {
+    const DatatablePage = () => {
+      const data = {
+        columns: [
+          {
+            label: 'Nome',
+            field: 'firstName',
+          },
+          {
+            label: 'Cognome',
+            field: 'lastName',
+          },
+          {
+            label: 'Email',
+            field: 'email',
+          }
+        ],
+        rows: this.state.allStudenti,
+      };
+        return (
+          <div>
+            <Card>
+              <CardHeader >
+                <div className="text-center font-weight-bold">STUDENTI </div>
+              </CardHeader>
+              <CardBody>
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={data}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                />
+              </CardBody>
+              <Button outline color="dark" onClick={this.displayTab}>Torna indietro</Button>
+            </Card>
+          </div>
+        )
+      }
+    
+    if(this.state.displayCard){
+      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable}/>
+    }else{
+      return (
+        <>
+          {DatatablePage()}
+        </>
+      )
+    }
+  }
+
+  toggleWarning = () => {
+    this.setState({
+      warning: !this.state.warning,
+    });
+  }
+
+  openModal = () => {
+    return (
+      <Modal isOpen={this.state.warning} toggle={this.toggleWarning}
+        className={'modal-danger ' + this.props.className}>
+        <ModalHeader toggle={this.toggleWarning}>WARNING</ModalHeader>
+        <ModalBody>
+          <div className="text-center">
+            Stai importando un <b>nuovo</b> csv, i vecchi studenti verranno cancellati
+            <h5 >Procedere?</h5>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={this.getCsv} color="danger">Continua</Button>{' '}
+          <Button color="secondary" onClick={this.toggleWarning}>Cancella</Button>
+        </ModalFooter>
+      </Modal>
+    )
+  }
 
   render() {
-      return this.tabPane()
+    if (this.state.displayTab) {
+      return this.tabAllStudents()
+    } else {
+      return (
+        <div>
+          {this.tabPane()} {this.openModal()}
+          <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
+        </div>
+      )
     }
+  }
+
+
   }
 
 export default Studenti;

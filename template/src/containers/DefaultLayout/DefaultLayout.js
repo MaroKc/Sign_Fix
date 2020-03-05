@@ -21,7 +21,7 @@ import navigation from '../../_nav';
 import routes from '../../routes';
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
-// const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
+const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 
 class DefaultLayout extends Component {
@@ -30,7 +30,6 @@ class DefaultLayout extends Component {
     super(props);
 
     const cookieCorso = JSON.parse(sessionStorage.getItem("corso"));
-    console.log(JSON.stringify(cookieCorso));
     this.state = {
       classe: cookieCorso ? cookieCorso : null
     }
@@ -38,10 +37,8 @@ class DefaultLayout extends Component {
 
   changeCorso = (corso) => {
     this.setState({ classe: corso })
-    console.log(corso);
     sessionStorage.setItem("corso", JSON.stringify(corso));
   }
-
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
@@ -55,13 +52,11 @@ class DefaultLayout extends Component {
     return (
       <div className="app">
 
-{/*    
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} />
           </Suspense>
         </AppHeader>
-        */}
 
         <div className="app-body">
 
