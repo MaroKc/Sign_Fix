@@ -155,41 +155,56 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
-app.get('/importCsv',function(req,res){
+app.get('/importCsv/:id_course',function(req,res){
+   idCorso =req.params.id_course
+   connection.query("DELETE FROM `students` WHERE id_course="+idCorso, function (error, results, fields) {
+      if (error) throw error;
+      });
+   try {
    
-try {
-   // read contents of the file
-   const data = fs.readFileSync('data.csv', 'UTF-8');
+      // read contents of the file
+      const data = fs.readFileSync('data.csv', 'UTF-8');
 
-   // split the contents by new line
-   const lines = data.split(/\r?\n/);
-   persone=[]
-   idCorso=2
-  
-   for (let i = 0; i < lines.length-1; i++) {
+      // split the contents by new line
+      const lines = data.split(/\r?\n/);
+      persone=[]
+   
+      for (let i = 0; i < lines.length-1; i++) {
 
-      // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
-      const lineaSplittata= lines[i].split(',')
-      const email = tools.stringLowerCase(tools.stringTrim(lineaSplittata[22]));
-      const firstName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[7]));
-      const lastName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[8]));
-      const birth = tools.stringLowerCase(tools.stringTrim(lineaSplittata[10]));
-      const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
-      const fiscalCode = lineaSplittata[3];
-      var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES ("+email+","+firstName+","+lastName+","+birth+","+residence+","+fiscalCode+","+ idCorso+",0)";
-      
-      connection.query(query, function (error, results, fields) {
-         if (error) throw error;
-         });
-      }
-      
-   // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
-      return res.send({ error: true, message: 'ok' });
+         // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
+         const lineaSplittata= lines[i].split(',')
+         const email = tools.stringLowerCase(tools.stringTrim(lineaSplittata[22]));
+         const firstName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[7]));
+         const lastName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[8]));
+         const birth = tools.stringLowerCase(tools.stringTrim(lineaSplittata[10]));
+         const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
+         const fiscalCode = lineaSplittata[3];
+         var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES ("+email+","+firstName+","+lastName+","+birth+","+residence+","+fiscalCode+","+ idCorso+",0)";
+         
+         connection.query(query, function (error, results, fields) {
+            if (error) throw error;
+            });
+         }
+      // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
+         return res.send({ error: true, message: 'ok' });
 
-   } catch (err) {
-      return res.send({ error: true, data: err, message: 'ko' });
+      } catch (err) {
+         return res.send({ error: true, data: err, message: 'ko' });
 
-      }
+         }
+});
+
+
+
+
+app.get('/listAllTeachers', function (req, res) {
+   var data = [];
+
+   connection.query("SELECT * from teachers", function (error, results, fields) {
+      if (error) throw error;
+      data= results
+      return res.send(JSON.stringify(data));
+   });
 });
 
 app.get('/listTeachers',function(req,res){
@@ -216,6 +231,7 @@ app.get('/listTeachers',function(req,res){
       return res.send({ error: true,data:error,message:'ko' });
    }
 });
+
 
 app.put('/updateTeacher/:email', function (req, res) {
 try {
@@ -281,10 +297,6 @@ app.post('/createTeacher', function (req, res) {
    var emailDocente = req.body.emailDocente
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
-<<<<<<< HEAD
-   var ritirato = 0
-=======
->>>>>>> 500e343fbebecb8eed21a7cec1fb5563649ecccf
    var company=[]
 
    connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
@@ -424,34 +436,54 @@ app.get('/listStudents/:id_course', function (req, res) {
    });
 });
 
+app.get('/listAllStudents/:id_course', function (req, res) {
+   var data = [];
+   var id_course = req.params.id_course
+   connection.query("SELECT * from students where id_course= "+id_course, function (error, results, fields) {
+      if (error) throw error;
+      data= results
+      return res.send(JSON.stringify(data));
+   });
+});
+
 app.put('/updateStudent/:email', function (req, res) {
 
-   var email = req.params.email
-   var first_name = req.body.first_name
-   var last_name = req.body.last_name
-   var date_of_birth = req.body.date_of_birth
-   var residence = req.body.residence
-   var fiscal_code = req.body.fiscal_code
-
-   var query = "UPDATE `students` SET `first_name`=?,`last_name`=?,`date_of_birth`=?,`residence`=?,`fiscal_code`=? WHERE `email` = ?";
-   connection.query(query, [first_name, last_name, date_of_birth, residence, fiscal_code, email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
-   });
+   try {
+      var email = req.params.email
+      var first_name = req.body.first_name
+      var last_name = req.body.last_name
+      var date_of_birth = req.body.date_of_birth
+      var residence = req.body.residence
+      var fiscal_code = req.body.fiscal_code
+   
+      var query = "UPDATE `students` SET `first_name`=?,`last_name`=?,`date_of_birth`=?,`residence`=?,`fiscal_code`=? WHERE `email` = ?";
+      connection.query(query, [first_name, last_name, date_of_birth, residence, fiscal_code, email], function (error, results, fields) {
+         if (error) throw error;
+         res.send({ error: false, data: results, message: 'ok' });
+      });
+   } catch (error) {
+      res.send({ error: false, data: error, message: 'ko' });
+   }
+ 
 });
 
 
 
 app.put('/retireStudent/:email', function (req, res) {
-   var email = req.params.email;
+   
+   try {
+      var email = req.params.email;
 
-   var ritirato = req.body.ritirato
-
-   var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
-   connection.query(query, [ritirato, email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: false, data: results, message: 'user has been updated successfully.' });
-   });
+      var ritirato = req.body.ritirato
+   
+      var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
+      connection.query(query, [ritirato, email], function (error, results, fields) {
+         if (error) throw error;
+         res.send({ error: false, data: results, message: 'ok' });
+      });
+   } catch (error) {
+      res.send({ error: false, data: error, message: 'ko' });
+   }
 });
 
 app.get('/calendar/listLessons', function (req, res) {
