@@ -1,8 +1,10 @@
 import React from 'react';
 import { Card, CardBody, CardHeader, Button, Collapse, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter, Input } from 'reactstrap';
-import axios from 'axios'
-import DatePicker from 'react-datepicker'
+import axios from 'axios';
+import DatePicker from 'react-datepicker';
 import { MDBDataTable } from 'mdbreact';
+import OreLezioniMattina from './OreLezioniMattina';
+import OreLezioniPomeriggio from './OreLezioniPomeriggio';
 
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -20,21 +22,33 @@ class Lezioni extends React.Component {
       startDate: new Date(),
       collapse: false,
       accordion: [false, false],
-      warning: false,
-      emailStudent: "",
-      student: [],
-      firstName: '',
-      startTime: '',
-      endTime: ''
+      displayCard: null,
+      displayId: null,
+      mattinaPomeriggio: null
     }
-
   }
-
 
   handleChange = date => {
       this.setState({
         startDate: date
       },()=> this.getLessons()); 
+  }
+
+  displayCard = (e, f, g) => {
+    this.setState({
+      displayCard: e,
+      displayId: f,
+      mattinaPomeriggio: g
+    });
+  }
+
+
+  displayTable = () => {
+    this.setState({
+      displayCard: null,
+      displayId: null,
+      mattinaPomeriggio: null
+    });
   }
 
   getLessons = () => {
@@ -91,7 +105,7 @@ class Lezioni extends React.Component {
                 emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
                 endTime: this.formatHours(item.endTime),
-                clickEvent: () => this.toggleWarning(item.emailStudent)
+                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, item.mattinaPomeriggio)
               })
             }
             else if(item.mattinaPomeriggio === 1){
@@ -99,8 +113,10 @@ class Lezioni extends React.Component {
                 idLesson: item.idLesson,
                 firstName: item.firstName,
                 lastName: item.lastName,
+                emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
-                endTime: this.formatHours(item.endTime)
+                endTime: this.formatHours(item.endTime),
+                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, item.mattinaPomeriggio)
               })
             }
           });
@@ -129,60 +145,6 @@ class Lezioni extends React.Component {
     //         changeInfo: false
     //     })
     // }
-
-    toggleWarning = (e) => {
-      this.setState({
-        emailStudent: e,
-        warning: !this.state.warning,
-      },() => this.stud());
-      console.log(this.state.student)
-    }
-    
-    stud =() => {
-      this.setState({
-        student: this.state.emailStudent !== "" && this.state.studentiMattina.find(studente => studente.emailStudent === this.state.emailStudent),
-        firstName: this.state.student && this.state.student.firstName,
-        startTime: this.state.student && this.state.student.startTime,
-        endTime: this.state.student && this.state.student.endTime
-      })
-    }
-
-
-    toggle = () => {
-      this.setState({
-        warning: !this.state.warning
-      })
-    }
-
-    handle = (event) => {
-      let name = event.target.name;
-      let val = event.target.value;
-
-      this.setState({
-          [name]: val,
-      });
-  }
-
-
-  openModal = () => {
-    return (
-      <Modal isOpen={this.state.warning} toggle={this.toggleWarning}
-        className={'modal-danger ' + this.props.className}>
-        <ModalHeader toggle={this.toggleWarning}>WARNING</ModalHeader>
-        <ModalBody>
-          <div className="text-center">
-            Stai cambiando l'orario di ingresso e/o uscita dello studente {this.state.firstName}
-            <h5 >Procedere?</h5>
-            <Input name='startTime' value = {this.state.startTime} onChange={this.handle}  /> <Input name='endTime' value={this.state.endTime} onChange={this.handle}   />
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger">Continua</Button>{' '}
-          <Button color="secondary" onClick={this.toggle}>Cancella</Button>
-        </ModalFooter>
-      </Modal>
-    )
-  }
 
 
   formatHours (hours){
@@ -234,7 +196,7 @@ class Lezioni extends React.Component {
     if (nomeLezione) {
       
       return <>
-         {this.openModal()}
+        
         <Card className="m-4 ">
           <CardHeader id="headingOne">
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
@@ -364,11 +326,20 @@ class Lezioni extends React.Component {
     </div>
   );  
     }
+    if(this.state.displayCard && this.state.mattinaPomeriggio === 0){
+      return <OreLezioniMattina
+      studenteMattina={this.state.studentiMattina.find((studente) => studente.emailStudent === this.state.displayCard)} 
+      lezioneMattina={this.state.lezioniMattina.find(lezione => lezione.id === this.state.displayId )}
+
+      getLessons={this.getLessons} 
+      displayTable={this.displayTable}
+      />
+    }else{
     return (
       <>
         {DatatablePage()}
       </>
-    )
+    )}
   }
   
 
@@ -396,6 +367,7 @@ class Lezioni extends React.Component {
         rows: this.state.studentiPomeriggio
       };
 
+      // this.state.studentiPomeriggio.startTime === "assente" ? <div className="text-success">"assente"</div> : this.state.studentiPomeriggio.startTime
   return (
     <div>
       <Card>
@@ -413,11 +385,20 @@ class Lezioni extends React.Component {
     </div>
   );  
     }
+    if(this.state.displayCard && this.state.mattinaPomeriggio === 1){
+      return <OreLezioniPomeriggio 
+      studentePomeriggio={this.state.studentiPomeriggio.find((studente) => studente.emailStudent === this.state.displayCard)} 
+      lezionePomeriggio={this.state.lezioniPomeriggio.find(lezione => lezione.id === this.state.displayId )}
+
+      getLessons={this.getLessons} 
+      displayTable={this.displayTable}
+      />
+    }else{
     return (
       <>
         {DatatablePage()}
       </>
-    )
+    )}
   }
 
   render() {
@@ -437,11 +418,9 @@ class Lezioni extends React.Component {
                 className="border border-dark rounded text-center"
               />
                </div>
-
             </div>
             {this.lezioneMattina()}
             {this.lezionePomeriggio()}
-         
           </CardBody>
         </Card>
       </>

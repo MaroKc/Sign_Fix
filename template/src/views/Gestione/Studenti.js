@@ -19,7 +19,6 @@ class Studenti extends Component {
       studenti: [],
       displayCard: null,
       idCorso: this.props.classe["id"],
-      allStudenti: [],
       displayTab: false,
       warning: false
     }
@@ -28,7 +27,6 @@ class Studenti extends Component {
 
   componentDidMount() {
     this.getStudents();
-    this.getAllStudents();
   }
 
   getStudents = () => {
@@ -53,25 +51,8 @@ class Studenti extends Component {
       .catch(err => console.error(err));
   }
 
-  getAllStudents = () => {
-    axios.get('http://localhost:8080/listAllStudents/'+this.state.idCorso)
-      .then(res => res.data)
-      .then((data, index) => {
-        const allStudenti = [];
-        data.map(item => allStudenti.push({
-          firstName: item.first_name,
-          lastName: item.last_name,
-          email: item.email,
-        }));
-        this.setState({ allStudenti });
-      })
-      .catch(err => console.error(err));
-  }
-
   refresh() {
-    this.getAllStudents();
     this.getStudents();
-
   }
 
   getCsv = () => {
@@ -86,11 +67,10 @@ class Studenti extends Component {
     this.toggleWarning()
   }
 
-
   formatHours (hours){
     var startLessonAppoggio= (hours.toString()).split('.')
     var startLesson= ''
-
+  
     if(startLessonAppoggio[1]){
       var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
       startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
@@ -99,7 +79,7 @@ class Studenti extends Component {
     else{
       return startLessonAppoggio[0]
     }
-}
+  }
 
   displayCard = (e) => {
     this.setState({
@@ -111,12 +91,6 @@ class Studenti extends Component {
     this.setState({
       displayCard: null
     });
-  }
-
-  displayTab = () => {
-    this.setState({
-      displayTab: !this.state.displayTab
-    })
   }
 
   tabPane() {
@@ -176,7 +150,6 @@ class Studenti extends Component {
                 noBottomColumns={true}
               />
             </CardBody>
-            <Button outline color="dark" onClick={this.displayTab}>Visualizza tutti gli studenti</Button>
           </Card>
           <Card>
             <CardHeader >
@@ -223,7 +196,6 @@ class Studenti extends Component {
                   noBottomColumns={true}
                 />
               </CardBody>
-              <Button  outline color="dark" onClick={this.displayTab}>Visualizza tutti gli studenti</Button>
             </Card>
           </div>
         )
@@ -239,59 +211,7 @@ class Studenti extends Component {
       )
     }
   }
-  
 
-  tabAllStudents() {
-    const DatatablePage = () => {
-      const data = {
-        columns: [
-          {
-            label: 'Nome',
-            field: 'firstName',
-          },
-          {
-            label: 'Cognome',
-            field: 'lastName',
-          },
-          {
-            label: 'Email',
-            field: 'email',
-          }
-        ],
-        rows: this.state.allStudenti,
-      };
-        return (
-          <div>
-            <Card>
-              <CardHeader >
-                <div className="text-center font-weight-bold">STUDENTI </div>
-              </CardHeader>
-              <CardBody>
-                <MDBDataTable
-                  responsive
-                  hover
-                  data={data}
-                  searching={false}
-                  paging={false}
-                  noBottomColumns={true}
-                />
-              </CardBody>
-              <Button outline color="dark" onClick={this.displayTab}>Torna indietro</Button>
-            </Card>
-          </div>
-        )
-      }
-    
-    if(this.state.displayCard){
-      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable}/>
-    }else{
-      return (
-        <>
-          {DatatablePage()}
-        </>
-      )
-    }
-  }
 
   toggleWarning = () => {
     this.setState({
@@ -319,19 +239,13 @@ class Studenti extends Component {
   }
 
   render() {
-    if (this.state.displayTab) {
-      return this.tabAllStudents()
-    } else {
       return (
         <div>
           {this.tabPane()} {this.openModal()}
           <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
         </div>
       )
-    }
   }
-
-
   }
 
 export default Studenti;

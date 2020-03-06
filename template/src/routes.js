@@ -49,6 +49,9 @@ const Lezioni = React.lazy(() => import('./views/Gestione/Lezioni'));
 const Calendario = React.lazy(() => import('./views/Gestione/Calendario'));
 const Impostazioni = React.lazy(() => import('./views/Impostazioni/Impostazioni'))
 
+const StudentiPersonale = React.lazy(() => import('./views/Gestione/StudentiPersonale'))
+const DocentiPersonale = React.lazy(() => import('./views/Gestione/DocentiPersonale'))
+
 
 /* */
 
@@ -106,6 +109,9 @@ const routes = [
   { path: '/lezioni', exact: true, name: 'Lezioni', component: Lezioni },
   { path: '/calendario', exact: true, name: 'Calendario', component: Calendario },
   { path: '/impostazioni', exact: true, name: 'Impostazioni', component: Impostazioni },
+
+  { path: '/studentiPersonale', exact: true, name: 'Studenti', component: StudentiPersonale },
+  { path: '/docentiPersonale', exact: true, name: 'Studenti', component: DocentiPersonale },
 
 ];
 

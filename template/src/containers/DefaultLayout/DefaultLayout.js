@@ -32,7 +32,7 @@ class DefaultLayout extends Component {
     const cookieCorso = JSON.parse(sessionStorage.getItem("corso"));
     this.state = {
       classe: cookieCorso ? cookieCorso : null
-    }
+    } 
   }
 
   changeCorso = (corso) => {
@@ -60,7 +60,7 @@ class DefaultLayout extends Component {
 
         <div className="app-body">
 
-          {classe !== 0 && (
+          {classe  && (
             <AppSidebar fixed display="lg">
               <AppSidebarHeader />
               <AppSidebarForm />

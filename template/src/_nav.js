@@ -38,17 +38,7 @@ export default {
       icon: 'icon-pie-chart',
     },
     
-    /*
-    {
-      title: true,
-      name: 'Dati',
-      wrapper: {            // optional wrapper object
-        element: '',        // required valid HTML5 element tag
-        attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
-      },
-      class: ''             // optional class names space delimited list for title item ex: "text-center"
-    },
-    */
+
     {
       name: 'Lezioni',
       url: '/lezioni',
@@ -61,7 +51,28 @@ export default {
       url: '/calendario',
       icon: 'icon-pie-chart',
     },
+    {
+      name: 'DocentiPersonale',
+      url: '/docentiPersonale',
+      icon: 'icon-pie-chart',
+      class: 'mt-5',
+    },
+    {
+      name: 'StudentiPersonale',
+      url: '/studentiPersonale',
+      icon: 'icon-pie-chart',
+      class: '',
+    },
     /*
+    {
+      title: true,
+      name: 'Dati',
+      wrapper: {            // optional wrapper object
+        element: '',        // required valid HTML5 element tag
+        attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
+      },
+      class: ''             // optional class names space delimited list for title item ex: "text-center"
+    },
       {
         name: 'Impostazioni',
         url: '/impostazioni',
