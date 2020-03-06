@@ -19,7 +19,7 @@ var errorDataInsert = [];
 const connectionDB = require('./connectionDB');
 const connection = connectionDB.createConnectionDB();
 connection.connect();
-
+ 
 
 app.use(function (req, res, next) {
    res.header('Access-Control-Allow-Methods', 'DELETE, PUT');
