@@ -12,6 +12,7 @@ const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
 const tools = require('./tools');
+const keys = require('./outh2.key.json');
 
 var errorDataInsert = [];
 
@@ -46,7 +47,6 @@ async function chekUser(email) {
 app.post('/tokensignin', function (req, res) {
 
    const code = req.body.code;
-   const keys = require('./outh2.key.json');
 
    async function verify() {
       /*
@@ -216,34 +216,34 @@ app.get('/listTeachers',function(req,res){
       return res.send({error: true, data:data, message: 'ok'});   
       });
    } catch (error) {
-      return res.send({ error: true,data:error,message:'ko' });
+      return res.send({ error: true, data: error, message: 'ko' });
    }
 });
 
 
 app.put('/updateTeacher/:email', function (req, res) {
-try {
-   var email = req.params.email
-   var first_name = req.body.first_name
-   var last_name = req.body.last_name
+   try {
+      var email = req.params.email
+      var first_name = req.body.first_name
+      var last_name = req.body.last_name
 
-   var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
-   
-   connection.query(query, [first_name, last_name,email], function (error, results, fields) {
-      if (error) throw error;
-      res.send({ error: true, data: results, message: 'ok' });
-   });
+      var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
+      connection.query(query, [first_name, last_name, email], function (error, results, fields) {
+         if (error) throw error;
+         res.send({ error: true, data: results, message: 'ok' });
+      });
    } catch (error) {
       res.send({ error: true, data: error, message: 'ko' });
-   }   
+   }
+
 });
 
 app.put('/retireTeacher/:email', function (req, res) {
-   
+
    try {
       var email = req.params.email
       var ritirato = req.body.ritirato
-   
+
       var query = "UPDATE `teachers` SET `ritirato` = ? WHERE `email_responsible` = ?";
       connection.query(query, [ritirato, email], function (error, results, fields) {
          if (error) throw error;
@@ -254,9 +254,9 @@ app.put('/retireTeacher/:email', function (req, res) {
       }
 });
 
-app.get('/teachersDetails',function (req,res){
+app.get('/teachersDetails', function (req, res) {
    try {
-      var data= []
+      var data = []
       var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
       connection.query(query, function (err, results, fields) {
          if (err) throw err;
@@ -273,7 +273,7 @@ app.get('/teachersDetails',function (req,res){
       });
    } catch (error) {
       res.send({ error: false, data: error, message: 'ko' });
-   } 
+   }
 });
 
 app.post('/createTeacher', function (req, res) {
@@ -283,9 +283,9 @@ app.post('/createTeacher', function (req, res) {
    var emailDocente = req.body.emailDocente
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
-   var company=[]
+   var company = []
 
-   connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
+   connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, items, fields) {
       if (error) throw error;
       if (items.length >0){
          items.forEach(element => {
@@ -297,13 +297,13 @@ app.post('/createTeacher', function (req, res) {
          })
          connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
             if (error) throw error;
-               return res.send({ error: false, result: result, message: 'ok' });
-            });
-      }else{
-         connection.query("INSERT INTO `companies` (`name`) VALUES ('"+companyName +"')", function (error, result, fields) {
+            return res.send({ error: false, result: result, message: 'ok' });
+         });
+      } else {
+         connection.query("INSERT INTO `companies` (`name`) VALUES ('" + companyName + "')", function (error, result, fields) {
             if (error) throw error;
-            });
-         connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, results, fields) {
+         });
+         connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, results, fields) {
             if (error) throw error;
             if (results.length >0){
                results.forEach(element => {
@@ -315,13 +315,13 @@ app.post('/createTeacher', function (req, res) {
                })
                connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                   if (error) throw error;
-                     return res.send({ error: false, result: result, message: 'ok' });
-                  });
+                  return res.send({ error: false, result: result, message: 'ok' });
+               });
             }
-            });
+         });
       }
    });
-   
+
 });
 
 app.put('/updateSignature/:id_lesson',function(req,res){
@@ -348,12 +348,12 @@ app.put('/updateSignature/:id_lesson',function(req,res){
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
-   var date_appoggio = req.params.date 
-   var id_course = req.params.id_course 
+   var date_appoggio = req.params.date
+   var id_course = req.params.id_course
 
    var data_Scelta = date_appoggio.split('-');
-   var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
-   connection.query("SELECT * FROM lessons WHERE date= '" + (dataFinale) + "' and id_course="+ id_course+"", function (error, results, fields) {
+   var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
+   connection.query("SELECT * FROM lessons WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
@@ -394,11 +394,11 @@ app.get('/lessonsTeacher/:id_course/:id_company', function (req, res) {
    });
 });
 
-app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
+app.get('/listSignaturesStudents/:data_scelta', function (req, res) {
    var data = []
    var date_appoggio = req.params.data_scelta
    var data_Scelta = date_appoggio.split('-');
-   var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
+   var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
 
    connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
       if (error) throw error;
@@ -422,14 +422,14 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
 
 app.get('/listStudents/:id_course', function (req, res) {
    var data = [];
-   var totalHours =[]
+   var totalHours = []
    var datetimeNow = new Date();
    var id_course = req.params.id_course
-   var query= "SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date <= '"+tools.formattedDate(datetimeNow)+"' and id_course= "+id_course+"";
+   var query = "SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date <= '" + tools.formattedDate(datetimeNow) + "' and id_course= " + id_course + "";
    connection.query(query, function (error, results, fields) {
       if (error) throw error;
       totalHours.push({
-         totalHours : results[0].total_hours
+         totalHours: results[0].total_hours
       })
    });
    connection.query("SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student where id_course= "+id_course+" GROUP BY email", function (error, results, fields) {
@@ -510,17 +510,28 @@ app.post('/calendar/importLessons', async function (req, res) {
    const idCalendar = escape(req.body.token);
    const courseID = escape(req.body.courseID);
 
+
+   const oAuth2Client = new OAuth2Client(
+      keys.web.client_id,
+      keys.web.client_secret,
+      keys.web.redirect_uris[0]
+   );
+
+   authorize(oAuth2Client, listEvents);
+
+   /*
    // Load client secrets from a local file.
    fs.readFile('credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Calendar API.
       authorize(JSON.parse(content), listEvents);
    });
+   */
 
-   function authorize(credentials, callback) {
+   function authorize(oAuth2Client, callback) {
 
-      const { client_secret, client_id, redirect_uris } = credentials.installed;
-      const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+      //const { client_secret, client_id, redirect_uris } = credentials.installed;
+      //const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
       const query = 'SELECT * FROM google_token WHERE email = ' + connection.escape(email);
       connection.query(query, async function (error, results, fields) {
@@ -532,42 +543,48 @@ app.post('/calendar/importLessons', async function (req, res) {
 
          const tokenInfo = results[0];
          const tokenExpire = new Date(parseInt(tokenInfo.expiry_date));
-         const accessToken = tokenInfo.access_token
+         oAuth2Client.setCredentials({ refresh_token: tokenInfo.refresh_token });
 
-         /*if(tokenExpire < (new Date())) {
+         if(tokenExpire < (new Date())) {
+            const newToken = await oAuth2Client.getAccessToken().catch(console.error);
+            const query = "UPDATE google_token SET access_token = ?, expiry_date = ? WHERE email = ?";
+            connection.query(query, [newToken.token, newToken.res.data.expiry_date, email], function (error, results, fields) {
+               if (error) throw error;
+               console.log("Acces Token Refreshato e Salvato");
+            });
+            oAuth2Client.setCredentials({ access_token: newToken.token });
+            callback(oAuth2Client);
 
-            oAuth2Client.refreshAccessToken(function(err, token) {
-               if (err) throw err;
+         } else {
+            oAuth2Client.setCredentials({ access_token: tokenInfo.access_token });
+            callback(oAuth2Client);
+         }
 
-               console.log(token);
-               
-               const query = "UPDATE google_token SET access_token = ? WHERE email = ?";
-               connection.query(query, [token, email], function (error, results, fields) {
-                  if (error) throw error;
-                  accessToken = token;
-                  console.log("Nuovo Token  : " + token);
-               });
-               
-
-            })
-         }*/
-         /*oAuth2Client.on('tokens', (tokenInfo) => {
-            console.log(tokenInfo);
-            if (tokenInfo.refresh_token) {
-              // store the refresh_token in my database!
-              console.log(tokenInfo.refresh_token);
-            }
-            console.log(tokenInfo.access_token);
-          });
-
-         
-         const pippo = oAuth2Client.getAccessToken().catch(console.error);
-         console.log(pippo);*/
-         oAuth2Client.setCredentials({ access_token: accessToken, refresh_token: tokenInfo.refresh_token });
-         callback(oAuth2Client);
       })
    }
 
+
+   let ProfCheck = (teacher) => {
+      return new Promise(function (resolve, reject) {
+         const queryProf = 'SELECT id FROM companies WHERE name like "%?%" ';
+         connection.query(queryProf, [teacher], function (errorProf, resultsProf, fields) {
+            if (errorProf) { throw reject(new Error(errorProf)); }
+            if (resultsProf.length == 0) { resolve(false); } else { resolve(queryProf[0].id); }
+         });
+
+      });
+   }
+
+   let LeassonCheck =  (lessontype) => {
+      return new Promise( function (resolve, reject) {
+         const querySub = 'SELECT id FROM companies WHERE name like "%?%" ';
+         connection.query(querySub, [lessontype], function (errorSub, resultsSub, fields) {
+            if (errorSub) { throw errorSub; }
+            if (resultsSub.length == 0) { resolve(false); } else { resolve(querySub[0].id); }
+         });
+
+      });
+   }
 
    /**
     * Lists the next 10 events on the user's primary calendar.
@@ -583,18 +600,17 @@ app.post('/calendar/importLessons', async function (req, res) {
          maxResults: 1,
          singleEvents: true,
          orderBy: 'startTime',
-      }, (err, resu) => {
+      }, async (err, resu) => {
          if (err) return console.log('The API returned an error: ' + err);
          const events = resu.data.items;
-                     
+
          const errori = [];
          const datiInsert = [];
 
          if (events.length) {
 
-            events.map( async (event, i) => {
+            events.map(async (event, i) => {
                const riga = {}
-
 
                try {
                   const classroom = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[0]));
@@ -606,28 +622,26 @@ app.post('/calendar/importLessons', async function (req, res) {
 
                   const timeStart = dateStart.getHours() + dateStart.getMinutes() / 60;
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
-      
+
                   const totalHours = timeEnd - timeStart;
 
-                  const queryProf = 'SELECT id FROM companies WHERE name like "%?%" ';
-                  await connection.query(queryProf, [teacher], Sync(function (errorProf, resultsProf, fields) {
-                     if (errorProf) { throw errorProf;}
-                     if (resultsProf.length == 0) { riga.prof = false; console.log("prof");}
-                  }));
+                  
+                  const checkProf = await ProfCheck(teacher);
+                  const checkLeasson = await LeassonCheck(lessontype);
+                  if (checkProf === false) {
+                     riga.prof = false;
+                  }
+                  if (checkLeasson === false) {
+                     riga.leasson = false;
+                  }
 
-                  const querySub = 'SELECT id FROM type_leasson WHERE name like "%?%" ';
-                  await connection.query(querySub, [lessontype], Sync(function (errorSub, resultsSub, fields) {
-                  if (errorSub) { throw errorSub;}
-                     if (resultsSub.length == 0) { riga.leasson = false; console.log("lezi");}
-                  }));
-
-                  if(Object.entries(riga).length !== 0) {
+                  if (Object.entries(riga).length !== 0) {
                      riga.dataStart = dateStart;
                      riga.dataEnd = dateEnd;
                      errori.push(riga);
                      console.log("push");
                   } else {
-                     //datiInsert.push([resultsSub[0].id, resultsProf[0].id, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
+                     //datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
                      console.log("ok");
                   }
 
@@ -638,14 +652,15 @@ app.post('/calendar/importLessons', async function (req, res) {
                   console.log(JSON.stringify(errorDataInsert));
                }
 
-               
+
             });
          } else {
             console.log('No upcoming events found.');
          }
+      
 
-         if(errori.length === 0) {
-            
+         if (errori.length === 0) {
+            console.log("insert")
             /*const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
             connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
                if (errorIns) throw errorIns;
