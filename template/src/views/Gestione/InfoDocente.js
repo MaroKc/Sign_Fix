@@ -77,24 +77,8 @@ refresh = () => {
 onclickModifyState = () => {
             this.setState({
             changeInfo: !this.state.changeInfo
-        })    // formOrario(){
-
-            //     axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
-            //         first_name: this.state.firstName,
-            //         last_name: this.state.lastName
-            //     })
-            //         .then(res => {
-            //             if (res.data.message === "ok") ToastsStore.success("La modifica è stata effettuata con successo!")
-            //             else if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
-            //         })
-            //         .catch(err => {
-            //             return console.log(err);
-            //         });
-            //     this.setState({
-            //         changeInfo: false
-            //     })
-            // }
-        
+        })
+    }
 
 changeInfo = (changeInfo) => {
     if (!changeInfo) {

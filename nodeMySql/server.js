@@ -208,21 +208,12 @@ app.get('/listTeachers',function(req,res){
                {
                   name : element.name,
                   lesson : element.lesson,
-<<<<<<< HEAD
-                  first_name: element.first_name,
-                  ritirato: element.ritirato,
-                  lastName: element.last_name,
-                  companiId: element.company_id,
-                  emailTeacher: element.email,
-                  hourOfLessons: tools.formattedDecimal(element.hourOfLessons),
-=======
                   firstName: element.first_name,
                   lastName: element.last_name,
                   ritirato: element.ritirato,
                   companyId: element.company_id,
                   emailTeacher: element.email,
                   hoursOfLessons: tools.formattedDecimal(element.hourOfLessons),
->>>>>>> 283f0c409b2a420770973489c12572ec2b2ed92d
                   totalHours: tools.formattedDecimal(element.totalHours),
                })
          })
@@ -267,30 +258,6 @@ app.put('/retireTeacher/:email', function (req, res) {
       }
 });
 
-<<<<<<< HEAD
-app.get('/teachersDetails', function (req, res) {
-   try {
-      var data = []
-      var query = "SELECT name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
-      connection.query(query, function (err, results, fields) {
-         if (err) throw err;
-         results.forEach(element => {
-            data.push(
-               {
-                  company_name: element.company_name,
-                  company_id: element.company_id,
-                  total_hours: tools.formattedDecimal(element.total_hours) ? tools.formattedDecimal(element.total_hours) : '0',
-                  lesson: element.lesson ? element.lesson : '',
-               })
-         })
-         res.send({ error: false, data: data, message: 'ok' });
-      });
-   } catch (error) {
-      res.send({ error: false, data: error, message: 'ko' });
-   }
-});
-=======
->>>>>>> 283f0c409b2a420770973489c12572ec2b2ed92d
 
 app.post('/createTeacher', function (req, res) {
 
@@ -346,11 +313,7 @@ app.put('/updateSignature/:id_lesson',function(req,res){
       var data =[]
       var email = req.body.email
       var id_lesson = req.params.id_lesson
-<<<<<<< HEAD
-      var startTime = req.bosy.startTime
-=======
       var startTime = req.body.startTime
->>>>>>> 283f0c409b2a420770973489c12572ec2b2ed92d
       var endTime = req.body.endTime
       var dateOfModify= tools.formattedDate(new Date())
       
@@ -389,7 +352,6 @@ app.get('/lessons/:date/:id_course', function (req, res) {
       res.send(JSON.stringify(data));
    });
 });
-<<<<<<< HEAD
 
 
 app.get('/lessonsTeacher/:id_course/:id_company', function (req, res) {
@@ -397,15 +359,6 @@ app.get('/lessonsTeacher/:id_course/:id_company', function (req, res) {
    var id_company = req.params.id_company 
    var id_course = req.params.id_course 
 
-=======
-
-
-app.get('/lessonsTeacher/:id_course/:id_company', function (req, res) {
-   var data = [];
-   var id_company = req.params.id_company 
-   var id_course = req.params.id_course 
-
->>>>>>> 283f0c409b2a420770973489c12572ec2b2ed92d
    connection.query("SELECT * FROM lessons WHERE companies_id= '" + (id_company) + "' and id_course="+ id_course+"", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
