@@ -15,10 +15,10 @@ class InfoDocente extends React.Component {
             emailDocente: this.props.docente.emailDocente,
             hoursOfLessons: this.props.docente.hoursOfLessons,
             ritirato: this.props.docente.ritirato,
-            companyName: this.props.details.companyName ,
-            lessonName: this.props.details.lessonName ,
-            totalHours: this.props.details.totalHours,         
-            companyId: this.props.details.companyId,           
+            companyName: this.props.docente.companyName,
+            lessonName: this.props.docente.lessonName,
+            totalHours: this.props.docente.totalHours,         
+            companyId: this.props.docente.companyId,           
         }
     }
 
@@ -45,18 +45,16 @@ class InfoDocente extends React.Component {
         axios.put('http://localhost:8080/retireTeacher/' + this.state.emailDocente, {
             ritirato: 1,
         })
-            .then(res => {
-                if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
-            })
+        .then(res => {
+            if (res.data.message === "ok"){ToastsStore.success(this.state.firstName + ' ' + this.state.lastName + " è stato aggiunto alla lista docenti archiviati!"); this.refresh();}
+          })
             .catch(err => {
                 return console.log(err);
             });
-        window.location.reload();
     }
 
 
 handleChange = (event) => {
-
         let name = event.target.name;
         let val = event.target.value;
 
@@ -79,8 +77,24 @@ refresh = () => {
 onclickModifyState = () => {
             this.setState({
             changeInfo: !this.state.changeInfo
-        })
-    }
+        })    // formOrario(){
+
+            //     axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
+            //         first_name: this.state.firstName,
+            //         last_name: this.state.lastName
+            //     })
+            //         .then(res => {
+            //             if (res.data.message === "ok") ToastsStore.success("La modifica è stata effettuata con successo!")
+            //             else if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
+            //         })
+            //         .catch(err => {
+            //             return console.log(err);
+            //         });
+            //     this.setState({
+            //         changeInfo: false
+            //     })
+            // }
+        
 
 changeInfo = (changeInfo) => {
     if (!changeInfo) {

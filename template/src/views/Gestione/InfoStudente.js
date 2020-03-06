@@ -46,10 +46,12 @@ class infoStudente extends React.Component {
     axios.put('http://localhost:8080/retireStudent/' + this.state.email, {
       ritirato: 1,
     })
+    .then(res => {
+      if (res.data.message === "ok"){ToastsStore.success(this.props.studente.firstName +' '+ this.props.studente.lastName +" è stato aggiunto alla lista ritirati!"); this.refresh();}
+    })
       .catch(err => {
         return console.log(err);
       });
-      window.location.reload();
   }
 
 

@@ -15,7 +15,6 @@ class DocentiPersonale extends Component {
         super(props);
         this.state = {
             docenti: [],
-            dettagliDocente: [],
             lezioni: []
         }
 
@@ -23,9 +22,6 @@ class DocentiPersonale extends Component {
 
     componentDidMount() {
         this.getTeachers();
-        this.teacherDetails();
-        
-
     }
 
 
@@ -34,11 +30,15 @@ class DocentiPersonale extends Component {
             .then(res => {
                 const docenti = [];
                 res.data.data.map(item => docenti.push({
-                    firstName: item.first_name,
-                    lastName: item.last_name,
-                    emailDocente: item.email_responsible,
-                    companiesId: item.companies_id,
-                    hoursOfLessons: this.formatHours(item.hours_of_lessons)
+                    companyName: item.name,
+                    lessonName: item.lesson,
+                    firstName: item.firstName,
+                    lastName: item.lastName,
+                    ritirato: item.ritirato,
+                    companyId: item.companyId,
+                    emailDocente: item.emailTeacher,
+                    hoursOfLessons: this.formatHours(item.hoursOfLessons),
+                    totalHours: this.formatHours(item.totalHours),
                 }));
                 this.setState({ docenti });
                 this.getLesson();
@@ -47,31 +47,10 @@ class DocentiPersonale extends Component {
     }
 
 
-
-
-    teacherDetails = () => {
-        axios.get('http://localhost:8080/teachersDetails')
-            .then(res => {
-                const dettagli = res.data.data;
-                var dettagliDocente = [];
-                dettagli.map(item =>
-                    dettagliDocente.push({
-                        companyName: item.company_name,
-                        lessonName: item.lesson,
-                        totalHours: this.formatHours(item.total_hours),
-                        companyId: item.company_id
-                    })
-                );
-                this.setState({ dettagliDocente: dettagliDocente })
-            })
-            .catch(err => console.error(err));
-    }
-
     getLesson = () => {
         let docente = this.state.docenti.find(docente => docente.emailDocente === 'michele@info.com')
 
-
-        axios.get('http://localhost:8080/lessonsTeacher/' + this.props.classe["id"] +"/" + docente.companiesId)
+        axios.get('http://localhost:8080/lessonsTeacher/' + this.props.classe["id"] +"/" + docente.companyId)
             .then(res =>{
                 const lezioni = [];
                 res.data.map(item => lezioni.push({
@@ -86,17 +65,19 @@ class DocentiPersonale extends Component {
             .catch(err => console.error(err));
     }
 
-    formatHours(hours) {
-        var startLessonAppoggio = (hours.toString()).split('.')
-        var startLesson = ''
-
-        if (startLessonAppoggio[1]) {
-            var startLessonSecondaParte = startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
-            startLesson = startLessonAppoggio[0] + ': ' + startLessonSecondaParte
-            return startLesson
+    formatHours (hours){
+        var startLessonAppoggio= (hours.toString()).split('.')
+        var startLesson= ''
+  
+        var startLessonPrimaParte=  startLessonAppoggio[0].length == 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
+        if(startLessonAppoggio[1]){
+          var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+          startLesson= startLessonPrimaParte+': '+startLessonSecondaParte
+          return startLesson
         }
-        else {
-            return startLessonAppoggio[0]
+        else{
+          startLesson= startLessonPrimaParte+': 00'
+          return startLesson
         }
     }
 
@@ -127,7 +108,6 @@ class DocentiPersonale extends Component {
             row: this.state.lezioni
         };
 
-
         return (
             <div>
                 <CardHeader className="text-center font-weight-bold">
@@ -146,15 +126,13 @@ class DocentiPersonale extends Component {
 
             </div>
         );
-
-
     }
 
 
     infoTeacher() {
 
         let docente = this.state.docenti.find(docente => docente.emailDocente === 'michele@info.com')
-        let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companiesId)
+        let dettaglioDocente = this.state.docenti.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
 
 
         return (

@@ -1,8 +1,12 @@
 import React from 'react';
 import { Card, CardBody, CardHeader, Button, Collapse, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter, Input } from 'reactstrap';
-import axios from 'axios'
-import DatePicker from 'react-datepicker'
+import axios from 'axios';
+import DatePicker from 'react-datepicker';
 import { MDBDataTable } from 'mdbreact';
+import OreLezioniMattina from './OreLezioniMattina';
+import OreLezioniPomeriggio from './OreLezioniPomeriggio';
+
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 // import { MDBDataTable } from 'mdbreact';
@@ -19,15 +23,33 @@ class Lezioni extends React.Component {
       startDate: new Date(),
       collapse: false,
       accordion: [false, false],
+      displayCard: null,
+      displayId: null,
+      mattinaPomeriggio: null
     }
-
   }
-
 
   handleChange = date => {
       this.setState({
         startDate: date
       },()=> this.getLessons()); 
+  }
+
+  displayCard = (e, f, g) => {
+    this.setState({
+      displayCard: e,
+      displayId: f,
+      mattinaPomeriggio: g
+    });
+  }
+
+
+  displayTable = () => {
+    this.setState({
+      displayCard: null,
+      displayId: null,
+      mattinaPomeriggio: null
+    });
   }
 
   getLessons = () => {
@@ -85,6 +107,7 @@ class Lezioni extends React.Component {
                 emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
                 endTime: this.formatHours(item.endTime),
+                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, item.mattinaPomeriggio)
               })
             }
             else if(item.mattinaPomeriggio === 1){
@@ -92,8 +115,10 @@ class Lezioni extends React.Component {
                 idLesson: item.idLesson,
                 firstName: item.firstName,
                 lastName: item.lastName,
+                emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
-                endTime: this.formatHours(item.endTime)
+                endTime: this.formatHours(item.endTime),
+                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, item.mattinaPomeriggio)
               })
             }
           });
@@ -104,34 +129,7 @@ class Lezioni extends React.Component {
         })
         .catch(err => console.error(err));
     }
-  
-    // formOrario(){
 
-    //     axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
-    //         first_name: this.state.firstName,
-    //         last_name: this.state.lastName
-    //     })
-    //         .then(res => {
-    //             if (res.data.message === "ok") ToastsStore.success("La modifica è stata effettuata con successo!")
-    //             else if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
-    //         })
-    //         .catch(err => {
-    //             return console.log(err);
-    //         });
-    //     this.setState({
-    //         changeInfo: false
-    //     })
-    // }
-
-
-    handle = (event) => {
-      let name = event.target.name;
-      let val = event.target.value;
-
-      this.setState({
-          [name]: val,
-      });
-  }
 
   formatHours (hours){
       var startLessonAppoggio= (hours.toString()).split('.')
@@ -182,6 +180,7 @@ class Lezioni extends React.Component {
     if (nomeLezione) {
       
       return <>
+        
         <Card className="m-4 ">
           <CardHeader id="headingOne">
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
@@ -309,11 +308,20 @@ class Lezioni extends React.Component {
     </div>
   );  
     }
+    if(this.state.displayCard && this.state.mattinaPomeriggio === 0){
+      return <OreLezioniMattina
+      studenteMattina={this.state.studentiMattina.find((studente) => studente.emailStudent === this.state.displayCard)} 
+      lezioneMattina={this.state.lezioniMattina.find(lezione => lezione.id === this.state.displayId )}
+
+      getLessons={this.getLessons} 
+      displayTable={this.displayTable}
+      />
+    }else{
     return (
       <>
         {DatatablePage()}
       </>
-    )
+    )}
   }
   
 
@@ -341,6 +349,7 @@ class Lezioni extends React.Component {
         rows: this.state.studentiPomeriggio
       };
 
+      // this.state.studentiPomeriggio.startTime === "assente" ? <div className="text-success">"assente"</div> : this.state.studentiPomeriggio.startTime
   return (
     <div>
       <Card>
@@ -358,11 +367,20 @@ class Lezioni extends React.Component {
     </div>
   );  
     }
+    if(this.state.displayCard && this.state.mattinaPomeriggio === 1){
+      return <OreLezioniPomeriggio 
+      studentePomeriggio={this.state.studentiPomeriggio.find((studente) => studente.emailStudent === this.state.displayCard)} 
+      lezionePomeriggio={this.state.lezioniPomeriggio.find(lezione => lezione.id === this.state.displayId )}
+
+      getLessons={this.getLessons} 
+      displayTable={this.displayTable}
+      />
+    }else{
     return (
       <>
         {DatatablePage()}
       </>
-    )
+    )}
   }
 
   render() {
@@ -382,11 +400,9 @@ class Lezioni extends React.Component {
                 className="border border-dark rounded text-center"
               />
                </div>
-
             </div>
             {this.lezioneMattina()}
             {this.lezionePomeriggio()}
-
           </CardBody>
         </Card>
       </>

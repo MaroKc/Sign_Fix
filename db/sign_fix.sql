@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.1
+-- version 4.8.5
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Creato il: Mar 05, 2020 alle 03:32
--- Versione del server: 10.4.11-MariaDB
--- Versione PHP: 7.4.2
+-- Host: 127.0.0.1:3306
+-- Creato il: Mar 06, 2020 alle 15:24
+-- Versione del server: 5.7.26
+-- Versione PHP: 7.2.18
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -21,6 +21,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `sign_fix`
 --
+CREATE DATABASE IF NOT EXISTS `sign_fix` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `sign_fix`;
 
 -- --------------------------------------------------------
 
@@ -28,12 +30,14 @@ SET time_zone = "+00:00";
 -- Struttura della tabella `anagrafica`
 --
 
-CREATE TABLE `anagrafica` (
-  `ID` int(11) NOT NULL,
+DROP TABLE IF EXISTS `anagrafica`;
+CREATE TABLE IF NOT EXISTS `anagrafica` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `codice_anagrafica` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `id_anagrafica` int(11) NOT NULL,
-  `valore` varchar(80) COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `valore` varchar(80) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `anagrafica`
@@ -52,10 +56,12 @@ INSERT INTO `anagrafica` (`ID`, `codice_anagrafica`, `id_anagrafica`, `valore`) 
 -- Struttura della tabella `authentications`
 --
 
-CREATE TABLE `authentications` (
+DROP TABLE IF EXISTS `authentications`;
+CREATE TABLE IF NOT EXISTS `authentications` (
   `email_student` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `code_image` blob DEFAULT NULL
+  `code_image` blob,
+  PRIMARY KEY (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -64,10 +70,12 @@ CREATE TABLE `authentications` (
 -- Struttura della tabella `companies`
 --
 
-CREATE TABLE `companies` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+DROP TABLE IF EXISTS `companies`;
+CREATE TABLE IF NOT EXISTS `companies` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `companies`
@@ -77,7 +85,12 @@ INSERT INTO `companies` (`id`, `name`) VALUES
 (1, 'flowing'),
 (2, 'matteo@info.com'),
 (3, 'brizio@info.com'),
-(27, 'niccolo@info');
+(22, 'valmori.paolo@gmail.com'),
+(23, 'niccolo@zona.it'),
+(24, 'jhg'),
+(25, 'calimero@calimeri.it'),
+(26, 'francesco.delfagio@gmail.com'),
+(27, 'calim.cala@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -85,13 +98,15 @@ INSERT INTO `companies` (`id`, `name`) VALUES
 -- Struttura della tabella `courses`
 --
 
-CREATE TABLE `courses` (
-  `id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `courses`;
+CREATE TABLE IF NOT EXISTS `courses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `start_year` int(11) DEFAULT NULL,
   `end_year` int(11) DEFAULT NULL,
-  `token_calendar` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `token_calendar` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `courses`
@@ -109,13 +124,15 @@ INSERT INTO `courses` (`id`, `name`, `start_year`, `end_year`, `token_calendar`)
 -- Struttura della tabella `google_token`
 --
 
-CREATE TABLE `google_token` (
+DROP TABLE IF EXISTS `google_token`;
+CREATE TABLE IF NOT EXISTS `google_token` (
   `email` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
   `access_token` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `refresh_token` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `scope` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `token_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `expiry_date` varchar(20) COLLATE utf8_unicode_ci NOT NULL
+  `expiry_date` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -123,7 +140,7 @@ CREATE TABLE `google_token` (
 --
 
 INSERT INTO `google_token` (`email`, `access_token`, `refresh_token`, `scope`, `token_type`, `expiry_date`) VALUES
-('daniele.marocchi.studio@fitstic-edu.com', 'ya29.a0Adw1xeXQG_Zd6upFs41V2acZslI03aGzLoPp-erpB3Yl5QOUiyEbcscpDIm3ioMaopiE5hx4_dwtOkun-eJL4AYxWPkCju7s9ZYLl7G_wU48zKuXxN4ur2Ln0H9efoy17Iyp1FaD5A_oJ6EKSKMFs2oZTTl8_W5ExoI', '1//0c7TOPVbkzvvjCgYIARAAGAwSNwF-L9IrjyP4qZoH39I4BRO0FYEf0uF32oKyoRr50EqXAwYhuVY6MrGC3_eQSwZnPGebCKQbZ3M', 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar.readonly openid', 'Bearer', '1583378396033');
+('daniele.marocchi.studio@fitstic-edu.com', 'ya29.a0Adw1xeUlZ-2Dn5pjoRTOvevZ5SiV-2NSkCtjVQ7W5R0p-qWaEr8jAGzrMQ1JqQel7i341OWnITojHqcwVnlyny62J8LvRHWEXkAz7Cw_EI9eZrjh50gusl7NK2POiKTIlnWeS-BibPqbo60IavuBYY_htluKcRBOdnc', '1//0cQV1XdDEBcMfCgYIARAAGAwSNwF-L9Ir2E1AWn9Qt7fhWQgRCJWlLAvQUurt6DQN7aDM9VU6f0-XMXUmvXTZ3iwlhVdKHXI3Ru4', 'openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar.readonly', 'Bearer', '1582508544511');
 
 -- --------------------------------------------------------
 
@@ -131,12 +148,14 @@ INSERT INTO `google_token` (`email`, `access_token`, `refresh_token`, `scope`, `
 -- Struttura della tabella `judgments`
 --
 
-CREATE TABLE `judgments` (
-  `id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `judgments`;
+CREATE TABLE IF NOT EXISTS `judgments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_questionnaire` int(11) DEFAULT NULL,
   `vote` int(11) NOT NULL,
   `email_user_receiving` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `email_user_sender` varchar(50) COLLATE utf8_unicode_ci NOT NULL
+  `email_user_sender` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -145,8 +164,9 @@ CREATE TABLE `judgments` (
 -- Struttura della tabella `lessons`
 --
 
-CREATE TABLE `lessons` (
-  `id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `lessons`;
+CREATE TABLE IF NOT EXISTS `lessons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `lesson` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `email_signature` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `companies_id` int(11) DEFAULT NULL,
@@ -159,8 +179,9 @@ CREATE TABLE `lessons` (
   `creation_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
   `modify_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
   `email_supervisor_create` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email_supervisor_modify` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `email_supervisor_modify` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `lessons`
@@ -179,8 +200,7 @@ INSERT INTO `lessons` (`id`, `lesson`, `email_signature`, `companies_id`, `class
 (118, 'php', 'matteo@info.com', 2, 'comandini', 1, '2020-02-13', 14, 17, 3, '07/02/2020', NULL, NULL, NULL),
 (119, 'database', 'brizio@info.com', 3, 'comandini', 1, '2020-02-12', 14, 18, 4, '07/02/2020', NULL, NULL, NULL),
 (120, 'php', 'matteo@info.com', 2, 'comandini', 1, '2020-02-11', 9, 13, 4, '07/02/2020', NULL, NULL, NULL),
-(121, 'metodologia agile', 'michele@info.com', 1, 'maggioli', 1, '2020-02-11', 14, 17, 3, '07/02/2020', NULL, NULL, NULL),
-(123, 'python', 'niccolo@info', 27, 'maggioli', 1, '2020-03-02', 14, 17, 3, '07/02/2020', NULL, NULL, NULL);
+(121, 'metodologia agile', 'michele@info.com', 1, 'maggioli', 1, '2020-02-11', 14, 17, 3, '07/02/2020', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -188,10 +208,12 @@ INSERT INTO `lessons` (`id`, `lesson`, `email_signature`, `companies_id`, `class
 -- Struttura della tabella `questionnaires`
 --
 
-CREATE TABLE `questionnaires` (
-  `id` int(11) NOT NULL,
-  `text` text COLLATE utf8_unicode_ci DEFAULT NULL,
-  `subject` int(11) DEFAULT NULL
+DROP TABLE IF EXISTS `questionnaires`;
+CREATE TABLE IF NOT EXISTS `questionnaires` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `text` text COLLATE utf8_unicode_ci,
+  `subject` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -200,12 +222,14 @@ CREATE TABLE `questionnaires` (
 -- Struttura della tabella `responsibles_auth`
 --
 
-CREATE TABLE `responsibles_auth` (
+DROP TABLE IF EXISTS `responsibles_auth`;
+CREATE TABLE IF NOT EXISTS `responsibles_auth` (
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `first_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `responsible_level` int(11) DEFAULT NULL
+  `responsible_level` int(11) DEFAULT NULL,
+  PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -221,8 +245,9 @@ INSERT INTO `responsibles_auth` (`email`, `password`, `first_name`, `last_name`,
 -- Struttura della tabella `signatures_students`
 --
 
-CREATE TABLE `signatures_students` (
-  `id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `signatures_students`;
+CREATE TABLE IF NOT EXISTS `signatures_students` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `code_authentication` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `email_student` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `date` date DEFAULT NULL,
@@ -235,26 +260,27 @@ CREATE TABLE `signatures_students` (
   `lost_hours` float DEFAULT NULL,
   `mattinaPomeriggio` int(11) NOT NULL,
   `email_supervisor_modify` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `modify_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `modify_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=328 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `signatures_students`
 --
 
 INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`, `date`, `current_start_time`, `current_end_time`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`, `lost_hours`, `mattinaPomeriggio`, `email_supervisor_modify`, `modify_date`) VALUES
-(1, '1', 'acookek@nps.gov', '2020-02-10', NULL, NULL, 8.42, 11, 1, 2.5, NULL, 0, NULL, NULL),
-(2, '2', 'ajardeinl@163.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
-(3, '3', 'azeale0@linkedin.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
-(4, '4', 'bjuggingj@alibaba.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
-(5, '4', 'chackinga@g.co', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
-(6, '4', 'cweineb@businessinsider.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
+(1, '1', 'acookek@nps.gov', '2020-02-10', NULL, NULL, 8.5, 11.5, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
+(2, '2', 'ajardeinl@163.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
+(3, '3', 'azeale0@linkedin.com', '2020-02-10', NULL, NULL, 8.5, 8.33, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
+(4, '4', 'bjuggingj@alibaba.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-06'),
+(5, '4', 'chackinga@g.co', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
+(6, '4', 'cweineb@businessinsider.com', '2020-02-10', NULL, NULL, 8.53, 11, 1, 2.5, NULL, 0, NULL, '2020-03-06'),
 (7, '4', 'ecoalburnm@cnbc.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (8, '4', 'dmycockf@posterous.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (9, '4', 'evellad@fc2.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (10, '4', 'fdecourtc@hp.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (11, '4', 'hnatalie6@networkadvertising.org', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
-(12, '4', 'iallnatto@e-recht24.de', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
+(12, '4', 'iallnatto@e-recht24.de', '2020-02-10', NULL, NULL, 8.5, 11.2, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
 (13, '4', 'jbenniee@epa.gov', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (14, '4', 'ktrouel4@alexa.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (15, '4', 'lblasiak2@amazonaws.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
@@ -267,18 +293,18 @@ INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`,
 (22, '4', 'tgrimes1@linkedin.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (23, '4', 'ustouteh@paginegialle.it', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, NULL),
 (25, '4', 'hszachniewicz7@eventbrite.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, 0, 0, NULL, NULL),
-(26, '1', 'acookek@nps.gov', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
+(26, '1', 'acookek@nps.gov', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, '2020-03-06'),
 (27, '2', 'ajardeinl@163.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (28, '3', 'azeale0@linkedin.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (29, '4', 'bjuggingj@alibaba.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (30, '4', 'chackinga@g.co', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
-(31, '4', 'cweineb@businessinsider.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
+(31, '4', 'cweineb@businessinsider.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, '2020-03-05'),
 (32, '4', 'ecoalburnm@cnbc.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (33, '4', 'dmycockf@posterous.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (34, '4', 'evellad@fc2.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (35, '4', 'fdecourtc@hp.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (36, '4', 'hnatalie6@networkadvertising.org', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
-(37, '4', 'iallnatto@e-recht24.de', '2020-02-10', NULL, NULL, 1, 1, 2, 4, NULL, 1, NULL, NULL),
+(37, '4', 'iallnatto@e-recht24.de', '2020-02-10', NULL, NULL, 15.28, 17.83, 2, 4, NULL, 1, NULL, '2020-03-06'),
 (38, '4', 'jbenniee@epa.gov', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (39, '4', 'ktrouel4@alexa.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (40, '4', 'lblasiak2@amazonaws.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
@@ -575,10 +601,11 @@ INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`,
 -- Struttura della tabella `signatures_teachers`
 --
 
-CREATE TABLE `signatures_teachers` (
-  `id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `signatures_teachers`;
+CREATE TABLE IF NOT EXISTS `signatures_teachers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `email_responsible` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `date` date DEFAULT NULL,
+  `date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
   `current_start_time` timestamp NULL DEFAULT NULL,
   `current_end_time` timestamp NULL DEFAULT NULL,
   `final_start_time` float DEFAULT NULL,
@@ -587,8 +614,9 @@ CREATE TABLE `signatures_teachers` (
   `hours_of_lessons` float DEFAULT NULL,
   `lost_hours` float DEFAULT NULL,
   `email_supervisor_modify` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `modify_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `modify_date` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dump dei dati per la tabella `signatures_teachers`
@@ -607,8 +635,7 @@ INSERT INTO `signatures_teachers` (`id`, `email_responsible`, `date`, `current_s
 (10, 'matteo@info.com', '2020-02-18', NULL, NULL, 9, 13, 111, 4, NULL, NULL, NULL),
 (11, 'brizio@info.com', '2020-02-18', NULL, NULL, 14, 18, 112, 4, NULL, NULL, NULL),
 (12, 'michele@info.com', '2020-02-19', NULL, NULL, 9, 13, 4, 4, NULL, NULL, NULL),
-(13, 'michele@info.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, NULL, NULL),
-(14, 'niccolo@info', '2020-03-02', NULL, NULL, 14, 17, 123, 3, NULL, NULL, NULL);
+(13, 'michele@info.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -616,7 +643,8 @@ INSERT INTO `signatures_teachers` (`id`, `email_responsible`, `date`, `current_s
 -- Struttura della tabella `students`
 --
 
-CREATE TABLE `students` (
+DROP TABLE IF EXISTS `students`;
+CREATE TABLE IF NOT EXISTS `students` (
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `first_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -624,7 +652,8 @@ CREATE TABLE `students` (
   `residence` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `fiscal_code` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
   `id_course` int(11) DEFAULT NULL,
-  `ritirato` int(11) NOT NULL
+  `ritirato` int(11) NOT NULL,
+  PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -632,16 +661,28 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES
-('acookek@nps.gov', 'Angilo', 'Cooke', '30/08/2019', 'Kanye', 'VLLRNN10E21L736C', 1, 0),
+('acookek@nps.gov', 'Angila', 'Cooke', '30/08/2019', 'Kanye', 'VLLRNN10E21L736C', 1, 0),
 ('ajardeinl@163.com', 'Antonio', 'Jasd', '08/01/2020', 'España', 'VLLRNN10E21L736C', 1, 0),
-('azeale0@linkedin.com', 'Bombazzas', 'Zeales', '25/11/2020', 'Pshadas', 'VLLRNN10E21L736T', 1, 0),
+('alberto.spinardi.jr@outlook.it', 'alberto junior', 'spinardi', '08/07/1999', 'via nino bixio n. 35', 'SPNLRT99L08H294M', 3, 0),
+('amicoexe@gmail.com', 'leonardo', 'grandolfo', '17/04/1999', 'via san michele 22', 'GRNLRD99D17L219L', 3, 0),
+('azeale0@linkedin.com', 'Bombazza', 'Zeales', '25/11/2020', 'Pshadas', 'VLLRNN10E21L736T', 1, 0),
 ('bjuggingj@alibaba.com', 'Bernadine', 'camelio', '25/03/2019', 'Lebedyan’', 'ZNONCL92P30G596D', 1, 0),
 ('chackinga@g.co', 'Charmione', 'Hackinge', '23/02/2017', 'Ballitovillee', 'VLLRNN10E21L736D', 1, 0),
 ('cweineb@businessinsider.com', 'Colene', 'Weine', '04/09/2019', 'Māymay', 'CSSNSC09P47H501F', 1, 0),
+('dangeli050@gmail.com', 'andrea', 'd\'angeli', '02/07/1999', 'via luigi zuppetta 17', 'DNGNDR99L02H294L', 3, 0),
+('daniele.marocchi97@gmail.com', 'daniele', 'marocchi', '24/10/1997', 'via s. serripini n. 14', 'MRCDNL97R24D704U', 3, 0),
+('diromaalessandro@gmail.com', 'alessandro', 'di roma', '27/11/1998', 'via ravennate 8187', 'DRMLSN98S27H294M', 3, 0),
 ('dmycockf@posterous.com', 'Deck', 'Mycock', '18/08/2019', 'Rudo', 'FDLDDE02P70C351K', 1, 0),
 ('ecoalburnm@cnbc.com', 'Evy', 'Coalburn', '13/11/2020', 'Changtang', 'CSSNSC09P47H501F', 1, 0),
+('elyes.ghoul@gmail.com', 'elyes', 'ghoul', '10/07/1999', 'via darwin n. 12', 'GHLLYS99L10H294P', 3, 0),
+('enorel@gmail.com', 'enore', 'lasi', '22/11/1973', 'via celletta 14/a', 'LSANRE73S22E289V', 3, 0),
 ('evellad@fc2.com', 'Erie', 'Vella', '06/12/2019', 'Bangrat', 'FDLDDE02P70C351K', 1, 0),
 ('fdecourtc@hp.com', 'Forest', 'Decourt', '12/07/2019', 'Jakšić', 'CSSNSC09P47H501F', 1, 0),
+('ferranteemaldi@hotmail.it', 'ferrante', 'emaldi', '17/10/1991', 'via firenze 238', 'MLDFRN91R17A944O', 3, 0),
+('francesco.delfagio@gmail.com', 'francesco', 'del fagio', '06/02/1994', 'via giuseppe sarti n. 16', 'DLFFNC94B06D458E', 3, 0),
+('francescopedulli@gmail.com', 'francesco', 'pedulli', '15/06/1997', 'via plauto n. 28', 'PDLFNC97H15A944A', 3, 0),
+('frenci.carnevali@gmail.com', 'francesco', 'carnevali', '12/07/1997', 'via bonacini 5', 'CRNFNC97L12F257J', 3, 0),
+('giacomocorezzi1999@gmail.com', 'giacomo', 'corezzi', '06/09/1999', 'via giuseppe bonci 57', 'CRZGCM99P06A851K', 3, 0),
 ('hnatalie6@networkadvertising.org', 'Harriett', 'Natalie', '14/02/2020', 'Eldoret', 'VLLRNN10E21L736C', 1, 0),
 ('hszachniewicz7@eventbrite.com', 'Howie', 'Szachniewicz', '15/11/2019', 'Linares', 'FDLDDE02P70C351K', 1, 0),
 ('iallnatto@e-recht24.de', 'Inger', 'Allnatt', '16/03/2019', 'Rizári', 'DOJNFJ92P30G596P', 1, 0),
@@ -649,13 +690,24 @@ INSERT INTO `students` (`email`, `first_name`, `last_name`, `date_of_birth`, `re
 ('ktrouel4@alexa.com', 'Katie', 'Trouel', '15/02/2020', 'Osiek', 'FDLDDE02P70C351K', 1, 0),
 ('lblasiak2@amazonaws.com', 'Lexine', 'Blasiak', '14/06/2019', 'Kugesi', 'VLLRNN10E21L736C', 1, 0),
 ('lrodnight5@123-reg.co.uk', 'Lexy', 'Rodnight', '07/07/2019', 'Cachoeiras de Macacu', 'CSSNSC09P47H501F', 1, 0),
-('mmaycockg@sfgate.com', 'Martie', 'Maycock', '13/09/2019', 'Ueki', 'SLVLEI07R24C351Y', 1, 0),
+('lucabaldassarri94@gmail.com', 'luca', 'baldassari', '27/03/1994', 'via del lavoro 21/b', 'BLDLCU94C27C357E', 3, 0),
+('mad_tyrion@libero.it', 'giulio', 'lega', '28/12/1988', 'via gorizia n. 100', 'LGEGLI88T28C573Y', 3, 0),
+('maurojmanzo@gmail.com', 'mauro johnathan', 'manzo', '06/05/1994', 'via madonnina n. 10', 'MNZMJH94E06I483T', 3, 0),
+('max26061997@gmail.com', 'massimo', 'tamburini', '26/06/1997', 'via portoferrario 14', 'TMBMSM97H26H294Y', 3, 0),
+('mmaycockg@sfgate.com', 'Martie', 'Maycock', '13/09/2019', 'Ueki', 'SLVLEI07R24C351Y', 1, 1),
+('musso98@outlook.com', 'matteo', 'mussoni', '12/11/1998', 'via flavio biondo n. 52', 'MSSMTT98S12C573N', 3, 0),
+('mvmiki.viti@gmail.com', 'michele', 'vitali', '08/04/1999', 'via vasto 1', 'VTLMHL99D08H294D', 3, 0),
+('pietro.ventriglia@gmail.com', 'pietro silvestro', 'ventriglia', '30/06/1994', 'via guglielmo marconi n. 53/g', 'VNTPRS94H30Z114D', 3, 0),
 ('rclynmans9@gravatar.com', 'Rosa', 'Clynmans', '24/06/2019', 'Taoyao', 'MZZRLF02C30D612Y', 1, 0),
 ('rferrandn@wufoo.com', 'Rossien', 'Ferrandn', '10/12/2020', 'Dentonn', 'CSSNSC09P47H501D', 1, 0),
+('simonegrassisimone@gmail.com', 'simone', 'grassi', '01/08/1999', 'via dei vigneti 338', 'GRSSMN99M01H294P', 3, 0),
 ('storri3@surveymonkey.com', 'Sofie', 'Torri', '23/02/2019', 'Kushtia', 'FDLDDE02P70C351K', 1, 0),
 ('tbeldani@google.fr', 'Tades', 'Beldan', '03/03/2019', 'Galitsy', 'VLLRNN10E21L736C', 1, 0),
 ('tgrimes1@linkedin.com', 'Torieew', 'Grimes', '01/12/2019', 'Geshan', 'CSSNSC09P47H501F', 1, 0),
 ('ustouteh@paginegialle.it', 'Ursuline', 'Stoute', '11/11/2019', 'Zhonggang', 'VLLRNN10E21L736C', 1, 0),
+('valmori.paolo@gmail.com', 'paolo', 'valmori', '29/03/1993', 'via risorgimento n. 252', 'VLMPLA93C29A944O', 3, 0),
+('zh.colombarone@gmail.com', 'zakaria', 'habibi', '02/10/1996', 'strada di vincolungo n. 4', 'HBBZKR96R02L500X', 3, 0),
+('zonaniccolo92@gmail.com', 'niccol�', 'zona', '30/09/1992', 'via bizzarri n. 70', 'ZNONCL92P30G596T', 3, 0),
 ('zvanhault8@twitpic.com', 'Zabrina', 'Van Hault', '24/08/2019', 'La Agustina', 'ZNONCL65P24G596T', 1, 0);
 
 -- --------------------------------------------------------
@@ -664,9 +716,11 @@ INSERT INTO `students` (`email`, `first_name`, `last_name`, `date_of_birth`, `re
 -- Struttura della tabella `supervisors`
 --
 
-CREATE TABLE `supervisors` (
+DROP TABLE IF EXISTS `supervisors`;
+CREATE TABLE IF NOT EXISTS `supervisors` (
   `email_responsible` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `id_course` int(11) NOT NULL
+  `id_course` int(11) NOT NULL,
+  PRIMARY KEY (`email_responsible`,`id_course`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -683,13 +737,15 @@ INSERT INTO `supervisors` (`email_responsible`, `id_course`) VALUES
 -- Struttura della tabella `teachers`
 --
 
-CREATE TABLE `teachers` (
+DROP TABLE IF EXISTS `teachers`;
+CREATE TABLE IF NOT EXISTS `teachers` (
   `email_responsible` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `first_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `id_course` int(11) DEFAULT NULL,
   `companies_id` int(11) DEFAULT NULL,
-  `ritirato` int(11) NOT NULL
+  `ritirato` int(11) NOT NULL,
+  PRIMARY KEY (`email_responsible`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -697,175 +753,23 @@ CREATE TABLE `teachers` (
 --
 
 INSERT INTO `teachers` (`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES
-('brizio@info.com', 'brizio', 'rossi', 1, 3, 0),
-('matteo@info.com', 'matteo', 'morandi', 1, 2, 0),
+('brizio@info.com', 'Brizia', 'rossi', 1, 3, 0),
+('matteo@info.com', 'mattea', 'morandi', 1, 2, 0),
 ('michele@info.com', 'michele', 'lampada', 1, 1, 0),
-('niccolo@info', 'niccolo', 'zona', 1, 27, 0),
 ('simone@info.com', 'simone', 'd\'amico', 1, 1, 0);
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `type_leasson`
+-- Struttura della tabella `type_lesson`
 --
 
-CREATE TABLE `type_leasson` (
-  `id` int(11) NOT NULL,
-  `leasson` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Indici per le tabelle scaricate
---
-
---
--- Indici per le tabelle `anagrafica`
---
-ALTER TABLE `anagrafica`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indici per le tabelle `authentications`
---
-ALTER TABLE `authentications`
-  ADD PRIMARY KEY (`code`);
-
---
--- Indici per le tabelle `companies`
---
-ALTER TABLE `companies`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `courses`
---
-ALTER TABLE `courses`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `google_token`
---
-ALTER TABLE `google_token`
-  ADD PRIMARY KEY (`email`);
-
---
--- Indici per le tabelle `judgments`
---
-ALTER TABLE `judgments`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `lessons`
---
-ALTER TABLE `lessons`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `questionnaires`
---
-ALTER TABLE `questionnaires`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `responsibles_auth`
---
-ALTER TABLE `responsibles_auth`
-  ADD PRIMARY KEY (`email`);
-
---
--- Indici per le tabelle `signatures_students`
---
-ALTER TABLE `signatures_students`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `signatures_teachers`
---
-ALTER TABLE `signatures_teachers`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `students`
---
-ALTER TABLE `students`
-  ADD PRIMARY KEY (`email`);
-
---
--- Indici per le tabelle `supervisors`
---
-ALTER TABLE `supervisors`
-  ADD PRIMARY KEY (`email_responsible`,`id_course`);
-
---
--- Indici per le tabelle `teachers`
---
-ALTER TABLE `teachers`
-  ADD PRIMARY KEY (`email_responsible`);
-
---
--- Indici per le tabelle `type_leasson`
---
-ALTER TABLE `type_leasson`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT per le tabelle scaricate
---
-
---
--- AUTO_INCREMENT per la tabella `anagrafica`
---
-ALTER TABLE `anagrafica`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT per la tabella `companies`
---
-ALTER TABLE `companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
-
---
--- AUTO_INCREMENT per la tabella `courses`
---
-ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT per la tabella `judgments`
---
-ALTER TABLE `judgments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT per la tabella `lessons`
---
-ALTER TABLE `lessons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
-
---
--- AUTO_INCREMENT per la tabella `questionnaires`
---
-ALTER TABLE `questionnaires`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT per la tabella `signatures_students`
---
-ALTER TABLE `signatures_students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=328;
-
---
--- AUTO_INCREMENT per la tabella `signatures_teachers`
---
-ALTER TABLE `signatures_teachers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
--- AUTO_INCREMENT per la tabella `type_leasson`
---
-ALTER TABLE `type_leasson`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+DROP TABLE IF EXISTS `type_lesson`;
+CREATE TABLE IF NOT EXISTS `type_lesson` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
