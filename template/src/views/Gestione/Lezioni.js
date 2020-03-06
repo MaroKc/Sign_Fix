@@ -19,12 +19,6 @@ class Lezioni extends React.Component {
       startDate: new Date(),
       collapse: false,
       accordion: [false, false],
-      warning: false,
-      emailStudent: "",
-      student: [],
-      firstName: '',
-      startTime: '',
-      endTime: ''
     }
 
   }
@@ -91,7 +85,6 @@ class Lezioni extends React.Component {
                 emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
                 endTime: this.formatHours(item.endTime),
-                clickEvent: () => this.toggleWarning(item.emailStudent)
               })
             }
             else if(item.mattinaPomeriggio === 1){
@@ -130,29 +123,6 @@ class Lezioni extends React.Component {
     //     })
     // }
 
-    toggleWarning = (e) => {
-      this.setState({
-        emailStudent: e,
-        warning: !this.state.warning,
-      },() => this.stud());
-      console.log(this.state.student)
-    }
-    
-    stud =() => {
-      this.setState({
-        student: this.state.emailStudent !== "" && this.state.studentiMattina.find(studente => studente.emailStudent === this.state.emailStudent),
-        firstName: this.state.student && this.state.student.firstName,
-        startTime: this.state.student && this.state.student.startTime,
-        endTime: this.state.student && this.state.student.endTime
-      })
-    }
-
-
-    toggle = () => {
-      this.setState({
-        warning: !this.state.warning
-      })
-    }
 
     handle = (event) => {
       let name = event.target.name;
@@ -162,28 +132,6 @@ class Lezioni extends React.Component {
           [name]: val,
       });
   }
-
-
-  openModal = () => {
-    return (
-      <Modal isOpen={this.state.warning} toggle={this.toggleWarning}
-        className={'modal-danger ' + this.props.className}>
-        <ModalHeader toggle={this.toggleWarning}>WARNING</ModalHeader>
-        <ModalBody>
-          <div className="text-center">
-            Stai cambiando l'orario di ingresso e/o uscita dello studente {this.state.firstName}
-            <h5 >Procedere?</h5>
-            <Input name='startTime' value = {this.state.startTime} onChange={this.handle}  /> <Input name='endTime' value={this.state.endTime} onChange={this.handle}   />
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger">Continua</Button>{' '}
-          <Button color="secondary" onClick={this.toggle}>Cancella</Button>
-        </ModalFooter>
-      </Modal>
-    )
-  }
-
 
   formatHours (hours){
       var startLessonAppoggio= (hours.toString()).split('.')
@@ -234,7 +182,6 @@ class Lezioni extends React.Component {
     if (nomeLezione) {
       
       return <>
-         {this.openModal()}
         <Card className="m-4 ">
           <CardHeader id="headingOne">
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
@@ -319,7 +266,6 @@ class Lezioni extends React.Component {
       accordion: state,
     });
   }
-
 
 
   tabPaneMattina() {
@@ -440,7 +386,7 @@ class Lezioni extends React.Component {
             </div>
             {this.lezioneMattina()}
             {this.lezionePomeriggio()}
-         
+
           </CardBody>
         </Card>
       </>

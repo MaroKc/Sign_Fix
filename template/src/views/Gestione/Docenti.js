@@ -37,7 +37,6 @@ class Docenti extends Component {
   componentDidMount() {
     this.getTeachers();
     this.teacherDetails();
-    this.getAllTeachers ();
 
   }
 
@@ -55,7 +54,7 @@ class Docenti extends Component {
           clickEvent: () => this.displayCard(item.email_responsible,item.companies_id)
         }));
         this.setState({ docenti });
-        console.log(this.state.docenti)
+        console.log(docenti)
       })
       .catch(err => console.error(err));
   }
@@ -69,11 +68,12 @@ teacherDetails = () => {
           dettagliDocente.push({
               companyName: item.company_name,
               lessonName: item.lesson,
-              totalHours: this.formatHours(item.total_hours),
+              totalHours: item.total_hours,
               companyId: item.company_id
           })
       );
         this.setState({dettagliDocente: dettagliDocente})
+        console.log(dettagliDocente)
       })
       .catch(err => console.error(err));
   }
@@ -92,20 +92,6 @@ teacherDetails = () => {
       })
   }
 
-  getAllTeachers = () => {
-    axios.get('http://localhost:8080/listAllTeachers/')
-    .then(res => res.data)
-    .then((data, index) => {
-      const allTeachers = [];
-      data.map(item => allTeachers.push({
-        firstName: item.first_name,
-        lastName: item.last_name,
-        email: item.email_responsible,
-      }));
-      this.setState({ allTeachers });
-    })
-    .catch(err => console.error(err));
-  }
 
 formatHours (hours){
   var startLessonAppoggio= (hours.toString()).split('.')
@@ -117,7 +103,13 @@ formatHours (hours){
     return startLesson
   }
   else{
-    return startLessonAppoggio[0]
+    if(startLessonAppoggio[0].length >1){
+      return startLessonAppoggio[0] + ': 00'
+    }
+    else{
+      return '0'+startLessonAppoggio[0] + ': 00'
+
+    }
   }
 }
 

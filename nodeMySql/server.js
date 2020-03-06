@@ -196,36 +196,23 @@ app.get('/importCsv/:id_course',function(req,res){
 });
 
 
-
-
-app.get('/listAllTeachers', function (req, res) {
-   var data = [];
-
-   connection.query("SELECT * from teachers", function (error, results, fields) {
-      if (error) throw error;
-      data= results
-      return res.send(JSON.stringify(data));
-   });
-});
-
 app.get('/listTeachers',function(req,res){
    try {
       var data =[]
-      connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id as companies_id,signatures_teachers.email_responsible as email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM signatures_teachers join teachers on signatures_teachers.email_responsible=teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
+      connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id as companies_id,teachers.email_responsible as email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM teachers left join signatures_teachers on teachers.email_responsible = signatures_teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
          if (error) throw error;
-         for (let i = 0; i < results.length; i++) {
-            var hours_appoggio = (results[i].hours_of_lessons.toString()).split('.')
-            var hours_of_lessonss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
+
+         results.forEach( element => {
             data.push(
                {
-                  first_name: results[i].first_name,
-                  ritirato: results[i].ritirato,
-                  last_name: results[i].last_name,
-                  email_responsible: results[i].email_responsible,
-                  companies_id: results[i].companies_id,
-                  hours_of_lessons : hours_of_lessonss ? hours_of_lessonss : '0',
+                  first_name: element.first_name,
+                  ritirato: element.ritirato,
+                  last_name: element.last_name,
+                  email_responsible: element.email_responsible,
+                  companies_id: element.companies_id,
+                  hours_of_lessons : tools.formattedDecimal(element.hours_of_lessons),
                })
-         }
+         })
       return res.send({error: true, data:data, message: 'ok'});   
       });
    } catch (error) {
@@ -241,14 +228,14 @@ try {
    var last_name = req.body.last_name
 
    var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
+   
    connection.query(query, [first_name, last_name,email], function (error, results, fields) {
       if (error) throw error;
       res.send({ error: true, data: results, message: 'ok' });
    });
-} catch (error) {
-   res.send({ error: true, data: error, message: 'ko' });
-}
-   
+   } catch (error) {
+      res.send({ error: true, data: error, message: 'ko' });
+   }   
 });
 
 app.put('/retireTeacher/:email', function (req, res) {
@@ -262,9 +249,9 @@ app.put('/retireTeacher/:email', function (req, res) {
          if (error) throw error;
          res.send({ error: false, data: results, message: 'ok' });
       });
-   } catch (error) {
-      res.send({ error: false, data: error, message: 'ko' });
-   }
+      } catch (error) {
+         res.send({ error: false, data: error, message: 'ko' });
+      }
 });
 
 app.get('/teachersDetails',function (req,res){
@@ -273,17 +260,15 @@ app.get('/teachersDetails',function (req,res){
       var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
       connection.query(query, function (err, results, fields) {
          if (err) throw err;
-         for (let i = 0; i < results.length; i++) {
-            var hours_appoggio = (results[i].total_hours.toString()).split('.')
-            var total_hourss= hours_appoggio[1] > 0 ? hours_appoggio[0] +'.'+ (hours_appoggio[1]*0.60).toFixed(0) : hours_appoggio[0]
+         results.forEach(element => {
             data.push(
                {
-                  company_name: results[i].company_name,
-                  company_id: results[i].company_id,
-                  total_hours: total_hourss ? total_hourss : '0',
-                  lesson: results[i].lesson,
+                  company_name: element.company_name,
+                  company_id: element.company_id,
+                  total_hours: tools.formattedDecimal(element.total_hours) ? tools.formattedDecimal(element.total_hours) : '0',
+                  lesson: element.lesson ? element.lesson : '',
                })
-         }
+         })
          res.send({ error: false, data: data, message: 'ok' });
       });
    } catch (error) {
@@ -303,13 +288,13 @@ app.post('/createTeacher', function (req, res) {
    connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, items, fields) {
       if (error) throw error;
       if (items.length >0){
-         for (let i = 0; i < items.length; i++) {
+         items.forEach(element => {
             company.push(
                {
-                  id: items[i].id,
-                  name: items[i].name,
+                  id: element.id,
+                  name: element.name,
                })
-         }
+         })
          connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
             if (error) throw error;
                return res.send({ error: false, result: result, message: 'ok' });
@@ -321,13 +306,13 @@ app.post('/createTeacher', function (req, res) {
          connection.query("SELECT * FROM companies where name='"+companyName+"'", function (error, results, fields) {
             if (error) throw error;
             if (results.length >0){
-               for (let i = 0; i < results.length; i++) {
+               results.forEach(element => {
                   company.push(
                      {
-                        id: results[i].id,
-                        name: results[i].name,
+                        id: element.id,
+                        name: element.name,
                      })
-               }
+               })
                connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                   if (error) throw error;
                      return res.send({ error: false, result: result, message: 'ok' });
@@ -348,7 +333,9 @@ app.put('/updateSignature/:id_lesson',function(req,res){
       var startTime = req.bosy.startTime
       var endTime = req.body.endTime
       var dateOfModify= tools.formattedDate(new Date())
+      
       var query = "UPDATE `signatures_students` SET `final_start_time`=?,`final_end_time`=?,`modify_date`=? WHERE `id_lesson`= '"+id_lesson+"'  and `email_student`='"+email+"'"
+      
       connection.query(query,[startTime,endTime,dateOfModify], function (error, results, fields){
          if (error) throw error;
          data=results
@@ -368,23 +355,41 @@ app.get('/lessons/:date/:id_course', function (req, res) {
    var dataFinale=data_Scelta[2]+'-'+data_Scelta[1]+'-'+data_Scelta[0]
    connection.query("SELECT * FROM lessons WHERE date= '" + (dataFinale) + "' and id_course="+ id_course+"", function (error, results, fields) {
       if (error) throw error;
-      for (let i = 0; i < results.length; i++) {
-         var end_time_appoggio = (results[i].end_time.toString()).split('.')
-         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ (end_time_appoggio[1]*0.60).toFixed(0) : end_time_appoggio[0]
-         
-         var start_time_appoggio = (results[i].start_time.toString()).split('.')
-         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ (start_time_appoggio[1]*0.60).toFixed(0) : start_time_appoggio[0]
-         
+      results.forEach(element => {
          data.push(
             {
-               email: results[i].email_signature,
-               classroom: results[i].classroom,
-               id: results[i].id,
-               lesson: results[i].lesson,
-               startTime:start_time_float ? start_time_float : 'errore',
-               endTime: end_time_float ? end_time_float : 'errore'
+               email: element.email_signature,
+               classroom: element.classroom,
+               id: element.id,
+               lesson: element.lesson,
+               startTime:tools.formattedDecimal(element.start_time) ,
+               endTime: tools.formattedDecimal(element.end_time)
             })
-      }
+      })
+      res.send(JSON.stringify(data));
+   });
+});
+
+
+app.get('/lessonsTeacher/:id_course/:id_company', function (req, res) {
+   var data = [];
+   var id_company = req.params.id_company 
+   var id_course = req.params.id_course 
+
+   connection.query("SELECT * FROM lessons WHERE companies_id= '" + (id_company) + "' and id_course="+ id_course+"", function (error, results, fields) {
+      if (error) throw error;
+      results.forEach(element => {
+       
+         data.push(
+            {
+               date: tools.formattedDate(element.date),
+               classroom: element.classroom,
+               id: element.id,
+               lesson: element.lesson,
+               startTime: tools.formattedDecimal(element.start_time),
+               endTime: tools.formattedDecimal(element.end_time) 
+            })
+      })
       res.send(JSON.stringify(data));
    });
 });
@@ -397,26 +402,20 @@ app.get('/listSignaturesStudents/:data_scelta', function(req,res) {
 
    connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
       if (error) throw error;
-      for (let i = 0; i < results.length; i++) {
-         
-         var end_time_appoggio = (results[i].final_end_time.toString()).split('.')
-         var end_time_float= end_time_appoggio[1] > 0 ? end_time_appoggio[0] +'.'+ (end_time_appoggio[1]*0.60).toFixed(0) : end_time_appoggio[0]
-         
-         var start_time_appoggio = (results[i].final_start_time.toString()).split('.')
-         var start_time_float= start_time_appoggio[1] > 0 ? start_time_appoggio[0] +'.'+ (start_time_appoggio[1]*0.60).toFixed(0) : start_time_appoggio[0]
+      results.forEach(element =>{
          
          data.push(
             {
-               mattinaPomeriggio: results[i].mattinaPomeriggio,
-               firstName: results[i].first_name,
-               lastName: results[i].last_name,
-               email: results[i].email,
-               idLesson :  results[i].id_lesson,
-               emailStudent : results[i].email,
-               startTime: start_time_float !=1 ? start_time_float : 'assente',
-               endTime: end_time_float !=1 ? end_time_float : 'assente'
+               mattinaPomeriggio: element.mattinaPomeriggio,
+               firstName: element.first_name,
+               lastName: element.last_name,
+               email: element.email,
+               idLesson :  element.id_lesson,
+               emailStudent : element.email,
+               startTime: tools.formattedDecimal(element.final_start_time) !=1 ? tools.formattedDecimal(element.final_start_time) : 'assente',
+               endTime: tools.formattedDecimal(element.final_end_time) !=1 ?  tools.formattedDecimal(element.final_end_time) : 'assente'
             })
-      }
+      })
       return res.send(JSON.stringify(data));
    });
 });
@@ -433,36 +432,26 @@ app.get('/listStudents/:id_course', function (req, res) {
          totalHours : results[0].total_hours
       })
    });
-   connection.query("SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students join signatures_students on students.email=signatures_students.email_student where id_course= "+id_course+" GROUP BY email_student", function (error, results, fields) {
+   connection.query("SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student where id_course= "+id_course+" GROUP BY email", function (error, results, fields) {
       if (error) throw error;
-      for (let i = 0; i < results.length; i++) {
+     
 
-         var hoursDecimalAppoggio = (results[i].hours_of_lessons.toString()).split('.')
-         var hourDecimal= hoursDecimalAppoggio[1] > 0 ? hoursDecimalAppoggio[0] +'.'+ (hoursDecimalAppoggio[1]*0.60).toFixed(0) : hoursDecimalAppoggio[0]
-         var percentage = ((results[i].hours_of_lessons  * 100) / totalHours[0].totalHours).toFixed(0)      
+      results.forEach(element => {
+         var percentage = ((element.hours_of_lessons  * 100) / totalHours[0].totalHours).toFixed(0)      
+
          data.push(
             {
-               firstName: results[i].first_name,
-               lastName: results[i].last_name,
-               email: results[i].email,
-               fiscalCode: results[i].fiscal_code,
-               dateOfBirth: results[i].date_of_birth,
-               residence: results[i].residence,
-               hoursOfLessons: hourDecimal ? hourDecimal : '0',
+               firstName: element.first_name,
+               lastName: element.last_name,
+               email: element.email,
+               fiscalCode: element.fiscal_code,
+               dateOfBirth: element.date_of_birth,
+               residence: element.residence,
+               hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
                percentage: (percentage) ? (percentage) + " %" : '0',
-               ritirato: results[i].ritirato
+               ritirato: element.ritirato
             })
-      }
-      return res.send(JSON.stringify(data));
-   });
-});
-
-app.get('/listAllStudents/:id_course', function (req, res) {
-   var data = [];
-   var id_course = req.params.id_course
-   connection.query("SELECT * from students where id_course= "+id_course, function (error, results, fields) {
-      if (error) throw error;
-      data= results
+      })
       return res.send(JSON.stringify(data));
    });
 });

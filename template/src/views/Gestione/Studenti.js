@@ -22,7 +22,6 @@ class Studenti extends Component {
 
   componentDidMount() {
     this.getStudents();
-    this.getAllStudents();
   }
 
   getStudents = () => {
@@ -47,23 +46,7 @@ class Studenti extends Component {
       .catch(err => console.error(err));
   }
 
-  getAllStudents = () => {
-    axios.get('http://localhost:8080/listAllStudents/'+this.state.idCorso)
-      .then(res => res.data)
-      .then((data, index) => {
-        const allStudenti = [];
-        data.map(item => allStudenti.push({
-          firstName: item.first_name,
-          lastName: item.last_name,
-          email: item.email,
-        }));
-        this.setState({ allStudenti });
-      })
-      .catch(err => console.error(err));
-  }
-
   refresh() {
-    this.getAllStudents();
     this.getStudents();
 
   }
