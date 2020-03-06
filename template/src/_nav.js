@@ -61,6 +61,17 @@ export default {
       url: '/calendario',
       icon: 'icon-pie-chart',
     },
+    {
+      name: 'DocentiPersonale',
+      url: '/docentiPersonale',
+      icon: 'icon-pie-chart',
+    },
+    {
+      name: 'StudentiPersonale',
+      url: '/studentiPersonale',
+      icon: 'icon-pie-chart',
+    }
+
     /*
       {
         name: 'Impostazioni',

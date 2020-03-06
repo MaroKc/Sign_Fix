@@ -15,8 +15,8 @@ class InfoDocente extends React.Component {
             emailDocente: this.props.docente.emailDocente,
             hoursOfLessons: this.props.docente.hoursOfLessons,
             ritirato: this.props.docente.ritirato,
-            companyName: this.props.details.companyName,
-            lessonName: this.props.details.lessonName,
+            companyName: this.props.details.companyName ,
+            lessonName: this.props.details.lessonName ,
             totalHours: this.props.details.totalHours,         
             companyId: this.props.details.companyId,           
         }

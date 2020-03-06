@@ -199,18 +199,22 @@ app.get('/importCsv/:id_course',function(req,res){
 app.get('/listTeachers',function(req,res){
    try {
       var data =[]
-      connection.query("SELECT first_name,ritirato,last_name,teachers.companies_id as companies_id,teachers.email_responsible as email_responsible,sum(signatures_teachers.hours_of_lessons) as hours_of_lessons FROM teachers left join signatures_teachers on teachers.email_responsible = signatures_teachers.email_responsible group by teachers.email_responsible", function (error, results, fields) {
+      var query ="SELECT name,lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,( SELECT SUM(total_hours) FROM lessons where companies_id = t.companies_id ) AS totalHours FROM teachers t JOIN companies c ON t.id_course = c.id LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible LEFT JOIN lessons l ON l.id = s.id_lesson GROUP BY t.email_responsible, l.lesson"
+      connection.query(query, function (error, results, fields) {
          if (error) throw error;
 
          results.forEach( element => {
             data.push(
                {
+                  name : element.name,
+                  lesson : element.lesson,
                   first_name: element.first_name,
                   ritirato: element.ritirato,
-                  last_name: element.last_name,
-                  email_responsible: element.email_responsible,
-                  companies_id: element.companies_id,
-                  hours_of_lessons : tools.formattedDecimal(element.hours_of_lessons),
+                  lastName: element.last_name,
+                  companiId: element.company_id,
+                  emailTeacher: element.email,
+                  hourOfLessons: tools.formattedDecimal(element.hourOfLessons),
+                  totalHours: tools.formattedDecimal(element.totalHours),
                })
          })
       return res.send({error: true, data:data, message: 'ok'});   
@@ -257,7 +261,7 @@ app.put('/retireTeacher/:email', function (req, res) {
 app.get('/teachersDetails', function (req, res) {
    try {
       var data = []
-      var query = "SELECT  name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
+      var query = "SELECT name as company_name,companies.id as company_id,lesson,sum(`total_hours`) as total_hours FROM `lessons` join companies on lessons.companies_id=companies.id group by lesson,company_name,company_id";
       connection.query(query, function (err, results, fields) {
          if (err) throw err;
          results.forEach(element => {
