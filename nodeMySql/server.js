@@ -199,7 +199,7 @@ app.get('/importCsv/:id_course',function(req,res){
 app.get('/listTeachers',function(req,res){
    try {
       var data =[]
-      var query ="SELECT name,lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,( SELECT SUM(total_hours) FROM lessons where companies_id = t.companies_id ) AS totalHours FROM teachers t JOIN companies c ON t.id_course = c.id LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible LEFT JOIN lessons l ON l.id = s.id_lesson GROUP BY t.email_responsible, l.lesson"
+      var query ="SELECT name,lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,( SELECT SUM(total_hours) FROM lessons where companies_id = t.companies_id ) AS totalHours FROM teachers t JOIN companies c ON t.companies_id = c.id LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible LEFT JOIN lessons l ON l.id = s.id_lesson GROUP BY t.email_responsible, l.lesson"
       connection.query(query, function (error, results, fields) {
          if (error) throw error;
 
