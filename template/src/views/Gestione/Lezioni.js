@@ -181,14 +181,14 @@ class Lezioni extends React.Component {
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                <h5 className="d-md-inline ml-md-4">mattina</h5>
-                <h5 className="d-md-inline ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5> 
+                <h5 className="d-block ml-md-4">mattina</h5>
+                <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5> 
                 </Col>
-                <Col className="col-sm-8">
-                   <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
+                <Col className="col-sm-8 mt-3">
+                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Docente: <b>{email}</b></p></h5>
                 </Col>
               </Row>
-             {!assenti.length ? "" :  <div className="ml-md-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
+             {!assenti.length ? "" :  <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</h4> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
@@ -234,14 +234,14 @@ class Lezioni extends React.Component {
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(1)} aria-expanded={this.state.accordion[1]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                <h5 className="d-md-inline ml-md-4">pomeriggio</h5>
-                <h5 className="d-md-inline ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
+                <h5 className="d-block ml-md-4">pomeriggio</h5>
+                <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
-                <Col className="col-sm-8">
-                   <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
+                <Col className="col-sm-8 mt-3">
+                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Docente: <b>{email}</b></p></h5>
                 </Col>
               </Row>
-              {!assenti.length ? "" :  <div className="ml-md-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
+              {!assenti.length ? "" :  <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</h4></div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[1]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">

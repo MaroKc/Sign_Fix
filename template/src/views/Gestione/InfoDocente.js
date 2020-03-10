@@ -10,17 +10,15 @@ class InfoDocente extends React.Component {
             changeInfo: false,
             warning: false,
             displayCard: this.props.displayCard,
-            firstName: this.props.docente.firstName,
-            lastName: this.props.docente.lastName,
-            emailDocente: this.props.docente.emailDocente,
-            hoursOfLessons: this.props.docente.hoursOfLessons,
-            ritirato: this.props.docente.ritirato,
-            companyName: this.props.docente.companyName,
-            lessonName: this.props.docente.lessonName,
-            totalHours: this.props.docente.totalHours,         
-            companyId: this.props.docente.companyId,           
+            firstName: this.props.docente['0'].firstName,
+            lastName: this.props.docente['0'].lastName,
+            dettagli: this.props.dettagli,
+            value: this.props.docente['0'].lessonName
         }
+console.log(this.props.dettagli)
     }
+
+
 
     callForUpdate = () => {
         axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
@@ -80,7 +78,54 @@ onclickModifyState = () => {
         })
     }
 
+    selectLesson = () => {
+        if(this.props.docente.length === 1){
+            return (
+                <>
+                    <tr>
+                        <td><h5>Lezione:</h5></td>
+                        <td><h5>{this.props.docente['0'].lessonName}</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore fatte:</h5></td>
+                        <td><h5>{this.props.docente['0'].hoursOfLessons}</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore di lezione:</h5></td>
+                        <td><h5>{this.props.docente['0'].totalHours}</h5></td>
+                    </tr>
+                </>
+            )
+        }else{
+            let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
+            return (
+                <>
+                
+                    <tr>
+                        <td><h5>Lezione:</h5></td>
+                        <td><h5>
+                            <Input type="select" name="select" id="select" className="w-auto" onChange={(e) => this.setState({ value: e.target.value })}>
+
+                                {this.props.docente.map(item => <option value={item.lessonName}>{item.lessonName}</option>)}
+                            </Input>
+                        </h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore fatte:</h5></td>
+                        <td><h5>{this.state.value && totalHours['hoursOfLessons'] }</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore di lezione:</h5></td>
+                        <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
+                    </tr>
+                </>
+            )
+
+        }
+
+    }
 changeInfo = (changeInfo) => {
+
     if (!changeInfo) {
         return (
             <Table borderless responsive>
@@ -95,20 +140,9 @@ changeInfo = (changeInfo) => {
                     </tr>
                     <tr>
                         <td><h5>Nome azienda:</h5></td>
-                        <td><h5>{this.state.companyName}</h5> </td>
+                        <td><h5>{this.props.docente['0'].companyName}</h5> </td>
                     </tr>
-                    <tr>
-                        <td><h5>Lezione:</h5></td>
-                        <td><h5>{this.state.lessonName}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore fatte:</h5></td>
-                        <td><h5>{this.state.hoursOfLessons}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.state.totalHours}</h5></td>
-                    </tr>
+                    {this.selectLesson()}
                 </tbody>
             </Table>
         )
@@ -156,7 +190,7 @@ renderButtons = (changeInfo) => {
     const { firstName, lastName } = this.state
     const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName)
 
-    if (this.props.docente.ritirato === 0) {
+    if (this.props.docente['0'].ritirato === 0) {
         if (!changeInfo) {
             return (
                 <>

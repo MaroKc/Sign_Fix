@@ -195,11 +195,33 @@ app.get('/importCsv/:id_course',function(req,res){
          }
 });
 
-
 app.get('/listTeachers',function(req,res){
    try {
       var data =[]
-      var query ="SELECT name,lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,( SELECT SUM(total_hours) FROM lessons where companies_id = t.companies_id ) AS totalHours FROM teachers t JOIN companies c ON t.companies_id = c.id LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible LEFT JOIN lessons l ON l.id = s.id_lesson GROUP BY t.email_responsible, l.lesson"
+      connection.query("SELECT name,first_name,ritirato,last_name,teachers.companies_id as companies_id,teachers.email_responsible as email_responsible FROM teachers left join signatures_teachers on signatures_teachers.email_responsible=teachers.email_responsible join companies on companies.id = teachers.companies_id group by teachers.email_responsible", function (error, results, fields) {
+         if (error) throw error;
+         results.forEach(element => {
+            data.push(
+               {
+                  name: element.name,
+                  firstName: element.first_name,
+                  ritirato: element.ritirato,
+                  lastName: element.last_name,
+                  emailTeacher: element.email_responsible,
+                  companyId: element.companies_id,
+               })
+         })
+      return res.send({error: true, data:data, message: 'ok'});   
+      });
+   } catch (error) {
+      return res.send({ error: true,data:error,message:'ko' });
+   }
+});
+
+app.get('/teacherDetails',function(req,res){
+   try {
+      var data =[]
+      var query ="SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours FROM teachers t JOIN companies c ON t.companies_id = c.id LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible LEFT JOIN lessons l ON l.id = s.id_lesson GROUP BY t.email_responsible, l.lesson"
       connection.query(query, function (error, results, fields) {
          if (error) throw error;
 

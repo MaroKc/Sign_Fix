@@ -21,6 +21,7 @@ class Docenti extends Component {
     super(props)
     this.state = {
       docenti: [],
+      dettagliDocente: [],
       displayCard: null,
       displayDetails: null,
       displayForm: null,
@@ -35,6 +36,7 @@ class Docenti extends Component {
 
   componentDidMount() {
     this.getTeachers();
+    this.getTeacherDetails();
   }
 
   getTeachers = () => {
@@ -42,22 +44,40 @@ class Docenti extends Component {
       .then(res =>  {
         let docenti = [];
         res.data.data.map(item => docenti.push({
-          companyName: item.name === item.emailTeacher ? '' : item.name,
-          lessonName: item.lesson,
+          companyName: item.name === item.emailTeacher ? "" : item.name,
           firstName: item.firstName,
           lastName: item.lastName,
           ritirato: item.ritirato,
           companyId: item.companyId,
           emailDocente: item.emailTeacher,
-          hoursOfLessons: this.formatHours(item.hoursOfLessons),
-          totalHours: this.formatHours(item.totalHours),
           clickEvent: () => this.displayCard(item.emailTeacher)
         }));
         this.setState({ docenti });
-        console.log(docenti)
       })
       .catch(err => console.error(err));
   }
+
+  getTeacherDetails = () => {
+    axios.get('http://localhost:8080/teacherDetails')
+    .then(res =>  {
+      let dettagliDocente = [];
+      res.data.data.map(item => dettagliDocente.push({
+        companyName: item.name === item.emailTeacher ? "" : item.name,
+        lessonName: item.lesson,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        ritirato: item.ritirato,
+        companyId: item.companyId,
+        emailDocente: item.emailTeacher,
+        hoursOfLessons: this.formatHours(item.hoursOfLessons),
+        totalHours: this.formatHours(item.totalHours),
+        clickEvent: () => this.displayCard(item.emailTeacher)
+      }));
+      this.setState({ dettagliDocente });
+    })
+    .catch(err => console.error(err));
+  }
+
 
   createTeacher = () => {
     axios.post('http://localhost:8080/createTeacher/', { 
@@ -72,19 +92,19 @@ class Docenti extends Component {
     })
   }
 
-  formatHours (hours){
-    var startLessonAppoggio= (hours.toString()).split('.')
-    var startLesson= ''
-  
-    if(startLessonAppoggio[1]){
-      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-      startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
-      return startLesson
-    }
-    else{
-      return startLessonAppoggio[0]
-    }
+formatHours (hours){
+  var startLessonAppoggio= (hours.toString()).split('.')
+  var startLesson= ''
+
+  if(startLessonAppoggio[1]){
+    var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+    startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
+    return startLesson
   }
+  else{
+    return startLessonAppoggio[0]
+  }
+}
 
 displayTab = () => {
   this.setState({
@@ -137,6 +157,17 @@ handleChange = (event) => {
       this.setState({
         [name]: val,
       });
+    }
+
+   groupBy = (objectArray, property) => {
+      return objectArray.reduce(function (acc, obj) {
+        var key = obj[property];
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(obj);
+        return acc;
+      }, {});
     }
 
   tabPane() {
@@ -243,7 +274,15 @@ handleChange = (event) => {
       }
     }
     if(this.state.displayCard){
-      return <InfoDocente docente={this.state.docenti.find((docente) => docente.emailDocente === this.state.displayCard)} getTeachers={this.getTeachers} displayTable={this.displayTable}/>
+      let groupedPeople = this.groupBy(this.state.dettagliDocente, 'emailDocente');
+      // console.log(groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']])
+
+      return <InfoDocente 
+      docente={groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']]} 
+      getTeachers={this.getTeachers} 
+      getTeacherDetails={this.getTeacherDetails} 
+      displayTable={this.displayTable}
+      />
     }else{
       return (
         <>

@@ -92,43 +92,48 @@ class OreLezioniMattina extends React.Component {
         return (
             <>
                 <div className="text-center mt-3"> <h4>{this.props.studenteMattina.firstName} {this.props.studenteMattina.lastName}</h4></div>
-                <Row>
-                    <Col className="m-3">
-                        <Table borderless responsive style={{ overflow: "hidden" }}>
 
-                            <tbody>
-                                <tr>
-                                    <td className=""><h5> <b>Inizio</b> lezione:</h5></td>
-                                    <td className="w-50">
-                                        <Row>
-                                            <Col xs="4">
-                                                <Input invalid={!validationOreStart} className="" name='oreStartTimeMattina' onChange={this.handleChange} value={this.state.oreStartTimeMattina} />
-                                            </Col>
-                                            :
-                                        <Col xs="4">
-                                                <Input invalid={!validationMinutiStart} className="" name='minutiStartTimeMattina' onChange={this.handleChange} value={this.state.minutiStartTimeMattina} />
-                                            </Col>
-                                        </Row>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><h5> <b>Fine</b> lezione:</h5></td>
-                                    <td className="w-50">
-                                        <Row>
-                                            <Col xs="4">
-                                                <Input invalid={!validationOreEnd} className="text-center" name='oreEndTimeMattina' onChange={this.handleChange} value={this.state.oreEndTimeMattina} />
-                                            </Col>
-                                            :
-                                        <Col xs="4">
-                                                <Input invalid={!validationMinutiEnd} className="text-center" name='minutiEndTimeMattina' onChange={this.handleChange} value={this.state.minutiEndTimeMattina} />
-                                            </Col>
-                                        </Row>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </Table>
+                <Row>
+                    <Col md="9">
+
+
+                        <Row className="m-3">
+                            <Col md="7" className="text-center">
+                                <h5> <b>Inizio</b> lezione:</h5>
+                            </Col>
+                            <Col md="5">
+                                <Row>
+                                    <Col>
+                                        <Input invalid={!validationOreStart} className="text-center" name='oreStartTimeMattina' onChange={this.handleChange} value={this.state.oreStartTimeMattina} />
+                                    </Col>
+                                    :
+                                        <Col >
+                                        <Input invalid={!validationMinutiStart} className="text-center" name='minutiStartTimeMattina' onChange={this.handleChange} value={this.state.minutiStartTimeMattina} />
+                                    </Col>
+                                </Row>
+
+                            </Col>
+                        </Row>
+
+                        <Row className="m-3">
+                            <Col md="7" className="text-center">
+                                <h5> <b>Fine</b> lezione:</h5>
+                            </Col>
+                            <Col md="5">
+                                <Row>
+                                    <Col >
+                                        <Input invalid={!validationOreEnd} className="text-center" name='oreEndTimeMattina' onChange={this.handleChange} value={this.state.oreEndTimeMattina} />
+                                    </Col>
+                                    :
+                                    <Col>
+                                        <Input invalid={!validationMinutiEnd} className="text-center" name='minutiEndTimeMattina' onChange={this.handleChange} value={this.state.minutiEndTimeMattina} />
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
                     </Col>
-                    <Col xs="auto" className="my-auto mx-auto pr-5">
+
+                    <Col md="3">
                         <Button disabled={!validation} outline color="dark" onClick={this.callForUpdateMattina}> <i className="cui-check icons d-block mt-2"></i> conferma <br /> modifiche </Button>
                     </Col>
                 </Row>
