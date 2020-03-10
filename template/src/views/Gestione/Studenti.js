@@ -5,12 +5,6 @@ import { MDBDataTable } from 'mdbreact';
 import InfoStudente from './InfoStudente';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
-// import { AppSidebarToggler } from '@coreui/react';
-
-
-//https://mdbootstrap.com/docs/react/tables/search/
-
-
 
 class Studenti extends Component {
   constructor(props) {

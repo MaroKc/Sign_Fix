@@ -15,9 +15,9 @@ class infoStudente extends React.Component {
       residence: this.props.studente.residence,
       fiscalCode: this.props.studente.fiscalCode,
       ritirato: this.props.studente.ritirato,
+      displayCard: this.props.displayCard,
       changeInfo: false,
       warning: false,
-      displayCard: this.props.displayCard,
     }
   }
 

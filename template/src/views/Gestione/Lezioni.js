@@ -97,6 +97,7 @@ class Lezioni extends React.Component {
               studentiMattina.push({
                 idLesson: item.idLesson,
                 firstName: item.firstName,
+                email: item.email,
                 lastName: item.lastName,
                 emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
@@ -254,7 +255,6 @@ class Lezioni extends React.Component {
     }
   }
 
-
   toggleAccordion = (tab) => {
     const prevState = this.state.accordion;
     const state = prevState.map((x, index) => tab === index ? !x : false);
@@ -262,7 +262,6 @@ class Lezioni extends React.Component {
       accordion: state,
     });
   }
-
 
 
   tabPaneMattina() {
@@ -286,7 +285,7 @@ class Lezioni extends React.Component {
             field: 'endTime',
           },
         ],
-        rows: this.state.studentiMattina
+        rows:this.state.studentiMattina
       };
 
   return (

@@ -18,6 +18,17 @@ exports.formattedDate = (d = new Date) => {
     return `${year}-${month}-${day}`;
   }
 
+  exports.formattedDecimal = (hoursToFormats) =>{
+    if(hoursToFormats){
+      hoursToFormats = (hoursToFormats.toString()).split('.')
+      var hours_of_lessons= hoursToFormats[1] > 0 ? hoursToFormats[0] +'.'+ (hoursToFormats[1]*0.60).toFixed(0) : hoursToFormats[0]
+      return hours_of_lessons
+     }
+    else{
+      return hoursToFormats="0"
+    }  
+  }
+
 exports.checkCalendarData = (error) =>{
   if (error) return console.log('The API returned an error: ' + error);
 }

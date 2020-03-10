@@ -42,7 +42,7 @@ class Docenti extends Component {
       .then(res =>  {
         let docenti = [];
         res.data.data.map(item => docenti.push({
-          companyName: item.name === item.emailTeacher ? "" : item.name,
+          companyName: item.name === item.emailTeacher ? '' : item.name,
           lessonName: item.lesson,
           firstName: item.firstName,
           lastName: item.lastName,
@@ -54,11 +54,10 @@ class Docenti extends Component {
           clickEvent: () => this.displayCard(item.emailTeacher)
         }));
         this.setState({ docenti });
-        console.log(this.state.docenti)
+        console.log(docenti)
       })
       .catch(err => console.error(err));
   }
-
 
   createTeacher = () => {
     axios.post('http://localhost:8080/createTeacher/', { 
@@ -73,19 +72,19 @@ class Docenti extends Component {
     })
   }
 
-formatHours (hours){
-  var startLessonAppoggio= (hours.toString()).split('.')
-  var startLesson= ''
-
-  if(startLessonAppoggio[1]){
-    var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-    startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
-    return startLesson
+  formatHours (hours){
+    var startLessonAppoggio= (hours.toString()).split('.')
+    var startLesson= ''
+  
+    if(startLessonAppoggio[1]){
+      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+      startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
+      return startLesson
+    }
+    else{
+      return startLessonAppoggio[0]
+    }
   }
-  else{
-    return startLessonAppoggio[0]
-  }
-}
 
 displayTab = () => {
   this.setState({
