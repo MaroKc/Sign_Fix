@@ -15,13 +15,10 @@ class InfoDocente extends React.Component {
             dettagli: this.props.dettagli,
             value: this.props.docente['0'].lessonName
         }
-console.log(this.props.dettagli)
     }
 
-
-
     callForUpdate = () => {
-        axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
+        axios.put('http://localhost:8080/updateTeacher/' + this.props.docente['0'].emailDocente, {
             first_name: this.state.firstName,
             last_name: this.state.lastName
         })
