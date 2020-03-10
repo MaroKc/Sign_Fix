@@ -42,7 +42,7 @@ class Docenti extends Component {
       .then(res =>  {
         let docenti = [];
         res.data.data.map(item => docenti.push({
-          companyName: item.name,
+          companyName: item.name === item.emailTeacher ? "" : item.name,
           lessonName: item.lesson,
           firstName: item.firstName,
           lastName: item.lastName,
@@ -156,6 +156,10 @@ handleChange = (event) => {
             label: 'Email',
             field: 'emailDocente',
           },
+          {
+            label: 'Compagnia',
+            field: 'companyName'
+          }
         ]
       };
 
@@ -254,7 +258,7 @@ handleChange = (event) => {
     const regexLettere = /^[a-zA-Z]*$/;
     const regexEmail =	/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
     const {firstName, lastName, emailDocente, companyName} = this.state
-    const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
+    const validationFirstName = firstName.length > 2 && regexLettere.test(firstName) 
     const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
     const validationEmail = emailDocente.length > 4 && regexEmail.test(emailDocente)
 
@@ -272,15 +276,15 @@ handleChange = (event) => {
                     <tbody>
                       <tr>
                         <td><h5>Nome:</h5></td>
-                        <td><Input id="infoNome" name='firstName' onChange={this.handleChange} value={this.state.firstName} valid={validationFirstName}/></td>
+                        <td><Input id="infoNome" name='firstName' onChange={this.handleChange} value={this.state.firstName} invalid={!validationFirstName && firstName.length !== 0} valid={validationFirstName}/></td>
                       </tr>
                       <tr>
                         <td><h5>Cognome:</h5></td>
-                        <td><Input id="infoCognome" name='lastName' onChange={this.handleChange} value={this.state.lastName} valid={validationLastName}/></td>
+                        <td><Input id="infoCognome" name='lastName' onChange={this.handleChange} value={this.state.lastName} invalid={!validationLastName && lastName.length !== 0} valid={validationLastName}/></td>
                       </tr>
                       <tr>
                         <td><h5>Email:</h5></td>
-                        <td><Input id="infoEmail" name='emailDocente' onChange={this.handleChange} value={this.state.emailDocente} valid={validationEmail}/></td>
+                        <td><Input id="infoEmail" name='emailDocente' onChange={this.handleChange} value={this.state.emailDocente} invalid={!validationEmail && emailDocente.length !== 0} valid={validationEmail}/></td>
                       </tr>
                       <tr>
                         <td><h5>Compagnia:</h5></td>

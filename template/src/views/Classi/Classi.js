@@ -112,7 +112,7 @@ class Classi extends Component {
     }
 
     return (
-      <div className="animated fadeIn">
+      <div className="animated fadeIn my-auto">
         {items}
 
         {/* this.state.corsi.map(corso => 

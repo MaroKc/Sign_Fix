@@ -5,11 +5,7 @@ import DatePicker from 'react-datepicker';
 import { MDBDataTable } from 'mdbreact';
 import OreLezioniMattina from './OreLezioniMattina';
 import OreLezioniPomeriggio from './OreLezioniPomeriggio';
-
-
 import 'react-datepicker/dist/react-datepicker.css';
-// import { MDBDataTable } from 'mdbreact';
-
 
 class Lezioni extends React.Component {
   constructor(props) {
@@ -121,31 +117,13 @@ class Lezioni extends React.Component {
             }
           });
           this.setState(
-            { studentiMattina, 
+            { 
+              studentiMattina, 
               studentiPomeriggio 
            });
         })
         .catch(err => console.error(err));
     }
-  
-    // formOrario(){
-
-    //     axios.put('http://localhost:8080/updateTeacher/' + this.state.emailDocente, {
-    //         first_name: this.state.firstName,
-    //         last_name: this.state.lastName
-    //     })
-    //         .then(res => {
-    //             if (res.data.message === "ok") ToastsStore.success("La modifica è stata effettuata con successo!")
-    //             else if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
-    //         })
-    //         .catch(err => {
-    //             return console.log(err);
-    //         });
-    //     this.setState({
-    //         changeInfo: false
-    //     })
-    // }
-
 
   formatHours (hours){
       var startLessonAppoggio= (hours.toString()).split('.')
@@ -197,18 +175,19 @@ class Lezioni extends React.Component {
       
       return <>
         
-        <Card className="m-4 ">
+        <Card className="m-md-4 ">
           <CardHeader id="headingOne">
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                  <h5 className="ml-4">mattina   {this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
+                <h5 className="d-md-inline ml-md-4">mattina</h5>
+                <h5 className="d-md-inline ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5> 
                 </Col>
                 <Col className="col-sm-8">
                    <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
                 </Col>
               </Row>
-             {!assenti.length ? "" :  <div className="ml-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
+             {!assenti.length ? "" :  <div className="ml-md-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
@@ -239,7 +218,7 @@ class Lezioni extends React.Component {
     let assenti = []
 
     this.state.studentiPomeriggio.map((item) => {
-      if(item.startTime === 'assente'){
+      if(item.startTime === "assente"){
         assenti.push({
           firstName: item.firstName,
           lastName: item.lastName
@@ -249,18 +228,19 @@ class Lezioni extends React.Component {
 
     if (nomeLezione) {
       return <>
-        <Card className="m-4 ">
+        <Card className="m-md-4">
           <CardHeader id="headingOne">
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(1)} aria-expanded={this.state.accordion[1]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                  <h5 className="ml-4">pomeriggio   {this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
+                <h5 className="d-md-inline ml-md-4">pomeriggio</h5>
+                <h5 className="d-md-inline ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
                 <Col className="col-sm-8">
                    <h5>Luogo: <b> {classe} </b>   Lezione: <b>{nomeLezione}</b>   Docente: <b>{email}</b></h5>
                 </Col>
               </Row>
-              {!assenti.length ? "" :  <div className="ml-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
+              {!assenti.length ? "" :  <div className="ml-md-4">Assenti: <span className="text-danger">{assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</span> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[1]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
@@ -343,7 +323,8 @@ class Lezioni extends React.Component {
   }
   
 
-  tabPanePomeriggio() {
+  tabPanePomeriggio() { 
+
     const DatatablePage = () => {
       const data = {
         columns: [
@@ -364,7 +345,7 @@ class Lezioni extends React.Component {
             field: 'endTime',
           },
         ],
-        rows: this.state.studentiPomeriggio
+        rows: this.state.studentiPomeriggio 
       };
 
       // this.state.studentiPomeriggio.startTime === "assente" ? <div className="text-success">"assente"</div> : this.state.studentiPomeriggio.startTime
@@ -375,7 +356,8 @@ class Lezioni extends React.Component {
           <MDBDataTable
             responsive
             hover
-            data={data}
+            data={data
+            }
             searching={false}
             paging={false}
             noBottomColumns={true}

@@ -1,8 +1,8 @@
 
 import React from 'react'
-import { Card, Col, Row,  Button, Input, Table } from 'reactstrap';
+import { Card, Col, Row, Button, Input, Table } from 'reactstrap';
 import axios from 'axios'
-import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
+import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
 
 class OreLezioniMattina extends React.Component {
     constructor(props) {
@@ -21,29 +21,29 @@ class OreLezioniMattina extends React.Component {
         }
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.splitOrarioMattina();
     }
 
-    splitOrarioMattina(){
+    splitOrarioMattina() {
         this.setState({
-            oreStartTimeMattina: this.state.startTimeMattina.split(":")[0],
-            minutiStartTimeMattina: this.state.startTimeMattina.split(":")[1].trim(),
+            oreStartTimeMattina: this.state.startTimeMattina === "assente" ? 0 : this.state.startTimeMattina.split(":")[0],
+            minutiStartTimeMattina: this.state.startTimeMattina === "assente" ? 0 : this.state.startTimeMattina.split(":")[1].trim(),
         
-            oreEndTimeMattina: this.state.endTimeMattina.split(":")[0],
-            minutiEndTimeMattina: this.state.endTimeMattina.split(":")[1].trim(),
+            oreEndTimeMattina: this.state.endTimeMattina === "assente" ? 0 : this.state.endTimeMattina.split(":")[0],
+            minutiEndTimeMattina: this.state.endTimeMattina === "assente" ? 0 : this.state.endTimeMattina.split(":")[1].trim(),
         })
     }
-    
+
 
     callForUpdateMattina = () => {
-         axios.put('http://localhost:8080/updateSignature/'+this.props.studenteMattina.idLesson, {
-            startTime: this.state.oreStartTimeMattina + "." + (this.state.minutiStartTimeMattina/0.6).toFixed(0),
-            endTime: this.state.oreEndTimeMattina + "." + (this.state.minutiEndTimeMattina/0.6).toFixed(0),
-            email: this.props.studenteMattina.emailStudent,   
+        axios.put('http://localhost:8080/updateSignature/' + this.props.studenteMattina.idLesson, {
+            startTime: this.state.oreStartTimeMattina + "." + (this.state.minutiStartTimeMattina / 0.6).toFixed(0),
+            endTime: this.state.oreEndTimeMattina + "." + (this.state.minutiEndTimeMattina / 0.6).toFixed(0),
+            email: this.props.studenteMattina.emailStudent,
         })
             .then(res => {
-                if (res.data.message === "ok"){ToastsStore.success("La modifica è stata effettuata con successo!"); this.refresh();}
+                if (res.data.message === "ok") { ToastsStore.success("La modifica è stata effettuata con successo!"); this.refresh(); }
                 else if (res.data.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
             })
             .catch(err => {
@@ -52,7 +52,7 @@ class OreLezioniMattina extends React.Component {
     }
 
 
-handleChange = (event) => {
+    handleChange = (event) => {
         let name = event.target.name;
         let val = event.target.value;
 
@@ -62,7 +62,7 @@ handleChange = (event) => {
     }
 
 
-refresh = () => {
+    refresh = () => {
         this.props.getLessons();
         this.props.displayTable()
     }
@@ -72,6 +72,7 @@ refresh = () => {
     changeInfoMattina = () => {
         const Ore = /([0-1][0-9]|2[0-3])/
         const validationOreStart =
+        this.state.oreStartTimeMattina &&
             Ore.test(this.state.oreStartTimeMattina) &&
             this.state.oreStartTimeMattina >= this.formatHours(this.props.lezioneMattina.startTime).split(":")[0] &&
             this.state.oreStartTimeMattina <= this.formatHours(this.props.lezioneMattina.endTime).split(":")[0] &&
@@ -97,15 +98,15 @@ refresh = () => {
 
                             <tbody>
                                 <tr>
-                                    <td><h5> <b>Inizio</b> lezione:</h5></td>
+                                    <td className=""><h5> <b>Inizio</b> lezione:</h5></td>
                                     <td className="w-50">
                                         <Row>
                                             <Col xs="4">
-                                                <Input invalid={!validationOreStart} className="text-center" name='oreStartTimeMattina' onChange={this.handleChange} value={this.state.oreStartTimeMattina} />
+                                                <Input invalid={!validationOreStart} className="" name='oreStartTimeMattina' onChange={this.handleChange} value={this.state.oreStartTimeMattina} />
                                             </Col>
                                             :
                                         <Col xs="4">
-                                                <Input invalid={!validationMinutiStart} className="text-center" name='minutiStartTimeMattina' onChange={this.handleChange} value={this.state.minutiStartTimeMattina} />
+                                                <Input invalid={!validationMinutiStart} className="" name='minutiStartTimeMattina' onChange={this.handleChange} value={this.state.minutiStartTimeMattina} />
                                             </Col>
                                         </Row>
                                     </td>
@@ -137,35 +138,36 @@ refresh = () => {
     }
 
 
-formatHours (hours){
-    var startLessonAppoggio= (hours.toString()).split('.')
-    var startLesson= ''
+    formatHours(hours) {
+        var startLessonAppoggio = (hours.toString()).split('.')
+        var startLesson = ''
 
-    var startLessonPrimaParte=  startLessonAppoggio[0].length == 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
-    if(startLessonAppoggio[1]){
-      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-      startLesson= startLessonPrimaParte+': '+startLessonSecondaParte
-      return startLesson
+        var startLessonPrimaParte = startLessonAppoggio[0].length == 1 ? '0' + startLessonAppoggio[0] : startLessonAppoggio[0]
+        if (startLessonAppoggio[1]) {
+            var startLessonSecondaParte = startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
+            startLesson = startLessonPrimaParte + ': ' + startLessonSecondaParte
+            return startLesson
+        }
+        else if (startLessonAppoggio[0] == 'assente') {
+            return startLessonAppoggio[0]
+        }
+        else {
+            startLesson = startLessonPrimaParte + ': 00'
+            return startLesson
+        }
     }
-    else if(startLessonAppoggio[0]=='assente' ){
-      return startLessonAppoggio[0]
-    }
-    else{
-      startLesson= startLessonPrimaParte+': 00'
-      return startLesson
-    }
-}
 
-render() {
-    return (
-        <div className="d-flex justify-content-center mt-5">
-            <Card >
-                {this.changeInfoMattina()}
-                <Button onClick={this.refresh} outline color="dark"> Indietro </Button>
-            </Card>
-            <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
-        </div>
-    )}
+    render() {
+        return (
+            <div className="d-flex justify-content-center mt-5">
+                <Card >
+                    {this.changeInfoMattina()}
+                    <Button onClick={this.refresh} outline color="dark"> Indietro </Button>
+                </Card>
+                <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
+            </div>
+        )
+    }
 }
 
 export default OreLezioniMattina
