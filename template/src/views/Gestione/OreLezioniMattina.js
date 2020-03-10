@@ -27,11 +27,11 @@ class OreLezioniMattina extends React.Component {
 
     splitOrarioMattina(){
         this.setState({
-            oreStartTimeMattina: this.state.startTimeMattina.split(":")[0],
-            minutiStartTimeMattina: this.state.startTimeMattina.split(":")[1].trim(),
+            oreStartTimeMattina:this.state.startTimeMattina === "assente" ? 0 : this.state.startTimeMattina.split(":")[0],
+            minutiStartTimeMattina:this.state.startTimeMattina === "assente" ? 0 : this.state.startTimeMattina.split(":")[1].trim(),
         
-            oreEndTimeMattina: this.state.endTimeMattina.split(":")[0],
-            minutiEndTimeMattina: this.state.endTimeMattina.split(":")[1].trim(),
+            oreEndTimeMattina: this.state.endTimeMattina === "assente" ? 0 : this.state.endTimeMattina.split(":")[0],
+            minutiEndTimeMattina:this.state.endtTimeMattina === "assente" ? 0 : this.state.endTimeMattina.split(":")[1].trim(),
         })
     }
     
