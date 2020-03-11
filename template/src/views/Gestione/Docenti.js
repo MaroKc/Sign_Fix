@@ -156,7 +156,7 @@ handleChange = (event) => {
     let val = event.target.value;
       this.setState({
         [name]: val,
-      });
+      }); 
     }
 
    groupBy = (objectArray, property) => {
