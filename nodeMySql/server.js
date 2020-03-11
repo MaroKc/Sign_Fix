@@ -340,9 +340,9 @@ app.put('/updateSignature/:id_lesson',function(req,res){
       var endTime = req.body.endTime
       var dateOfModify= tools.formattedDate(new Date())
       
-      var query = "UPDATE `signatures_students` SET `final_start_time`=?,`final_end_time`=?,`modify_date`=? WHERE `id_lesson`= '"+id_lesson+"'  and `email_student`='"+email+"'"
+      var query = "UPDATE `signatures_students` SET `final_start_time`=?,`final_end_time`=?, `hours_of_lessons`=?, `modify_date`=? WHERE `id_lesson`= '"+id_lesson+"'  and `email_student`='"+email+"'"
       
-      connection.query(query,[startTime,endTime,dateOfModify], function (error, results, fields){
+      connection.query(query,[startTime,endTime,endTime-startTime,dateOfModify], function (error, results, fields){
          if (error) throw error;
          data=results
          return res.send({ error: false, data: data, message: 'ok' });
@@ -379,13 +379,11 @@ app.get('/lessons/:date/:id_course', function (req, res) {
 
 app.get('/lessonsTeacher/:id_company', function (req, res) {
    var data = [];
-   var id_company = req.params.id_company 
-   var id_course = req.params.id_course 
+   var id_company = req.params.id_company
 
-   connection.query("SELECT * FROM lessons WHERE companies_id= " + (id_company) + "", function (error, results, fields) {
+   connection.query("SELECT lessons.date,classroom,lessons.id,lesson,start_time,end_time,sum(hours_of_lessons) as hours_of_lessons, count(lessons.date) as numberStudents, lessons.total_hours as total_hours FROM lessons left join signatures_students on lessons.id= signatures_students.id_lesson WHERE companies_id="+ id_company+" GROUP by lessons.date, classroom, lessons.id", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
-       
          data.push(
             {
                date: tools.formattedDate(element.date),
@@ -393,7 +391,8 @@ app.get('/lessonsTeacher/:id_company', function (req, res) {
                id: element.id,
                lesson: element.lesson,
                startTime: tools.formattedDecimal(element.start_time),
-               endTime: tools.formattedDecimal(element.end_time) 
+               endTime: tools.formattedDecimal(element.end_time),
+               percentuale: (element.hours_of_lessons/(element.numberStudents* element.total_hours))*100
             })
       })
       res.send(JSON.stringify(data));

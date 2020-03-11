@@ -218,12 +218,12 @@ class infoStudente extends React.Component {
             <b>{this.state.firstName}  {this.state.lastName}</b>
           </CardHeader> */}
           <Row>
-            <Col className="">
+            <Col md="9">
               <div className="m-5" xs="auto">
                 {this.changeInfo(this.state.changeInfo)}
               </div>
             </Col>
-            <Col xs="auto" className="my-auto mx-auto pr-5">
+            <Col md="3" className="my-auto mx-auto pr-5">
               {this.renderButtons(this.state.changeInfo)}
               {this.openModal()}
             </Col>

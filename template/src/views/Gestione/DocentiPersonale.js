@@ -17,7 +17,8 @@ class DocentiPersonale extends Component {
             lezioni: [],
             docenti: [],
             dettagliDocente: [],
-            value: ''
+            value: '',
+            percentuale: ''
         }
     }
 
@@ -98,10 +99,13 @@ class DocentiPersonale extends Component {
                     classroom: item.classroom,
                     lessonName: item.lesson,
                     startTime: this.formatHours(item.startTime),
-                    endTime: this.formatHours(item.endTime)
+                    endTime: this.formatHours(item.endTime),
+                    percentage: item.percentuale.toFixed(0)+"%"
                 }));
-                this.setState({ lezioni });
-                console.log(this.props.classe["id"])
+                this.setState({
+                    lezioni
+                });
+                
             })
             .catch(err => console.error(err));
     }
@@ -158,6 +162,9 @@ class DocentiPersonale extends Component {
                 {
                     label: 'Orario Fine',
                     field: 'endTime',
+                },              {
+                    label: 'Presenze',
+                    field: 'percentage',
                 }
             ],
             row: this.state.lezioni
@@ -203,6 +210,10 @@ class DocentiPersonale extends Component {
                         <td><h5>Ore di lezione:</h5></td>
                         <td><h5>{dettaglioDocente && dettaglioDocente.totalHours}</h5></td>
                     </tr>
+                    <tr>
+                        <td><h5>Percentuale presenze:</h5></td>
+                        <td><h5>{this.getPercentage()}</h5></td>
+                    </tr>
                 </>
             )
         }else{
@@ -226,10 +237,27 @@ class DocentiPersonale extends Component {
                         <td><h5>Ore di lezione:</h5></td>
                         <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
                     </tr>
+                    <tr>
+                        <td><h5>Percentuale presenze:</h5></td>
+                        <td><h5>{this.getPercentage()}</h5></td>
+                    </tr>
                 </>
             )
 
         }
+
+    }
+
+    getPercentage() {
+        var initialValue = 0;
+        let tipoLezione = this.state.lezioni.filter(item => item.lessonName === this.state.value)
+        var sum = tipoLezione.reduce(
+            (accumulator, currentValue) => accumulator + parseInt(currentValue.percentage.split("%"), 10)
+            ,initialValue
+        );
+        
+        return (sum / tipoLezione.length).toFixed(0)+"%"
+
 
     }
 
