@@ -37,7 +37,7 @@ class InfoDocente extends React.Component {
 
     callForRetire = () => {
 
-        axios.put('http://localhost:8080/retireTeacher/' + this.state.emailDocente, {
+        axios.put('http://localhost:8080/retireTeacher/' + this.props.docente['0'].emailDocente, {
             ritirato: 1,
         })
         .then(res => {
@@ -117,10 +117,10 @@ onclickModifyState = () => {
                     </tr>
                 </>
             )
-
         }
-
     }
+
+
 changeInfo = (changeInfo) => {
 
     if (!changeInfo) {
@@ -213,7 +213,7 @@ openModal = () => {
             <ModalHeader toggle={this.toggleWarning}>WARNING</ModalHeader>
             <ModalBody>
                 <div className="text-center">
-                    <b>{this.props.docente.firstName} {this.props.docente.lastName}</b> verrà inserito tra i docenti <b>archiviati</b>
+                    <b>{this.props.docente['0'].firstName} {this.props.docente['0'].lastName}</b> verrà inserito tra i docenti <b>archiviati</b>
                     <h5 >Procedere?</h5>
                 </div>
             </ModalBody>

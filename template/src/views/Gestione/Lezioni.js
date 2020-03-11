@@ -86,7 +86,7 @@ class Lezioni extends React.Component {
       .catch(err => console.error(err));
 
 
-      axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta)
+      axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta+'/'+this.props.classe['id'])
         .then(res => res.data)
         .then((data) => {
           const studentiMattina = [];

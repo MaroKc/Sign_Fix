@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Row, Table, Card, CardHeader, CardBody, Button } from 'reactstrap';
+import { Col, Row, Table, Card, CardHeader, CardBody, Button, Input } from 'reactstrap';
 import { MDBDataTable } from 'mdbreact';
 import axios from 'axios'
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
@@ -14,43 +14,83 @@ class DocentiPersonale extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lezioni: [],
             docenti: [],
-            lezioni: []
+            dettagliDocente: [],
+            value: ''
         }
-
     }
 
     componentDidMount() {
         this.getTeachers();
+        this.getTeacherDetails();
+
     }
 
 
     getTeachers = () => {
         axios.get('http://localhost:8080/listTeachers')
-            .then(res => {
-                const docenti = [];
-                res.data.data.map(item => docenti.push({
-                    companyName: item.name,
-                    lessonName: item.lesson,
-                    firstName: item.firstName,
-                    lastName: item.lastName,
-                    ritirato: item.ritirato,
-                    companyId: item.companyId,
-                    emailDocente: item.emailTeacher,
-                    hoursOfLessons: this.formatHours(item.hoursOfLessons),
-                    totalHours: this.formatHours(item.totalHours),
-                }));
-                this.setState({ docenti });
-                this.getLesson();
-            })
-            .catch(err => console.error(err));
-    }
+          .then(res =>  {
+            let docenti = [];
+            res.data.data.map(item => docenti.push({
+              companyName: item.name === item.emailTeacher ? "" : item.name,
+              firstName: item.firstName,
+              lastName: item.lastName,
+              ritirato: item.ritirato,
+              companyId: item.companyId,
+              emailDocente: item.emailTeacher,
+              clickEvent: () => this.displayCard(item.emailTeacher)
+            }));
+            this.setState({ docenti });
+            this.getLesson();
+          })
+          .catch(err => console.error(err));
 
+      }
+    
+      getTeacherDetails = () => {
+        axios.get('http://localhost:8080/teacherDetails')
+        .then(res =>  {
+          let dettagliDocente = [];
+          res.data.data.map(item => dettagliDocente.push({
+            companyName: item.name === item.emailTeacher ? "" : item.name,
+            lessonName: item.lesson,
+            firstName: item.firstName,
+            lastName: item.lastName,
+            ritirato: item.ritirato,
+            companyId: item.companyId,
+            emailDocente: item.emailTeacher,
+            hoursOfLessons: this.formatHoursSemplice(item.hoursOfLessons),
+            totalHours: this.formatHoursSemplice(item.totalHours),
+            clickEvent: () => this.displayCard(item.emailTeacher)
+          }));
+          let groupedPeople = this.groupBy(dettagliDocente, 'emailDocente');
+
+          dettagliDocente = groupedPeople[(dettagliDocente.find((docente) => docente.emailDocente === 'matteo@info.com'))['emailDocente']] 
+          this.setState({
+              dettagliDocente,
+              value: dettagliDocente['0'].lessonName
+            })
+        })
+        .catch(err => console.error(err));
+      }
+
+      
+   groupBy = (objectArray, property) => {
+    return objectArray.reduce(function (acc, obj) {
+      var key = obj[property];
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(obj);
+      return acc;
+    }, {});
+  }
 
     getLesson = () => {
-        let docente = this.state.docenti.find(docente => docente.emailDocente === 'michele@info.com')
+        let docente = this.state.docenti.find(docente => docente.emailDocente === 'matteo@info.com')
 
-        axios.get('http://localhost:8080/lessonsTeacher/' + this.props.classe["id"] +"/" + docente.companyId)
+        axios.get('http://localhost:8080/lessonsTeacher/'+ docente.companyId)
             .then(res =>{
                 const lezioni = [];
                 res.data.map(item => lezioni.push({
@@ -61,9 +101,24 @@ class DocentiPersonale extends Component {
                     endTime: this.formatHours(item.endTime)
                 }));
                 this.setState({ lezioni });
+                console.log(this.props.classe["id"])
             })
             .catch(err => console.error(err));
     }
+
+    formatHoursSemplice (hours){
+        var startLessonAppoggio= (hours.toString()).split('.')
+        var startLesson= ''
+      
+        if(startLessonAppoggio[1]){
+          var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+          startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
+          return startLesson
+        }
+        else{
+          return startLessonAppoggio[0]
+        }
+      }
 
     formatHours (hours){
         var startLessonAppoggio= (hours.toString()).split('.')
@@ -117,7 +172,7 @@ class DocentiPersonale extends Component {
                     <MDBDataTable
                         responsive
                         hover
-                        data={{ columns: data.columns , rows: data.row }}
+                        data={{ columns: data.columns, rows: data.row }}
                         searching={false}
                         paging={false}
                         noBottomColumns={true}
@@ -129,10 +184,59 @@ class DocentiPersonale extends Component {
     }
 
 
+    selectLesson = () => {
+        let docente = this.state.docenti.find(docente => docente.emailDocente === 'matteo@info.com')
+        let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
+
+        if(this.state.dettagliDocente.length === 1){
+            return (
+                <>
+                    <tr>
+                        <td><h5>Lezione:</h5></td>
+                        <td><h5>{dettaglioDocente['0'] && dettaglioDocente['0'].lessonName}</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore fatte:</h5></td>
+                        <td><h5>{dettaglioDocente && dettaglioDocente.hoursOfLessons}</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore di lezione:</h5></td>
+                        <td><h5>{dettaglioDocente && dettaglioDocente.totalHours}</h5></td>
+                    </tr>
+                </>
+            )
+        }else{
+            let totalHours = (this.state.dettagliDocente.find(item => item.lessonName === this.state.value))
+            return (
+                <>
+                
+                    <tr>
+                        <td><h5>Lezione:</h5></td>
+                        <td><h5>
+                            <Input type="select" name="select" id="select" className="w-auto" onChange={(e) => this.setState({ value: e.target.value })}>
+                                {this.state.dettagliDocente.map(item => <option value={item.lessonName}>{item.lessonName}</option>)}
+                            </Input>
+                        </h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore fatte:</h5></td>
+                        <td><h5>{this.state.value && totalHours['hoursOfLessons'] }</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ore di lezione:</h5></td>
+                        <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
+                    </tr>
+                </>
+            )
+
+        }
+
+    }
+
     infoTeacher() {
 
-        let docente = this.state.docenti.find(docente => docente.emailDocente === 'michele@info.com')
-        let dettaglioDocente = this.state.docenti.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
+        let docente = this.state.docenti.find(docente => docente.emailDocente === 'matteo@info.com')
+        let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
 
 
         return (
@@ -154,31 +258,15 @@ class DocentiPersonale extends Component {
                                 </tr>
                                 <tr>
                                     <td><h5>Nome azienda:</h5></td>
-                                    <td><h5>{dettaglioDocente && dettaglioDocente.companyName === 'michele@info.com' ? '' : dettaglioDocente && dettaglioDocente.companyName}</h5> </td>
+                                    <td><h5>{dettaglioDocente && dettaglioDocente.companyName === 'matteo@info.com' ? '' : dettaglioDocente && dettaglioDocente.companyName}</h5> </td>
                                 </tr>
-                                <tr>
-                                    <td><h5>Lezione:</h5></td>
-                                    <td><h5>{dettaglioDocente && dettaglioDocente.lessonName}</h5></td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Ore fatte:</h5></td>
-                                    <td><h5>{docente && docente.hoursOfLessons}</h5></td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Ore di lezione:</h5></td>
-                                    <td><h5>{dettaglioDocente && dettaglioDocente.totalHours}</h5></td>
-                                </tr>
+                                {this.selectLesson()}
                             </tbody>
                         </Table>
                         <Button color="success" size="lg" block> TIMBRA </Button>
                     </CardBody>
-
-
                 {this.tabPane()}
-
                 </Card>
-
-
             </div>
         );
     }

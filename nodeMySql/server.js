@@ -377,12 +377,12 @@ app.get('/lessons/:date/:id_course', function (req, res) {
 });
 
 
-app.get('/lessonsTeacher/:id_course/:id_company', function (req, res) {
+app.get('/lessonsTeacher/:id_company', function (req, res) {
    var data = [];
    var id_company = req.params.id_company 
    var id_course = req.params.id_course 
 
-   connection.query("SELECT * FROM lessons WHERE companies_id= '" + (id_company) + "' and id_course="+ id_course+"", function (error, results, fields) {
+   connection.query("SELECT * FROM lessons WHERE companies_id= " + (id_company) + "", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
        
@@ -400,13 +400,14 @@ app.get('/lessonsTeacher/:id_course/:id_company', function (req, res) {
    });
 });
 
-app.get('/listSignaturesStudents/:data_scelta', function (req, res) {
+app.get('/listSignaturesStudents/:data_scelta/:id_course', function (req, res) {
    var data = []
    var date_appoggio = req.params.data_scelta
+   var id_course = req.params.id_course
    var data_Scelta = date_appoggio.split('-');
    var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
 
-   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0", function (error, results, fields) {
+   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='"+dataFinale+"' and ritirato=0 and id_course="+id_course, function (error, results, fields) {
       if (error) throw error;
       results.forEach(element =>{
          
