@@ -36,7 +36,7 @@ class Studenti extends Component {
           residence: item.residence,
           fiscalCode: item.fiscalCode,
           hoursOfLessons: this.formatHours(item.hoursOfLessons),
-          percentage: item.percentage,
+          percentage: item.percentage < "80" ? <div className="text-danger">{item.percentage}</div> : <div className="text-success">{item.percentage}</div>,
           ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
         }));
