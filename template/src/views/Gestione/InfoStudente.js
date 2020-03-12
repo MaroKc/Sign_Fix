@@ -58,7 +58,7 @@ class infoStudente extends React.Component {
   handleChange = (event) => {
     let name = event.target.name;
     let val = event.target.value;
-    if(name =="fiscalCode"){
+    if(name === "fiscalCode"){
       this.setState({
         [name]: val.toUpperCase(),
       });
