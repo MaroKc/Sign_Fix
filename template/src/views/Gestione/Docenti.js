@@ -135,21 +135,9 @@ displayTab = () => {
   
 refresh = () => {
   this.getTeachers();
-  this.displayTable()
+  this.displayTable();
+  this.getTeacherDetails();
 }
-
-handleChange = (event) => {
-  let name = event.target.name;
-  let val = event.target.value;
-    this.setState({
-      [name]: val,
-    });
-  }
-
-  refresh = () => {
-    this.getTeachers();
-    this.displayTable()
-  }
   
   handleChange = (event) => {
     let name = event.target.name;
@@ -278,7 +266,7 @@ handleChange = (event) => {
       // console.log(groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']])
 
       return <InfoDocente 
-      docente={groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']]} 
+      docente = {groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']]} 
       getTeachers={this.getTeachers} 
       getTeacherDetails={this.getTeacherDetails} 
       displayTable={this.displayTable}
@@ -293,9 +281,9 @@ handleChange = (event) => {
   }
 
   formDocente(){
-    const regexLettere = /^[a-zA-Z]*$/;
+    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
     const regexEmail =	/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-    const {firstName, lastName, emailDocente, companyName} = this.state
+    const {firstName, lastName, emailDocente} = this.state
     const validationFirstName = firstName.length > 2 && regexLettere.test(firstName) 
     const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
     const validationEmail = emailDocente.length > 4 && regexEmail.test(emailDocente)
@@ -333,7 +321,7 @@ handleChange = (event) => {
                 </div>
               </Col>
               <Col xs="auto" className="my-auto mx-auto pr-5">
-                <Button outline color="success" disabled={!validationFirstName, !validationLastName, !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
+                <Button outline color="success" disabled={!validationFirstName || !validationLastName || !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
               </Col>
             </Row>
           </CardBody>
@@ -342,7 +330,6 @@ handleChange = (event) => {
       </div>
     )
   }
-
   render() 
   {
     if(this.state.displayForm){
