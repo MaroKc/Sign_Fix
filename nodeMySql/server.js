@@ -90,7 +90,6 @@ app.post('/tokensignin', function (req, res) {
             console.log('The API returned an error: ' + err);
             return res.send({ error: true, data: err, message: 'The API returned an error' });
          }
-         //console.log(resu.data);
          const email = resu.data.email;
 
          const insertToken = email + '","' + tokenInfo.access_token + '","' + tokenInfo.refresh_token + '","' + tokenInfo.scope + '","' + tokenInfo.token_type + '","' + tokenInfo.expiry_date;
