@@ -127,7 +127,7 @@ class Studenti extends Component {
                   <Col sm="4">
                   </Col>
                   <Col sm="4" className="my-auto text-center">
-                    <span className="font-weight-bold"><h4>STUDENTI REGISTRATI</h4></span>
+                    <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
                     <span> <Button color="ghost-success" className="mr-1"  onClick={this.toggleWarning}><i className="cui-user-follow icons font-2xl d-block"></i> Importa csv </Button> </span>
@@ -147,7 +147,7 @@ class Studenti extends Component {
           </Card>
           <Card>
             <CardHeader >
-              <div className="text-center font-weight-bold">STUDENTI  RITIRATI</div>
+              <h4 className="text-center font-weight-bold">STUDENTI  RITIRATI</h4>
             </CardHeader>
             <CardBody>
               <MDBDataTable
@@ -173,7 +173,7 @@ class Studenti extends Component {
                   <Col sm="4">
                   </Col>
                   <Col sm="4" className="my-auto text-center">
-                    <span className="font-weight-bold"><h4>STUDENTI REGISTRATI</h4></span>
+                    <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
                     <span> <Button color="ghost-success" className="mr-1" onClick={this.toggleWarning}><i className="cui-user-follow icons font-2xl d-block"></i> Importa csv </Button> </span>

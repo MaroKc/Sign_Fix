@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, CardHeader, Button, Collapse, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter, Input } from 'reactstrap';
+import { Card, CardBody, CardHeader, Button, Collapse, Row, Col } from 'reactstrap';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import { MDBDataTable } from 'mdbreact';
@@ -130,13 +130,13 @@ class Lezioni extends React.Component {
       var startLessonAppoggio= (hours.toString()).split('.')
       var startLesson= ''
 
-      var startLessonPrimaParte=  startLessonAppoggio[0].length == 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
+      var startLessonPrimaParte=  startLessonAppoggio[0].length === 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
       if(startLessonAppoggio[1]){
-        var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+        var startLessonSecondaParte =  startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
         startLesson= startLessonPrimaParte+': '+startLessonSecondaParte
         return startLesson
       }
-      else if(startLessonAppoggio[0]=='assente' ){
+      else if(startLessonAppoggio[0] ==='assente' ){
         return startLessonAppoggio[0]
       }
       else{
@@ -387,7 +387,7 @@ class Lezioni extends React.Component {
       <>
         <Card>
           <CardHeader className="text-center">
-            <b>LEZIONI</b>
+            <h3><b>LEZIONI</b></h3>
           </CardHeader>
           <CardBody>
             <div className="d-flex justify-content-center">

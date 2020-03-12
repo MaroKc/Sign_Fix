@@ -90,6 +90,9 @@ class Docenti extends Component {
      .then(res => {
       if (res.data.message === "ok"){ToastsStore.success(" è stato aggiunto alla lista docenti!"); this.refresh();}
     })
+    this.setState({
+     firstName: '', lastName: '', emailDocente: '', companyName: ''
+    })
   }
 
 formatHours (hours){
@@ -135,7 +138,8 @@ displayTab = () => {
   
 refresh = () => {
   this.getTeachers();
-  this.displayTable()
+  this.displayTable();
+  this.getTeacherDetails();
 }
 
 handleChange = (event) => {
@@ -145,19 +149,6 @@ handleChange = (event) => {
       [name]: val,
     });
   }
-
-  refresh = () => {
-    this.getTeachers();
-    this.displayTable()
-  }
-  
-  handleChange = (event) => {
-    let name = event.target.name;
-    let val = event.target.value;
-      this.setState({
-        [name]: val,
-      }); 
-    }
 
    groupBy = (objectArray, property) => {
       return objectArray.reduce(function (acc, obj) {
@@ -205,7 +196,7 @@ handleChange = (event) => {
                   <Col sm="4">
                   </Col>
                   <Col sm="4" className="my-auto text-center">
-                    <span className="font-weight-bold"><h4>DOCENTI</h4></span>
+                    <span className="font-weight-bold"><h3><b>DOCENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
                     <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
@@ -225,7 +216,7 @@ handleChange = (event) => {
             </Card>
             <Card>
             <CardHeader >
-              <div className="text-center font-weight-bold">DOCENTI ARCHIVIATI</div>
+              <h4 className="text-center font-weight-bold">DOCENTI ARCHIVIATI</h4>
             </CardHeader>
             <CardBody>
               <MDBDataTable
@@ -251,7 +242,7 @@ handleChange = (event) => {
                   <Col sm="4">
                   </Col>
                   <Col sm="4" className="my-auto text-center">
-                    <span className="font-weight-bold"><h4>DOCENTI</h4></span>
+                    <span className="font-weight-bold"><h3><b>DOCENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
                     <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
@@ -278,7 +269,7 @@ handleChange = (event) => {
       // console.log(groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']])
 
       return <InfoDocente 
-      docente={groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']]} 
+      docente = {groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']]} 
       getTeachers={this.getTeachers} 
       getTeacherDetails={this.getTeacherDetails} 
       displayTable={this.displayTable}
@@ -293,6 +284,7 @@ handleChange = (event) => {
   }
 
   formDocente(){
+
     const regexLettere = /^[a-zA-Z]*$/;
     const regexEmail =	/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
     const {firstName, lastName, emailDocente, companyName} = this.state
@@ -333,7 +325,7 @@ handleChange = (event) => {
                 </div>
               </Col>
               <Col xs="auto" className="my-auto mx-auto pr-5">
-                <Button outline color="success" disabled={!validationFirstName, !validationLastName, !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
+                <Button outline color="dark" disabled={!validationFirstName || !validationLastName || !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
               </Col>
             </Row>
           </CardBody>
