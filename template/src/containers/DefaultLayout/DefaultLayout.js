@@ -65,7 +65,8 @@ class DefaultLayout extends Component {
               <AppSidebarHeader />
               <AppSidebarForm />
               <Suspense>
-                <AppSidebarNav navConfig={navigation} {...this.props} router={router} />
+                <h4 className="text-center mt-2">{this.state.classe['start_year']} - {this.state.classe['end_year']}</h4>
+                <AppSidebarNav navConfig={navigation} {...this.props} router={router} classe={this.state.classe}/>
               </Suspense>
               <AppSidebarFooter />
               <AppSidebarMinimizer />

@@ -1,8 +1,6 @@
-
 import React from 'react'
-import { Card, Col, Row, Button, Input, Table } from 'reactstrap';
+import { Card, Col, Row, Button, Input } from 'reactstrap';
 import axios from 'axios'
-import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 class OreLezioniPomeriggio extends React.Component {
     constructor(props) {
@@ -69,22 +67,49 @@ refresh = () => {
 
 
     changeInfoPomeriggio = () => {
+        const { oreStartTimePomeriggio, oreEndTimePomeriggio, minutiStartTimePomeriggio, minutiEndTimePomeriggio } = this.state
         const Ore = /([0-1][0-9]|2[0-3])/
+        
+        const equal =
+            oreStartTimePomeriggio === this.formatHours(this.props.lezionePomeriggio.startTime).split(":")[0]
+                ?
+                minutiStartTimePomeriggio >= parseInt(this.formatHours(this.props.lezionePomeriggio.startTime).split(":")[1])
+                :
+                true
+
+        const equalEnd =
+            this.state.oreEndTimePomeriggio === this.formatHours(this.props.lezionePomeriggio.endTime).split(":")[0]
+                ?
+                this.state.minutiEndTimePomeriggio <= parseInt(this.formatHours(this.props.lezionePomeriggio.endTime).split(":")[1])
+                :
+                true
+
         const validationOreStart =
             Ore.test(this.state.oreStartTimePomeriggio) &&
-            this.state.oreStartTimePomeriggio >= this.formatHours(this.props.lezionePomeriggio.startTime).split(":")[0] &&
-            this.state.oreStartTimePomeriggio <= this.formatHours(this.props.lezionePomeriggio.endTime).split(":")[0] &&
-            this.state.oreStartTimePomeriggio.length === 2
+            oreStartTimePomeriggio >= this.formatHours(this.props.lezionePomeriggio.startTime).split(":")[0] &&
+            oreStartTimePomeriggio <= this.formatHours(this.props.lezionePomeriggio.endTime).split(":")[0] &&
+            oreStartTimePomeriggio <= oreEndTimePomeriggio &&
+            oreStartTimePomeriggio.length === 2
 
         const validationOreEnd = 
             Ore.test(this.state.oreEndTimePomeriggio) &&
-            this.state.oreEndTimePomeriggio <= this.formatHours(this.props.lezionePomeriggio.endTime).split(":")[0] &&
-            this.state.oreEndTimePomeriggio >= this.formatHours(this.props.lezionePomeriggio.startTime).split(":")[0] &&
-            this.state.oreEndTimePomeriggio.length === 2
+            oreEndTimePomeriggio <= this.formatHours(this.props.lezionePomeriggio.endTime).split(":")[0] &&
+            oreEndTimePomeriggio >= this.formatHours(this.props.lezionePomeriggio.startTime).split(":")[0] &&
+            oreStartTimePomeriggio <= oreEndTimePomeriggio &&
+            oreEndTimePomeriggio.length === 2
 
         const Minuti = /[0-5][0-9]/
-        const validationMinutiStart = Minuti.test(this.state.minutiStartTimePomeriggio) && this.state.minutiStartTimePomeriggio.length === 2
-        const validationMinutiEnd = Minuti.test(this.state.minutiEndTimePomeriggio) && this.state.minutiEndTimePomeriggio.length === 2
+        const validationMinutiStart = 
+            Minuti.test(minutiStartTimePomeriggio) && 
+            minutiStartTimePomeriggio.length === 2 && 
+            equal  
+
+
+        const validationMinutiEnd = 
+            Minuti.test(minutiEndTimePomeriggio) && 
+            minutiEndTimePomeriggio.length === 2 &&
+            equalEnd
+
         const validation = validationOreStart && validationOreEnd && validationMinutiStart && validationMinutiEnd
 
 
@@ -132,7 +157,7 @@ refresh = () => {
                         </Row>
                     </Col>
 
-                    <Col md="3">
+                    <Col md="3" className='text-center mb-3'>
                         <Button disabled={!validation} outline color="dark" onClick={this.callForUpdatePomeriggio}> <i className="cui-check icons d-block mt-2"></i> conferma <br /> modifiche </Button>
                     </Col>
                 </Row>
