@@ -284,10 +284,9 @@ handleChange = (event) => {
   }
 
   formDocente(){
-
-    const regexLettere = /^[a-zA-Z]*$/;
+    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
     const regexEmail =	/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-    const {firstName, lastName, emailDocente, companyName} = this.state
+    const {firstName, lastName, emailDocente} = this.state
     const validationFirstName = firstName.length > 2 && regexLettere.test(firstName) 
     const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
     const validationEmail = emailDocente.length > 4 && regexEmail.test(emailDocente)
@@ -334,7 +333,6 @@ handleChange = (event) => {
       </div>
     )
   }
-
   render() 
   {
     if(this.state.displayForm){
