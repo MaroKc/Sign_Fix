@@ -30,9 +30,18 @@ class DefaultLayout extends Component {
     super(props);
 
     const cookieCorso = JSON.parse(sessionStorage.getItem("corso"));
+    const cookieUser = JSON.parse(sessionStorage.getItem("utente"));
+
     this.state = {
-      classe: cookieCorso ? cookieCorso : null
+      classe: cookieCorso ? cookieCorso : null,
+      user: cookieUser ? cookieUser : null
     } 
+  }
+
+  componentDidMount() {
+    if(this.state.user == null)
+      console.log("pippo")
+      //<Redirect from="/" to="/login" />
   }
 
   changeCorso = (corso) => {
@@ -93,7 +102,7 @@ class DefaultLayout extends Component {
                             )} />
                     ) : (null);
                   })}
-                  <Redirect from="/" to="/classi" />
+                  <Redirect from="/" to="/login" />
                 </Switch>
               </Suspense>
             </Container>
