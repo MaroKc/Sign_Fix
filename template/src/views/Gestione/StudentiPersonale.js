@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Col, Row, Table, Card, CardHeader, CardBody, Button } from 'reactstrap';
-import { MDBDataTable } from 'mdbreact';
+import { Table, Card, CardHeader, CardBody, Button } from 'reactstrap';
 import axios from 'axios'
-import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 
 class StudentiPersonale extends Component {

@@ -1,19 +1,14 @@
 var express = require('express');
-var Sync = require('sync');
 var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
-const fileUrl = require('file-url');
-const fs = require('fs');
+
 const { google } = require('googleapis');
 const tools = require('./tools');
 const keys = require('./outh2.key.json');
-const path = require('path');
-const os = require('os');
-
 
 var errorDataInsert = [];
 
@@ -165,21 +160,17 @@ app.get('/getCourses/:email', function (req, res) {
 })
 
 
-app.get('/importCsv/:id_course/:fileName',function(req,res){
-   const desktopDir = path.join(os.homedir(), "Desktop");
+app.post('/importCsv/:id_course',function(req,res){
    var idCorso =req.params.id_course
-   var fileName= req.params.fileName
+   var data= req.body.data
    connection.query("DELETE FROM `students` WHERE id_course="+idCorso, function (error, results, fields) {
       if (error) throw error;
       });
    try {
-      // read contents of the file
-      const data = fs.readFileSync(desktopDir.replace(/\\/g,'/')+'/'+fileName, 'UTF-8');
 
       // split the contents by new line
       const lines = data.split(/\r?\n/);
-      persone=[]
-   
+
       for (let i = 0; i < lines.length-1; i++) {
 
          // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
@@ -191,7 +182,7 @@ app.get('/importCsv/:id_course/:fileName',function(req,res){
          const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
          const fiscalCode = lineaSplittata[3];
          var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES ("+email+","+firstName+","+lastName+","+birth+","+residence+","+fiscalCode+","+ idCorso+",0)";
-         
+
          connection.query(query, function (error, results, fields) {
             if (error) throw error;
             });
@@ -498,10 +489,11 @@ app.put('/retireStudent/:email', function (req, res) {
    
    try {
       var email = req.params.email;
-
+         console.log("arrivo", email)
       var ritirato = req.body.ritirato
    
       var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
+      console.log(query)
       connection.query(query, [ritirato, email], function (error, results, fields) {
          if (error) throw error;
          res.send({ error: false, data: results, message: 'ok' });
