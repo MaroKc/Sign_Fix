@@ -81,7 +81,7 @@ app.post('/tokensignin', function (req, res) {
       const oAuth2Client = new OAuth2Client(
          keys.web.client_id,
          keys.web.client_secret,
-         keys.web.redirect_uris[0]
+         keys.web.redirect_uris[1]
       );
       const restInfo = await oAuth2Client.getToken(code);
       const tokenInfo = restInfo.tokens;
@@ -101,8 +101,8 @@ app.post('/tokensignin', function (req, res) {
          connection.query(query, function (error, items, fields) {
             if (error) throw error;
             return (
-               res.send({ error: false, data: items, message: 'Calendar added' }),
-               console.log({ error: error, data: items, message: 'Calendar added' })
+               res.send({ error: false, data: items, message: 'TOKEN ADDED' }),
+               console.log({ error: error, data: items, message: 'TOKEN ADDED' })
             );
          });
       });
@@ -116,10 +116,18 @@ app.post('/auth', function (req, res) {
 
    connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(req.body.email) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
       if (error) throw error;
-      //return res.send({ email: req.body.email, ruolo: results[0].responsible_level });
-      res.send({ email: req.body.email, ruolo: results });
-      console.log({ email: req.body.email, ruolo: results[0].responsible_level })
+
+      if(results.length == 1) {
+
+         //DA CRIPTARE LA PSWD perchè si salva nel client
+         res.send({ error: false, message: results[0] });
+         console.log({ error: false, message: results[0] })
+      } else {
+         res.send({ error: true, message: false });
+         console.log({ error: true, message: false })
+      }
    });
+   
 });
 
 /*
