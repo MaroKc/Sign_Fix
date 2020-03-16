@@ -3,16 +3,17 @@ var Sync = require('sync');
 var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
-const lineReader = require('line-reader');
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
-
+const fileUrl = require('file-url');
 const fs = require('fs');
-const readline = require('readline');
 const { google } = require('googleapis');
 const tools = require('./tools');
 const keys = require('./outh2.key.json');
+const path = require('path');
+const os = require('os');
+
 
 var errorDataInsert = [];
 
@@ -155,15 +156,17 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
-app.get('/importCsv/:id_course',function(req,res){
-   idCorso =req.params.id_course
+
+app.get('/importCsv/:id_course/:fileName',function(req,res){
+   const desktopDir = path.join(os.homedir(), "Desktop");
+   var idCorso =req.params.id_course
+   var fileName= req.params.fileName
    connection.query("DELETE FROM `students` WHERE id_course="+idCorso, function (error, results, fields) {
       if (error) throw error;
       });
    try {
-   
       // read contents of the file
-      const data = fs.readFileSync('data.csv', 'UTF-8');
+      const data = fs.readFileSync(desktopDir.replace(/\\/g,'/')+'/'+fileName, 'UTF-8');
 
       // split the contents by new line
       const lines = data.split(/\r?\n/);
