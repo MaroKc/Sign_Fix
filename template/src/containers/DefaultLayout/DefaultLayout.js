@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
 
+
 import {
   AppAside,
   AppFooter,
@@ -34,14 +35,10 @@ class DefaultLayout extends Component {
 
     this.state = {
       classe: cookieCorso ? cookieCorso : null,
-      user: cookieUser ? cookieUser : null
+      user: cookieUser ? cookieUser : null,      
+      navMenu: null,
+      to : '/'
     } 
-  }
-
-  componentDidMount() {
-    if(this.state.user == null)
-      console.log("pippo")
-      //<Redirect from="/" to="/login" />
   }
 
   changeCorso = (corso) => {
@@ -102,7 +99,7 @@ class DefaultLayout extends Component {
                             )} />
                     ) : (null);
                   })}
-                  <Redirect from="/" to="/login" />
+                 <Redirect from="/" to={this.state.to} />
                 </Switch>
               </Suspense>
             </Container>

@@ -21,10 +21,6 @@ class Login extends Component {
       pswd: null,
       status: false,
 
-      GoogleAuth: null,
-      CLIENT_ID: '122931835616-is0fj42a208qga441jf6bivffrb93trn.apps.googleusercontent.com',
-      DISCOVERY_DOCS: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-      SCOPES: "https://www.googleapis.com/auth/calendar.readonly profile email"
     }
   }
 
@@ -36,12 +32,6 @@ class Login extends Component {
   }
 
 
-
-  componentDidMount() {
-
-
-  }
-
   renderRedirect = () => {
     if (this.state.status) {
       return <Redirect to='/classi' />
@@ -49,10 +39,8 @@ class Login extends Component {
   }
 
   login() {
-
     axios.post('http://localhost:8080/auth', { email: this.state.user, pass: this.state.pswd })
       .then(res => {
-
         if (res.data.error) {
           console.log("FAILs")
         } else {
@@ -60,10 +48,8 @@ class Login extends Component {
           sessionStorage.setItem("utente", JSON.stringify(res.data.message));
 
           this.setState({ status: true });
-
         }
       })
-
   }
 
   googleauth = (cod) => {
@@ -72,13 +58,9 @@ class Login extends Component {
 
       axios.post('http://localhost:8080/tokensignin', { code: cod.code })
         .then(res => {
-          console.log("!")
-          console.log(res);
-          /*
-          console.log(res.data.message)
+
           sessionStorage.setItem("utente", JSON.stringify(res.data.message));
           this.setState({ status: true });
-          */
 
         })
     } else {
@@ -134,7 +116,7 @@ class Login extends Component {
                       <p>Dovrai accedere solo al primo ingresso.</p>
 
                       <GoogleLogin
-                        clientId="122931835616-is0f"
+                        clientId="122931835616-is0fj42a208qga441jf6bivffrb93trn.apps.googleusercontent.com"
                         scope="https://www.googleapis.com/auth/calendar.readonly profile email"
                         discoveryDocs="https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
                         buttonText="Login"

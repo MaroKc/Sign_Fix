@@ -89,6 +89,7 @@ class Docenti extends Component {
      })
      .then(res => {
       if (res.data.message === "ok"){ToastsStore.success(" è stato aggiunto alla lista docenti!"); this.refresh();}
+      if (res.data.message === 'esistente'){ToastsStore.warning("esiste già un docente"); this.refresh();}
     })
     this.setState({
      firstName: '', lastName: '', emailDocente: '', companyName: ''

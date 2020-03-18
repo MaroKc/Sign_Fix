@@ -102,10 +102,8 @@ const routes = [
 
 
   { path: '/studenti', exact: true, name: 'Studenti', component: Studenti },
-
   { path: '/classi', exact: true, name: 'Classi', component: Classi},
   { path: '/docenti', exact: true, name: 'Docenti', component: Docenti },
-
   { path: '/lezioni', exact: true, name: 'Lezioni', component: Lezioni },
   { path: '/calendario', exact: true, name: 'Calendario', component: Calendario },
   { path: '/impostazioni', exact: true, name: 'Impostazioni', component: Impostazioni },

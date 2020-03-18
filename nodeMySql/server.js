@@ -115,10 +115,8 @@ app.post('/auth', function (req, res) {
 
          //DA CRIPTARE LA PSWD perchè si salva nel client
          res.send({ error: false, message: results[0] });
-         console.log({ error: false, message: results[0] })
       } else {
          res.send({ error: true, message: false });
-         console.log({ error: true, message: false })
       }
    });
    
@@ -167,7 +165,6 @@ app.post('/importCsv/:id_course',function(req,res){
       if (error) throw error;
       });
    try {
-
       // split the contents by new line
       const lines = data.split(/\r?\n/);
 
@@ -188,7 +185,7 @@ app.post('/importCsv/:id_course',function(req,res){
             });
          }
       // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
-         return res.send({ error: true, message: 'ok' });
+      return res.send({ error: true, message: 'ok' });
 
       } catch (err) {
          return res.send({ error: true, data: err, message: 'ko' });
@@ -292,43 +289,50 @@ app.post('/createTeacher', function (req, res) {
    var companyName = req.body.companyName
    var company = []
 
-   connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, items, fields) {
-      if (error) throw error;
-      if (items.length >0){
-         items.forEach(element => {
-            company.push(
-               {
-                  id: element.id,
-                  name: element.name,
-               })
-         })
-         connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+   connection.query("SELECT * FROM teachers where email_responsible='"+emailDocente+"'", function (e, row, fields) {
+      if (e) throw error;
+      if(row.length==0){
+         connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, items, fields) {
             if (error) throw error;
-            return res.send({ error: false, result: result, message: 'ok' });
-         });
-      } else {
-         connection.query("INSERT INTO `companies` (`name`) VALUES ('" + companyName + "')", function (error, result, fields) {
-            if (error) throw error;
-         });
-         connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, results, fields) {
-            if (error) throw error;
-            if (results.length >0){
-               results.forEach(element => {
+            if (items.length >0){
+               items.forEach(element => {
                   company.push(
                      {
                         id: element.id,
                         name: element.name,
                      })
                })
-               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0) ", function (error, result, fields) {
                   if (error) throw error;
                   return res.send({ error: false, result: result, message: 'ok' });
+               });
+            } else {
+               connection.query("INSERT INTO `companies` (`name`) VALUES ('" + companyName + "')", function (error, result, fields) {
+                  if (error) throw error;
+               });
+               connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, results, fields) {
+                  if (error) throw error;
+                  if (results.length >0){
+                     results.forEach(element => {
+                        company.push(
+                           {
+                              id: element.id,
+                              name: element.name,
+                           })
+                     })
+                     connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+                        if (error) throw error;
+                        return res.send({ error: false, result: result, message: 'ok' });
+                     });
+                  }
                });
             }
          });
       }
-   });
-
+      else{
+         return res.send({ error: false, message: 'esistente' });
+      }
+   }); 
 });
 
 app.put('/updateSignature/:id_lesson',function(req,res){
@@ -632,7 +636,6 @@ app.post('/calendar/importLessons', async function (req, res) {
 
                   const totalHours = timeEnd - timeStart;
 
-                  
                   const checkProf = await ProfCheck(teacher);
                   const checkLeasson = await LeassonCheck(lessontype);
                   if (checkProf === false) {
@@ -664,7 +667,6 @@ app.post('/calendar/importLessons', async function (req, res) {
          } else {
             console.log('No upcoming events found.');
          }
-      
 
          if (errori.length === 0) {
             console.log("insert")
