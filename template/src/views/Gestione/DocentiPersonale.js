@@ -14,7 +14,7 @@ class DocentiPersonale extends Component {
             docenti: [],
             dettagliDocente: [],
             value: '',
-            percentuale: ''
+            percentuale: '',
         }
     }
 
@@ -221,7 +221,7 @@ class DocentiPersonale extends Component {
                         <td><h5>Lezione:</h5></td>
                         <td><h5>
                             <Input type="select" name="select" id="select" className="w-auto" onChange={(e) => this.setState({ value: e.target.value })}>
-                                {this.state.dettagliDocente.map(item => <option value={item.lessonName}>{item.lessonName}</option>)}
+                                {this.state.dettagliDocente.map((item, i) => <option key={i} value={item.lessonName}>{item.lessonName}</option>)}
                             </Input>
                         </h5></td>
                     </tr>

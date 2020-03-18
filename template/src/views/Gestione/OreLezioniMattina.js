@@ -70,8 +70,6 @@ class OreLezioniMattina extends React.Component {
 
     changeInfoMattina = () => {
         const Ore = /([0-1][0-9]|2[0-3])/
-
-console.log(this.state.minutiStartTimeMattina >= parseInt(this.formatHours(this.props.lezioneMattina.startTime).split(":")[1]))
         const equal =
             this.state.oreStartTimeMattina === this.formatHours(this.props.lezioneMattina.startTime).split(":")[0]
                 ?

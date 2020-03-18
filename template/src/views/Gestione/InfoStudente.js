@@ -43,7 +43,7 @@ class infoStudente extends React.Component {
   }
 
   callForRetire = () => {
-    axios.put('http://localhost:8080/retireStudent/' + this.state.email, {
+    axios.put('http://localhost:8080/retireStudent/'+this.state.email, {
       ritirato: 1,
     })
     .then(res => {

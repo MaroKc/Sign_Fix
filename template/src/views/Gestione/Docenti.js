@@ -88,7 +88,13 @@ class Docenti extends Component {
       idCorso: this.props.classe["id"]
      })
      .then(res => {
-      if (res.data.message === "ok"){ToastsStore.success(" è stato aggiunto alla lista docenti!"); this.refresh();}
+       console.log(res.data.message)
+      if (res.data.message === "ok") {
+        this.refresh();
+        ToastsStore.success(" è stato aggiunto alla lista docenti!");
+      }else if (res.data.message === "esistente") {
+        ToastsStore.warning(" OPS");
+      }
     })
     this.setState({
      firstName: '', lastName: '', emailDocente: '', companyName: ''
@@ -141,6 +147,7 @@ refresh = () => {
   this.displayTable();
   this.getTeacherDetails();
 }
+
 
 handleChange = (event) => {
   let name = event.target.name;

@@ -18,7 +18,7 @@ class StudentiPersonale extends Component {
 
 
     getStudents = () => {
-        axios.get('http://localhost:8080/listStudents/'+ this.props.classe["id"])
+        axios.get('http://localhost:8080/listStudents/'+ this.props.user['0'].id_course)
           .then(res => res.data)
           .then((data, index) => {
             const studenti = [];
@@ -49,47 +49,36 @@ class StudentiPersonale extends Component {
         }
     }
 
+    capitalizeFirst(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+
     infoStudent() {
 
-        let studente = this.state.studenti.find(studente => studente.email === 'acookek@nps.gov')
+        let studente = this.state.studenti.find(studente => studente.email === this.props.user['0'].email)
 
         return(
 
-            <div className="d-flex justify-content-center mt-5">
-                <Card className="w-75">
-                    <CardHeader className="text-center font-weight-bold">
-                        <h5>AREA PERSONALE</h5>
-                    </CardHeader>
-                    <CardBody>
-                        <Table borderless responsive>
-                            <tbody>
-                                <tr>
-                                    <td><h5>Nome:</h5></td>
-                                    <td><h5>{studente && studente.firstName}</h5></td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Cognome: </h5></td>
-                                    <td><h5 >{studente && studente.lastName}</h5></td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Email:</h5></td>
-                                    <td><h5>{studente && studente.email}</h5> </td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Ore fatte:</h5></td>
-                                    <td><h5>{studente && studente.hoursOfLessons}</h5></td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Percentuale Presenze:</h5></td>
-                                    <td><h5>{studente && studente.percentage}</h5></td>
-                                </tr>
-                            </tbody>
-                        </Table>
-                        <Button color="success" size="lg" block> BEDGE </Button>
-                    </CardBody>
-
-                </Card>
-        </div>
+            <div className="mt-5">
+                <div className="text-center font-weight-bold">
+                    <h3 className="d-inline-block text-center"><b>{studente && studente.firstName.toUpperCase() + ' ' + studente.lastName.toUpperCase()}</b> </h3>
+                    <h6 className="d-block text-center">{this.props.user['0'].email}</h6>
+                </div>
+             
+                <Table borderless responsive>
+                    <tbody>
+                        <tr>
+                            <td><h5>Ore fatte:</h5></td>
+                            <td><h5>{studente && studente.hoursOfLessons}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>Percentuale Presenze:</h5></td>
+                            <td><h5>{studente && studente.percentage}</h5></td>
+                        </tr>
+                    </tbody>
+                </Table>
+            </div>
         )
 
     }
