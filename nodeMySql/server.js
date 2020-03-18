@@ -94,11 +94,17 @@ app.post('/tokensignin', function (req, res) {
 
          connection.query(query, function (error, items, fields) {
             if (error) throw error;
-            return (
-               res.send({ error: false, data: items, message: 'TOKEN ADDED' }),
-               console.log({ error: error, data: items, message: 'TOKEN ADDED' })
-            );
          });
+
+         connection.query("SELECT id_course, email FROM students WHERE email ='"+email+"'", function (error, items, fields) {
+        
+            if (error) throw error;
+            
+            return (
+               res.send({ error: false, data: items, message: 'studente trovato' })
+            );
+         })
+         
       });
 
    }
@@ -279,7 +285,6 @@ app.put('/retireTeacher/:email', function (req, res) {
       }
 });
 
-
 app.post('/createTeacher', function (req, res) {
 
    var firstName = req.body.firstName
@@ -332,7 +337,7 @@ app.post('/createTeacher', function (req, res) {
       else{
          return res.send({ error: false, message: 'esistente' });
       }
-   }); 
+   });
 });
 
 app.put('/updateSignature/:id_lesson',function(req,res){

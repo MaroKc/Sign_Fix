@@ -58,7 +58,6 @@ class Studenti extends Component {
       this.setState({file})
       var reader = new FileReader();
       reader.onload = (e) => this.setState({ result: e.target.result })
-      console.log(event.target.value)
       reader.readAsText(file);
       this.toggleWarning(event)
       event.target.value = ''
@@ -146,13 +145,13 @@ class Studenti extends Component {
           <CardHeader>
                 <Row>
                   <Col sm="4">
-                  <Input type="file" id="result" name="result" onChange={this.handleChange} style={ {opacity: 0 } }  /> 
+                  <Input type="file" id="result" name="result" onChange={this.handleChange} style={ { opacity: 0 } }  /> 
                   </Col>
                   <Col sm="4" className="my-auto text-center">
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button><label className="m-0" for="result">Importa file <br/> studenti</label></Button>      
+                      <Button><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>
@@ -199,7 +198,7 @@ class Studenti extends Component {
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button><label className="m-0" for="result">Importa file <br/> studenti</label></Button>      
+                      <Button><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>
