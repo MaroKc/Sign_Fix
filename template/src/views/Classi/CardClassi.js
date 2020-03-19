@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { mapToCssModules } from 'reactstrap/lib/utils';
+import { Col, Row } from 'reactstrap';
 
 const propTypes = {
   children: PropTypes.node,
@@ -36,24 +37,29 @@ class CardClassi extends Component {
     const classCard = 'brand-card';
     const classCardHeader = classNames(`${classCard}-header`, back);
     const classCardBody = classNames(`${classCard}-body`);
-    const classes = mapToCssModules(classNames(classCard, className), cssModule);
+    const classes =  mapToCssModules(classNames(classCard, className), cssModule);
 
     return (
 
-      <div className={classes}>
+      <div className={classes} style={{marginTop: 10, marginBottom: 10}}> 
         <div className={classCardHeader}>
           <i /*className={icon}*/>{icon}</i>
           {children}
         </div>
         <div className={classCardBody}>
-          <div>
-            <div className="text-value">{vals[1]}</div>
+          <div  style={{color: "#000011"}}>
+            <Row>
+              <Col>
+              <div> <h1>{vals[2]}</h1></div>
+              </Col>
+              <Col>
+              <div className="text-value">{vals[1]}</div>
             <div className="text-uppercase text-muted small">{keys[1]}</div>
+              </Col>
+            </Row>
           </div>
-
         </div>
       </div>
-
     );
   }
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Row, Table, Card, CardHeader, CardBody, Button, Input } from 'reactstrap';
+import {Table, Card, CardHeader, CardBody, Button, Input } from 'reactstrap';
 import { MDBDataTable } from 'mdbreact';
 import axios from 'axios'
 import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
@@ -100,7 +100,8 @@ class DocentiPersonale extends Component {
                     classroom: item.classroom,
                     lessonName: item.lesson,
                     startTime: this.formatHours(item.startTime),
-                    endTime: this.formatHours(item.endTime)
+                    endTime: this.formatHours(item.endTime),
+                    percentage: item.percentuale.toFixed(0)+"%"
                 }));
                 this.setState({ lezioni });
             })
@@ -161,6 +162,9 @@ class DocentiPersonale extends Component {
                 {
                     label: 'Orario Fine',
                     field: 'endTime',
+                },              {
+                    label: 'Presenze',
+                    field: 'percentage',
                 }
             ],
             row: this.state.lezioni
@@ -208,6 +212,10 @@ class DocentiPersonale extends Component {
                         <td><h5>Ore di lezione:</h5></td>
                         <td><h5>{dettaglioDocente && dettaglioDocente.totalHours}</h5></td>
                     </tr>
+                    <tr>
+                        <td><h5>Percentuale presenze:</h5></td>
+                        <td><h5>{this.getPercentage()}</h5></td>
+                    </tr>
                 </>
             )
         } else {
@@ -219,7 +227,7 @@ class DocentiPersonale extends Component {
                         <td><h5>Lezione:</h5></td>
                         <td><h5>
                             <Input type="select" name="select" id="select" className="w-auto" onChange={(e) => this.setState({ value: e.target.value })}>
-                                {this.state.dettagliDocente.map(item => <option value={item.lessonName}>{item.lessonName}</option>)}
+                                {this.state.dettagliDocente.map((item, i) => <option key={i} value={item.lessonName}>{item.lessonName}</option>)}
                             </Input>
                         </h5></td>
                     </tr>
@@ -230,6 +238,10 @@ class DocentiPersonale extends Component {
                     <tr>
                         <td><h5>Ore di lezione:</h5></td>
                         <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
+                    </tr>
+                    <tr>
+                        <td><h5>Percentuale presenze:</h5></td>
+                        <td><h5>{this.getPercentage()}</h5></td>
                     </tr>
                 </>
             )
@@ -481,7 +493,6 @@ class DocentiPersonale extends Component {
 
 
     }
-
 
     infoTeacher() {
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Button, Row, Col, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Card, CardBody, CardHeader, Button, Row, Col, Modal, ModalBody, ModalFooter, ModalHeader, Input } from 'reactstrap';
 import axios from 'axios'
 import { MDBDataTable } from 'mdbreact';
 import InfoStudente from './InfoStudente';
@@ -14,7 +14,10 @@ class Studenti extends Component {
       displayCard: null,
       idCorso: this.props.classe["id"],
       displayTab: false,
-      warning: false
+      warning: false,
+      result: '',
+      file: '',
+      val: ''
     }
   }
 
@@ -36,7 +39,7 @@ class Studenti extends Component {
           residence: item.residence,
           fiscalCode: item.fiscalCode,
           hoursOfLessons: this.formatHours(item.hoursOfLessons),
-          percentage: item.percentage,
+          percentage: item.percentage < "80" ? <div className="text-danger">{item.percentage}</div> : <div className="text-success">{item.percentage}</div>,
           ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
         }));
@@ -49,16 +52,31 @@ class Studenti extends Component {
     this.getStudents();
   }
 
+   handleChange = (event) => {
+     try {
+      var file = event.target.files[0];
+      this.setState({file})
+      var reader = new FileReader();
+      reader.onload = (e) => this.setState({ result: e.target.result })
+      reader.readAsText(file);
+      this.toggleWarning(event)
+      event.target.value = ''
+     } catch (error) {
+
+     }
+   
+  }
+
   getCsv = () => {
-    axios.get('http://localhost:8080/importCsv/'+this.state.idCorso)
+    axios.post('http://localhost:8080/importCsv/'+this.state.idCorso, {data: this.state.result})
     .then(res => res.data)
     .then(res => {
-      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!")
-      else if (res.message === "ko") ToastsStore.danger("Ops, abbiamo un problema: " + res.data.data);
+      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!");else{ToastsStore.danger("OPSSSSSSS")}
+      this.refresh()
+      this.toggleWarning()  
     })
     .catch(err => console.error(err));
-    this.refresh()
-    this.toggleWarning()
+    
   }
 
   formatHours (hours){
@@ -67,13 +85,14 @@ class Studenti extends Component {
   
     if(startLessonAppoggio[1]){
       var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-      startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
+      startLesson= startLessonAppoggio[0]+': '+ (startLessonSecondaParte.toString()).substring(0,2)
       return startLesson
     }
     else{
       return startLessonAppoggio[0]
     }
   }
+
 
   displayCard = (e) => {
     this.setState({
@@ -89,6 +108,7 @@ class Studenti extends Component {
 
   tabPane() {
     const DatatablePage = () => {
+
       const data = {
         columns: [
           {
@@ -125,12 +145,13 @@ class Studenti extends Component {
           <CardHeader>
                 <Row>
                   <Col sm="4">
+                  <Input type="file" id="result" name="result" onChange={this.handleChange} style={ { opacity: 0 } }  /> 
                   </Col>
                   <Col sm="4" className="my-auto text-center">
-                    <span className="font-weight-bold"><h4>STUDENTI REGISTRATI</h4></span>
+                    <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                    <span> <Button color="ghost-success" className="mr-1"  onClick={this.toggleWarning}><i className="cui-user-follow icons font-2xl d-block"></i> Importa csv </Button> </span>
+                      <Button><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>
@@ -147,7 +168,7 @@ class Studenti extends Component {
           </Card>
           <Card>
             <CardHeader >
-              <div className="text-center font-weight-bold">STUDENTI  RITIRATI</div>
+              <h4 className="text-center font-weight-bold">STUDENTI  RITIRATI</h4>
             </CardHeader>
             <CardBody>
               <MDBDataTable
@@ -171,12 +192,13 @@ class Studenti extends Component {
               <CardHeader>
                 <Row>
                   <Col sm="4">
+                  <Input type="file" id="result" name="result" onChange={this.handleChange} style={ {opacity: 0 } }  /> 
                   </Col>
                   <Col sm="4" className="my-auto text-center">
-                    <span className="font-weight-bold"><h4>STUDENTI REGISTRATI</h4></span>
+                    <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                    <span> <Button color="ghost-success" className="mr-1" onClick={this.toggleWarning}><i className="cui-user-follow icons font-2xl d-block"></i> Importa csv </Button> </span>
+                      <Button><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>
@@ -207,10 +229,11 @@ class Studenti extends Component {
   }
 
 
-  toggleWarning = () => {
+  toggleWarning = (event) => {
     this.setState({
       warning: !this.state.warning,
     });
+    
   }
 
   openModal = () => {
@@ -220,7 +243,7 @@ class Studenti extends Component {
         <ModalHeader toggle={this.toggleWarning}>WARNING</ModalHeader>
         <ModalBody>
           <div className="text-center">
-            Stai importando un <b>nuovo</b> csv, i vecchi studenti verranno cancellati
+            Stai importando <b>{this.state.file['name']}</b>, i vecchi studenti verranno cancellati
             <h5 >Procedere?</h5>
           </div>
         </ModalBody>

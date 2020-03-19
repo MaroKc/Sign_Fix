@@ -145,6 +145,8 @@ changeInfo = (changeInfo) => {
         )
     }
     else {
+        let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
+
         const regexLettere = /^[a-zA-Z\\']*$/;
         const { firstName, lastName } = this.state
         const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
@@ -162,19 +164,19 @@ changeInfo = (changeInfo) => {
                     </tr>
                     <tr>
                         <td><h5>Nome azienda:</h5></td>
-                        <td><h5>{this.state.companyName}</h5></td>
+                        <td><h5>{this.props.docente['0'].companyName}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Lezione:</h5></td>
-                        <td><h5>{this.state.lessonName}</h5></td>
+                        <td><h5>{this.state.value && totalHours['lessonName']}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Ore fatte</h5></td>
-                        <td><h5>{this.state.hoursOfLessons}</h5></td>
+                        <td><h5>{this.state.value && totalHours['hoursOfLessons']}</h5></td>
                     </tr>
                     <tr>
                         <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.state.totalHours}</h5></td>
+                        <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
                     </tr>
                 </tbody>
             </Table>

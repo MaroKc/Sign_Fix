@@ -1,6 +1,6 @@
 export default {
   items: [
-
+    
     {
       title: true,
       name: '',
@@ -16,7 +16,13 @@ export default {
       name: 'Classi',
       url: '/classi',
       icon: 'icon-pie-chart',
+    },    
+    {
+      name: 'Docenti',
+      url: '/docenti',
+      icon: 'icon-pie-chart',
     },
+    
     {
       title: true,
       name: 'Gestione',
@@ -26,12 +32,7 @@ export default {
       },
       class: ''             // optional class names space delimited list for title item ex: "text-center"
     },
-    
-    {
-      name: 'Docenti',
-      url: '/docenti',
-      icon: 'icon-pie-chart',
-    },
+
     {
       name: 'Studenti',
       url: '/studenti',
@@ -51,18 +52,7 @@ export default {
       url: '/calendario',
       icon: 'icon-pie-chart',
     },
-    {
-      name: 'DocentiPersonale',
-      url: '/docentiPersonale',
-      icon: 'icon-pie-chart',
-      class: 'mt-5',
-    },
-    {
-      name: 'StudentiPersonale',
-      url: '/studentiPersonale',
-      icon: 'icon-pie-chart',
-      class: '',
-    },
+
     /*
     {
       title: true,

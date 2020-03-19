@@ -43,7 +43,7 @@ class infoStudente extends React.Component {
   }
 
   callForRetire = () => {
-    axios.put('http://localhost:8080/retireStudent/' + this.state.email, {
+    axios.put('http://localhost:8080/retireStudent/'+this.state.email, {
       ritirato: 1,
     })
     .then(res => {
@@ -58,7 +58,7 @@ class infoStudente extends React.Component {
   handleChange = (event) => {
     let name = event.target.name;
     let val = event.target.value;
-    if(name =="fiscalCode"){
+    if(name === "fiscalCode"){
       this.setState({
         [name]: val.toUpperCase(),
       });
@@ -122,7 +122,7 @@ class infoStudente extends React.Component {
       )
     }
     else {
-      const regexLettere = /^[a-zA-Z]*$/;
+      const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
       const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
       const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
       const {firstName, lastName, residence, fiscalCode, dateOfBirth} = this.state
@@ -165,7 +165,7 @@ class infoStudente extends React.Component {
   }
 
   renderButtons = (changeInfo) => {
-    const regexLettere = /^[a-zA-Z]*$/;
+    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
     const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
     const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
     const { firstName, lastName, residence, fiscalCode, dateOfBirth } = this.state
@@ -218,12 +218,12 @@ class infoStudente extends React.Component {
             <b>{this.state.firstName}  {this.state.lastName}</b>
           </CardHeader> */}
           <Row>
-            <Col className="">
+            <Col md="9">
               <div className="m-5" xs="auto">
                 {this.changeInfo(this.state.changeInfo)}
               </div>
             </Col>
-            <Col xs="auto" className="my-auto mx-auto pr-5">
+            <Col md="3" className="my-auto mx-auto pr-5">
               {this.renderButtons(this.state.changeInfo)}
               {this.openModal()}
             </Col>

@@ -13,6 +13,8 @@ const readline = require('readline');
 const { google } = require('googleapis');
 const tools = require('./tools');
 const keys = require('./outh2.key.json');
+const path = require('path');
+const os = require('os');
 
 var errorDataInsert = [];
 
@@ -79,7 +81,7 @@ app.post('/tokensignin', function (req, res) {
       const oAuth2Client = new OAuth2Client(
          keys.web.client_id,
          keys.web.client_secret,
-         keys.web.redirect_uris[0]
+         keys.web.redirect_uris[1]
       );
       const restInfo = await oAuth2Client.getToken(code);
       const tokenInfo = restInfo.tokens;
@@ -90,7 +92,6 @@ app.post('/tokensignin', function (req, res) {
             console.log('The API returned an error: ' + err);
             return res.send({ error: true, data: err, message: 'The API returned an error' });
          }
-         //console.log(resu.data);
          const email = resu.data.email;
 
          const insertToken = email + '","' + tokenInfo.access_token + '","' + tokenInfo.refresh_token + '","' + tokenInfo.scope + '","' + tokenInfo.token_type + '","' + tokenInfo.expiry_date;
@@ -99,11 +100,17 @@ app.post('/tokensignin', function (req, res) {
 
          connection.query(query, function (error, items, fields) {
             if (error) throw error;
-            return (
-               res.send({ error: false, data: items, message: 'Calendar added' }),
-               console.log({ error: error, data: items, message: 'Calendar added' })
-            );
          });
+
+         connection.query("SELECT id_course, email FROM students WHERE email ='"+email+"'", function (error, items, fields) {
+        
+            if (error) throw error;
+            
+            return (
+               res.send({ error: false, data: items, message: 'studente trovato' })
+            );
+         })
+         
       });
 
    }
@@ -115,10 +122,16 @@ app.post('/auth', function (req, res) {
 
    connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(req.body.email) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
       if (error) throw error;
-      //return res.send({ email: req.body.email, ruolo: results[0].responsible_level });
-      res.send({ email: req.body.email, ruolo: results });
-      console.log({ email: req.body.email, ruolo: results[0].responsible_level })
+
+      if(results.length == 1) {
+
+         //DA CRIPTARE LA PSWD perchè si salva nel client
+         res.send({ error: false, message: results[0] });
+      } else {
+         res.send({ error: true, message: false });
+      }
    });
+   
 });
 
 /*
@@ -156,20 +169,18 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
-app.get('/importCsv/:id_course',function(req,res){
-   idCorso =req.params.id_course
+
+app.post('/importCsv/:id_course',function(req,res){
+   var idCorso =req.params.id_course
+   var data= req.body.data
    connection.query("DELETE FROM `students` WHERE id_course="+idCorso, function (error, results, fields) {
       if (error) throw error;
       });
    try {
-   
-      // read contents of the file
-      const data = fs.readFileSync('data.csv', 'UTF-8');
 
       // split the contents by new line
       const lines = data.split(/\r?\n/);
-      persone=[]
-   
+
       for (let i = 0; i < lines.length-1; i++) {
 
          // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
@@ -181,7 +192,7 @@ app.get('/importCsv/:id_course',function(req,res){
          const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
          const fiscalCode = lineaSplittata[3];
          var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES ("+email+","+firstName+","+lastName+","+birth+","+residence+","+fiscalCode+","+ idCorso+",0)";
-         
+
          connection.query(query, function (error, results, fields) {
             if (error) throw error;
             });
@@ -281,7 +292,6 @@ app.put('/retireTeacher/:email', function (req, res) {
       }
 });
 
-
 app.post('/createTeacher', function (req, res) {
 
    var firstName = req.body.firstName
@@ -291,43 +301,50 @@ app.post('/createTeacher', function (req, res) {
    var companyName = req.body.companyName
    var company = []
 
-   connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, items, fields) {
-      if (error) throw error;
-      if (items.length >0){
-         items.forEach(element => {
-            company.push(
-               {
-                  id: element.id,
-                  name: element.name,
-               })
-         })
-         connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+   connection.query("SELECT * FROM teachers where email_responsible='"+emailDocente+"'", function (e, row, fields) {
+      if (e) throw error;
+      if(row.length==0){
+         connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, items, fields) {
             if (error) throw error;
-            return res.send({ error: false, result: result, message: 'ok' });
-         });
-      } else {
-         connection.query("INSERT INTO `companies` (`name`) VALUES ('" + companyName + "')", function (error, result, fields) {
-            if (error) throw error;
-         });
-         connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, results, fields) {
-            if (error) throw error;
-            if (results.length >0){
-               results.forEach(element => {
+            if (items.length >0){
+               items.forEach(element => {
                   company.push(
                      {
                         id: element.id,
                         name: element.name,
                      })
                })
-               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0) ", function (error, result, fields) {
                   if (error) throw error;
                   return res.send({ error: false, result: result, message: 'ok' });
+               });
+            } else {
+               connection.query("INSERT INTO `companies` (`name`) VALUES ('" + companyName + "')", function (error, result, fields) {
+                  if (error) throw error;
+               });
+               connection.query("SELECT * FROM companies where name='" + companyName + "'", function (error, results, fields) {
+                  if (error) throw error;
+                  if (results.length >0){
+                     results.forEach(element => {
+                        company.push(
+                           {
+                              id: element.id,
+                              name: element.name,
+                           })
+                     })
+                     connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
+                        if (error) throw error;
+                        return res.send({ error: false, result: result, message: 'ok' });
+                     });
+                  }
                });
             }
          });
       }
+      else{
+         return res.send({ error: false, message: 'esistente' });
+      }
    });
-
 });
 
 app.put('/updateSignature/:id_lesson',function(req,res){
@@ -340,9 +357,9 @@ app.put('/updateSignature/:id_lesson',function(req,res){
       var endTime = req.body.endTime
       var dateOfModify= tools.formattedDate(new Date())
       
-      var query = "UPDATE `signatures_students` SET `final_start_time`=?,`final_end_time`=?,`modify_date`=? WHERE `id_lesson`= '"+id_lesson+"'  and `email_student`='"+email+"'"
+      var query = "UPDATE `signatures_students` SET `final_start_time`=?,`final_end_time`=?, `hours_of_lessons`=?, `modify_date`=? WHERE `id_lesson`= '"+id_lesson+"'  and `email_student`='"+email+"'"
       
-      connection.query(query,[startTime,endTime,dateOfModify], function (error, results, fields){
+      connection.query(query,[startTime,endTime,endTime-startTime,dateOfModify], function (error, results, fields){
          if (error) throw error;
          data=results
          return res.send({ error: false, data: data, message: 'ok' });
@@ -379,13 +396,11 @@ app.get('/lessons/:date/:id_course', function (req, res) {
 
 app.get('/lessonsTeacher/:id_company', function (req, res) {
    var data = [];
-   var id_company = req.params.id_company 
-   var id_course = req.params.id_course 
+   var id_company = req.params.id_company
 
-   connection.query("SELECT * FROM lessons WHERE companies_id= " + (id_company) + "", function (error, results, fields) {
+   connection.query("SELECT lessons.date,classroom,lessons.id,lesson,start_time,end_time,sum(hours_of_lessons) as hours_of_lessons, count(lessons.date) as numberStudents, lessons.total_hours as total_hours FROM lessons left join signatures_students on lessons.id= signatures_students.id_lesson WHERE companies_id="+ id_company+" GROUP by lessons.date, classroom, lessons.id", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
-       
          data.push(
             {
                date: tools.formattedDate(element.date),
@@ -393,7 +408,8 @@ app.get('/lessonsTeacher/:id_company', function (req, res) {
                id: element.id,
                lesson: element.lesson,
                startTime: tools.formattedDecimal(element.start_time),
-               endTime: tools.formattedDecimal(element.end_time) 
+               endTime: tools.formattedDecimal(element.end_time),
+               percentuale: (element.hours_of_lessons/(element.numberStudents* element.total_hours))*100
             })
       })
       res.send(JSON.stringify(data));
@@ -489,10 +505,11 @@ app.put('/retireStudent/:email', function (req, res) {
    
    try {
       var email = req.params.email;
-
+         console.log("arrivo", email)
       var ritirato = req.body.ritirato
    
       var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
+      console.log(query)
       connection.query(query, [ritirato, email], function (error, results, fields) {
          if (error) throw error;
          res.send({ error: false, data: results, message: 'ok' });

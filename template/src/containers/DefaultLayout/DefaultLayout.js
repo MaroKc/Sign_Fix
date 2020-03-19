@@ -16,7 +16,10 @@ import {
   AppSidebarNav2 as AppSidebarNav,
 } from '@coreui/react';
 // sidebar nav config
-import navigation from '../../_nav';
+
+import navigation from '../../_nav';//(cordinatori)
+import navigationStud from '../../_navStud';//(studenti)
+import navigationDoc from '../../_navDoc';//(prof)
 // routes config
 import routes from '../../routes';
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
@@ -30,10 +33,34 @@ class DefaultLayout extends Component {
     super(props);
 
     const cookieCorso = JSON.parse(sessionStorage.getItem("corso"));
+    const cookieUser = JSON.parse(sessionStorage.getItem("utente"));
+
     this.state = {
-      classe: cookieCorso ? cookieCorso : null
+      classe: cookieCorso ? cookieCorso : null,
+      user: cookieUser ? cookieUser : null,
+      navMenu: null,
+      to : '/'
     } 
+  
   }
+
+  componentDidMount() {
+
+    if(this.state.user === null) {
+      return  <Redirect to='/login'/>
+     
+    } else if(this.state.user && this.state.user['responsible_level'] === 2) {
+      this.setState({navMenu: navigation, to: '/classi'})
+    } else if (this.state.user && this.state.user['responsible_level'] === 4){
+      //RUOLO
+      this.setState({navMenu: navigationDoc, to: '/docentiPersonale'})
+    }else{
+      this.setState({navMenu: navigationStud, to: '/studentiPersonale'})
+    }
+
+  }
+
+
 
   changeCorso = (corso) => {
     this.setState({ classe: corso })
@@ -44,20 +71,19 @@ class DefaultLayout extends Component {
 
   signOut(e) {
     e.preventDefault()
-    this.props.history.push('/login')
   }
 
   render() {
     const classe = this.state.classe;
     return (
       <div className="app">
-
-        <AppHeader fixed>
-          <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} />
-          </Suspense>
-        </AppHeader>
-
+        {classe && (
+          <AppHeader fixed>
+            <Suspense fallback={this.loading()}>
+              <DefaultHeader onLogout={e => this.signOut(e)} />
+            </Suspense>
+          </AppHeader>)
+        }
         <div className="app-body">
 
           {classe  && (
@@ -65,7 +91,8 @@ class DefaultLayout extends Component {
               <AppSidebarHeader />
               <AppSidebarForm />
               <Suspense>
-                <AppSidebarNav navConfig={navigation} {...this.props} router={router} />
+                <h4 className="text-center mt-2">{this.state.classe['start_year']} - {this.state.classe['end_year']}</h4>
+               <AppSidebarNav navConfig={this.state.navMenu} {...this.props} router={router} classe={this.state.classe} user={this.state.user}/>
               </Suspense>
               <AppSidebarFooter />
               <AppSidebarMinimizer />
@@ -77,6 +104,7 @@ class DefaultLayout extends Component {
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
+                 
                   {routes.map((route, idx) => {
                     return route.component ? (
                       <Route
@@ -86,17 +114,18 @@ class DefaultLayout extends Component {
                         name={route.name}
                         render={props =>
                           route.render ? (
-                            <route.component {...props} {...route.extraProps} route={route} />
+                            <route.component {...props} {...route.extraProps}  route={route} />
                           ) : (
-                              <route.component {...props} classe={this.state.classe} changeCorso={this.changeCorso} route={route} />
+                              <route.component {...props} classe={this.state.classe} to={this.state.to} user={this.state.user} changeCorso={this.changeCorso} route={route} />
                             )} />
                     ) : (null);
                   })}
-                  <Redirect from="/" to="/classi" />
+                  {this.state.user === null ? <Redirect from="/" to='/login'/> : <Redirect from="/" to={this.state.to}/>}
                 </Switch>
               </Suspense>
             </Container>
           </main>
+
           <AppAside fixed>
             <Suspense fallback={this.loading()}>
               <DefaultAside />
