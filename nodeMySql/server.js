@@ -633,7 +633,6 @@ app.post('/calendar/importLessons', async function (req, res) {
       calendar.events.list({
          calendarId: idCalendar,
          timeMin: (new Date()).toISOString(),
-         maxResults: 1,
          singleEvents: true,
          orderBy: 'startTime',
       }, async (err, resu) => {
@@ -664,6 +663,7 @@ app.post('/calendar/importLessons', async function (req, res) {
 
                   const checkProf = await ProfCheck(teacher);
                   const checkLeasson = await LeassonCheck(lessontype);
+                  console.log(event.summary)
                   if (checkProf === false) {
                      riga.prof = false;
                   }
@@ -675,11 +675,9 @@ app.post('/calendar/importLessons', async function (req, res) {
                      riga.dataStart = dateStart;
                      riga.dataEnd = dateEnd;
                      errori.push(riga);
-                     console.log('ciao')
-
                   } else {
                      datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
-                     console.log('ciao')
+                     console.log('dati da inserire')
                   }
 
                } catch (err) {
@@ -691,10 +689,11 @@ app.post('/calendar/importLessons', async function (req, res) {
          } else {
             return res.send({ error: false, data: error, message: 'Non sono stati trovanti eventi salvati nel calendario' });
          }
-
+         console.log(errori)
          if (errori.length === 0) {
             console.log("Dati inseriti con successo")
             console.log(datiInsert)
+
             /*
             const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
            
