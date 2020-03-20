@@ -587,7 +587,6 @@ app.post('/calendar/importLessons', async function (req, res) {
             if (errorProf) { throw reject(new Error(errorProf)); }
             if (resultsProf.length == 0) { resolve(false); } else { resolve(queryProf[0].id); }
          });
-
       });
    }
 
@@ -640,6 +639,7 @@ app.post('/calendar/importLessons', async function (req, res) {
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
 
                   const totalHours = timeEnd - timeStart;
+               
 
                   const checkProf = await ProfCheck(teacher);
                   const checkLeasson = await LeassonCheck(lessontype);
@@ -654,33 +654,35 @@ app.post('/calendar/importLessons', async function (req, res) {
                      riga.dataStart = dateStart;
                      riga.dataEnd = dateEnd;
                      errori.push(riga);
-                     console.log("push");
+                     console.log('ciao')
+
                   } else {
-                     //datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
-                     console.log("ok");
+                     datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
+                     console.log('ciao')
                   }
 
                } catch (err) {
-                  console.log(err);
-                  errorDataInsert.push(event.summary + " " + event.start.dateTime.split("T")[0]);
-                  console.log("I seguenti dati non sono stati inseriti correttamente: ");
-                  console.log(JSON.stringify(errorDataInsert));
+                  return res.send({ error: false, data: error, message: 'Errore di salvataggio dei dati' });
                }
 
 
             });
          } else {
-            console.log('No upcoming events found.');
+            return res.send({ error: false, data: error, message: 'Non sono stati trovanti eventi salvati nel calendario' });
          }
 
          if (errori.length === 0) {
-            console.log("insert")
-            /*const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+            console.log("Dati inseriti con successo")
+            console.log(datiInsert)
+            /*
+            const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+           
             connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
                if (errorIns) throw errorIns;
                return res.send({ error: false, data: items, message: 'Calendar added' });
             });*/
          } else {
+            console.log("Dati non inseriti, ci sono degli errori")
             console.log(errori);
          }
 
