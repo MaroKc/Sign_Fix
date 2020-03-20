@@ -128,6 +128,27 @@ app.post('/auth', function (req, res) {
    
 });
 
+app.post('/badge', function (req, res) {
+
+   const qr = req.body.email;
+
+   //Una volta che ho il QR faccio una select per trovare l'email associata
+   /*
+   connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(qr) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
+      if (error) throw error;
+
+      if(results.length == 1) {
+
+         //DA CRIPTARE LA PSWD perchè si salva nel client
+         res.send({ error: false, message: results[0] });
+      } else {
+         res.send({ error: true, message: false });
+      }
+   });
+   */
+   
+});
+
 /*
 fa il totale delle ore sulla tabella lessons a cominciare dalla data odierna meno un giorno.
 app.get('/totalHours', function (req, res) {

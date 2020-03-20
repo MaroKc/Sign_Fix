@@ -19,8 +19,7 @@ class Login extends Component {
     this.state = {
       user: null,
       pswd: null,
-      status: false,
-
+      status: false
     }
   }
 
