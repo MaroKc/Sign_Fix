@@ -84,11 +84,10 @@ class Docenti extends Component {
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       emailDocente: this.state.emailDocente,
-      companyName: this.state.companyName === "" ? this.state.emailDocente : this.state.companyName , 
+      companyName: this.state.companyName, 
       idCorso: this.props.classe["id"]
      })
      .then(res => {
-       console.log(res.data.message)
       if (res.data.message === "ok") {
         this.refresh();
         ToastsStore.success(" è stato aggiunto alla lista docenti!");
@@ -100,6 +99,7 @@ class Docenti extends Component {
      firstName: '', lastName: '', emailDocente: '', companyName: ''
     })
   }
+
 
 formatHours (hours){
   var startLessonAppoggio= (hours.toString()).split('.')

@@ -71,7 +71,7 @@ class Studenti extends Component {
     axios.post('http://localhost:8080/importCsv/'+this.state.idCorso, {data: this.state.result})
     .then(res => res.data)
     .then(res => {
-      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!");else{ToastsStore.danger("OPSSSSSSS")}
+      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!");else{ToastsStore.warning("OPSSSSSSS")}
       this.refresh()
       this.toggleWarning()  
     })

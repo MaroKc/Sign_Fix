@@ -18,7 +18,7 @@ class StudentiPersonale extends Component {
 
 
     getStudents = () => {
-        axios.get('http://localhost:8080/listStudents/'+ this.props.user['0'].id_course)
+        axios.get('http://localhost:8080/listStudents/'+ this.props.user.id_course)
           .then(res => res.data)
           .then((data, index) => {
             const studenti = [];
@@ -54,16 +54,16 @@ class StudentiPersonale extends Component {
     }
 
 
-    infoStudent() {
+    infoStudent = () => {
 
-        let studente = this.state.studenti.find(studente => studente.email === this.props.user['0'].email)
+        let studente = this.state.studenti.find(studente => studente.email === this.props.user.email)
 
         return(
 
             <div className="mt-5">
                 <div className="text-center font-weight-bold">
                     <h3 className="d-inline-block text-center"><b>{studente && studente.firstName.toUpperCase() + ' ' + studente.lastName.toUpperCase()}</b> </h3>
-                    <h6 className="d-block text-center">{this.props.user['0'].email}</h6>
+                    <h6 className="d-block text-center">{this.props.user.email}</h6>
                 </div>
              
                 <Table borderless responsive>

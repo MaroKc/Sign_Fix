@@ -1,20 +1,14 @@
 var express = require('express');
-var Sync = require('sync');
 var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
-const lineReader = require('line-reader');
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
 
-const fs = require('fs');
-const readline = require('readline');
 const { google } = require('googleapis');
 const tools = require('./tools');
 const keys = require('./outh2.key.json');
-const path = require('path');
-const os = require('os');
 
 var errorDataInsert = [];
 
@@ -134,6 +128,27 @@ app.post('/auth', function (req, res) {
    
 });
 
+app.post('/badge', function (req, res) {
+
+   const qr = req.body.email;
+
+   //Una volta che ho il QR faccio una select per trovare l'email associata
+   /*
+   connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(qr) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
+      if (error) throw error;
+
+      if(results.length == 1) {
+
+         //DA CRIPTARE LA PSWD perchè si salva nel client
+         res.send({ error: false, message: results[0] });
+      } else {
+         res.send({ error: true, message: false });
+      }
+   });
+   */
+   
+});
+
 /*
 fa il totale delle ore sulla tabella lessons a cominciare dalla data odierna meno un giorno.
 app.get('/totalHours', function (req, res) {
@@ -177,7 +192,6 @@ app.post('/importCsv/:id_course',function(req,res){
       if (error) throw error;
       });
    try {
-
       // split the contents by new line
       const lines = data.split(/\r?\n/);
 
@@ -198,7 +212,7 @@ app.post('/importCsv/:id_course',function(req,res){
             });
          }
       // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
-         return res.send({ error: true, message: 'ok' });
+      return res.send({ error: true, message: 'ok' });
 
       } catch (err) {
          return res.send({ error: true, data: err, message: 'ko' });
@@ -594,7 +608,6 @@ app.post('/calendar/importLessons', async function (req, res) {
             if (errorProf) { throw reject(new Error(errorProf)); }
             if (resultsProf.length == 0) { resolve(false); } else { resolve(queryProf[0].id); }
          });
-
       });
    }
 
@@ -620,7 +633,6 @@ app.post('/calendar/importLessons', async function (req, res) {
       calendar.events.list({
          calendarId: idCalendar,
          timeMin: (new Date()).toISOString(),
-         maxResults: 1,
          singleEvents: true,
          orderBy: 'startTime',
       }, async (err, resu) => {
@@ -647,10 +659,11 @@ app.post('/calendar/importLessons', async function (req, res) {
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
 
                   const totalHours = timeEnd - timeStart;
+               
 
-                  
                   const checkProf = await ProfCheck(teacher);
                   const checkLeasson = await LeassonCheck(lessontype);
+                  console.log(event.summary)
                   if (checkProf === false) {
                      riga.prof = false;
                   }
@@ -662,34 +675,34 @@ app.post('/calendar/importLessons', async function (req, res) {
                      riga.dataStart = dateStart;
                      riga.dataEnd = dateEnd;
                      errori.push(riga);
-                     console.log("push");
                   } else {
-                     //datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
-                     console.log("ok");
+                     datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
+                     console.log('dati da inserire')
                   }
 
                } catch (err) {
-                  console.log(err);
-                  errorDataInsert.push(event.summary + " " + event.start.dateTime.split("T")[0]);
-                  console.log("I seguenti dati non sono stati inseriti correttamente: ");
-                  console.log(JSON.stringify(errorDataInsert));
+                  return res.send({ error: false, data: error, message: 'Errore di salvataggio dei dati' });
                }
 
 
             });
          } else {
-            console.log('No upcoming events found.');
+            return res.send({ error: false, data: error, message: 'Non sono stati trovanti eventi salvati nel calendario' });
          }
-      
-
+         console.log(errori)
          if (errori.length === 0) {
-            console.log("insert")
-            /*const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+            console.log("Dati inseriti con successo")
+            console.log(datiInsert)
+
+            /*
+            const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+           
             connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
                if (errorIns) throw errorIns;
                return res.send({ error: false, data: items, message: 'Calendar added' });
             });*/
          } else {
+            console.log("Dati non inseriti, ci sono degli errori")
             console.log(errori);
          }
 

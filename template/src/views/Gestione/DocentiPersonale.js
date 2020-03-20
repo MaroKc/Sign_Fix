@@ -138,58 +138,16 @@ class DocentiPersonale extends Component {
         }
     }
 
-    tabPane() {
-
-
-        const data = {
-            columns: [
-                {
-                    label: 'Data',
-                    field: 'date',
-                },
-                {
-                    label: 'Classe',
-                    field: 'classroom',
-                },
-                {
-                    label: 'Lezione',
-                    field: 'lessonName',
-                },
-                {
-                    label: 'Orario Inizio',
-                    field: 'startTime',
-                },
-                {
-                    label: 'Orario Fine',
-                    field: 'endTime',
-                },              {
-                    label: 'Presenze',
-                    field: 'percentage',
-                }
-            ],
-            row: this.state.lezioni
-        };
-
-        return (
-            <div>
-                <CardHeader className="text-center font-weight-bold">
-                    <h5>Lezioni</h5>
-                </CardHeader>
-                <CardBody>
-                    <MDBDataTable
-                        responsive
-                        hover
-                        data={{ columns: data.columns, rows: data.row }}
-                        searching={false}
-                        paging={false}
-                        noBottomColumns={true}
-                    />
-                </CardBody>
-
-            </div>
+    getPercentage() {
+        var initialValue = 0;
+        let tipoLezione = this.state.lezioni.filter(item => item.lessonName === this.state.value)
+        var sum = tipoLezione.reduce(
+            (accumulator, currentValue) => accumulator + parseInt(currentValue.percentage.split("%"), 10)
+            ,initialValue
         );
+        
+        return (sum / tipoLezione.length).toFixed(0)+"%"
     }
-
 
     selectLesson = () => {
 
@@ -304,6 +262,10 @@ class DocentiPersonale extends Component {
                 {
                     label: 'Orario Fine',
                     field: 'endTime',
+                },
+                {
+                    label: 'Presenze',
+                    field: 'percentage',
                 }
             ],
             row: pastLesson
@@ -399,6 +361,7 @@ class DocentiPersonale extends Component {
 
     }
 
+
     todayLesson() {
         var d = new Date(),
             month = '' + (d.getMonth() + 1),
@@ -419,9 +382,6 @@ class DocentiPersonale extends Component {
         const dataControl = this.state.lezioni.filter(lezione => (lezione.date))
 
         
-
-       
-
         const data = {
             columns: [
                 {

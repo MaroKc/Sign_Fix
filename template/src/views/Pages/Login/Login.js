@@ -32,11 +32,6 @@ class Login extends Component {
   }
 
 
-  componentDidMount() {
-
-
-  }
-
   renderRedirect = () => {
     if (this.state.status) {
       return <Redirect to='/' />
