@@ -15,13 +15,17 @@ import {
   AppBreadcrumb2 as AppBreadcrumb,
   AppSidebarNav2 as AppSidebarNav,
 } from '@coreui/react';
-// sidebar nav config
 
-import navigation from '../../_nav';//(cordinatori)
-import navigationStud from '../../_navStud';//(studenti)
+// sidebar nav config
+import navigationCor from '../../_navCor';//(cordinatori)
 import navigationDoc from '../../_navDoc';//(prof)
+import navigationStud from '../../_navStud';//(studenti)
+
 // routes config
-import routes from '../../routes';
+import routesCor from '../../routesCor';
+import routesDoc from '../../routesDoc';
+import routesStud from '../../routesStud';
+
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
@@ -39,6 +43,7 @@ class DefaultLayout extends Component {
       classe: cookieCorso ? cookieCorso : null,
       user: cookieUser ? cookieUser : null,
       navMenu: null,
+      routes: [],
       to : '/'
     } 
   
@@ -50,12 +55,12 @@ class DefaultLayout extends Component {
       return  <Redirect to='/login'/>
      
     } else if(this.state.user && this.state.user['responsible_level'] === 2) {
-      this.setState({navMenu: navigation, to: '/classi'})
+      this.setState({navMenu: navigationCor, to: '/classi', routes: routesCor})
     } else if (this.state.user && this.state.user['responsible_level'] === 4){
       //RUOLO
-      this.setState({navMenu: navigationDoc, to: '/docentiPersonale'})
+      this.setState({navMenu: navigationDoc, to: '/docentiPersonale', routes: routesDoc})
     }else{
-      this.setState({navMenu: navigationStud, to: '/studentiPersonale'})
+      this.setState({navMenu: navigationStud, to: '/studentiPersonale', routes: routesStud})
     }
 
   }
@@ -100,12 +105,12 @@ class DefaultLayout extends Component {
           )}
 
           <main className="main">
-            <AppBreadcrumb appRoutes={routes} router={router} />
+            <AppBreadcrumb appRoutes={this.state.routes} router={router} />
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
                  
-                  {routes.map((route, idx) => {
+                  {this.state.routes.map((route, idx) => {
                     return route.component ? (
                       <Route
                         key={idx}

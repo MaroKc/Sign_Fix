@@ -19,12 +19,7 @@ class Login extends Component {
     this.state = {
       user: null,
       pswd: null,
-      status: false,
-
-      GoogleAuth: null,
-      CLIENT_ID: '122931835616-is0fj42a208qga441jf6bivffrb93trn.apps.googleusercontent.com',
-      DISCOVERY_DOCS: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-      SCOPES: "https://www.googleapis.com/auth/calendar.readonly profile email"
+      status: false
     }
   }
 
@@ -134,7 +129,7 @@ class Login extends Component {
                       <p>Dovrai accedere solo al primo ingresso.</p>
 
                       <GoogleLogin
-                        clientId="122931835616-is0f"
+                        clientId="122931835616-is0fj42a208qga441jf6bivffrb93trn.apps.googleusercontent.com"
                         scope="https://www.googleapis.com/auth/calendar.readonly profile email"
                         discoveryDocs="https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
                         buttonText="Login"
