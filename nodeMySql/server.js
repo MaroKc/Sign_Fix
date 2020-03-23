@@ -611,6 +611,21 @@ app.post('/calendar/importLessons', async function (req, res) {
       });
    }
 
+   let addLessons = (list) => {
+      return new Promise( function (resolve, reject) {
+
+         const queryIns = 'INSERT INTO lessons (`lesson`, `companies_id`,`classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+         if (list) { resolve (list); } else { resolve (false); }
+         /*
+         connection.query(queryIns, [list], function (errorIns, itemsIns, fields) {
+            if (errorIns) throw errorIns;
+            if (itemsIns) { resolve(false); } else { resolve(true); }
+         });
+         */
+      });
+
+   }
+
    let LeassonCheck =  (lessontype) => {
       return new Promise( function (resolve, reject) {
          const querySub = 'SELECT id FROM companies WHERE name like "%?%" ';
@@ -678,18 +693,30 @@ app.post('/calendar/importLessons', async function (req, res) {
                         
          } else {
             return res.send({ error: false, message: 'Non sono stati trovanti eventi salvati nel calendario' });
-         }
+         }  
+
+         (async function() {
+            const PrintLEssons=  await addLessons(datiInsert)
+            console.log(PrintLEssons);
+
+         // outputs `[2, 3, 5]` after five seconds
+          })();
+
+           
+         //console.log(datiInsert)
+         /*
          var interval= setInterval(() => {
                if (errori.length === 0) {
                   console.log(datiInsert)
-                 /*
+                 
+
                  const queryIns = 'INSERT INTO lessons (`lesson`, `companies_id`,`classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
                 
                  connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
                     if (errorIns) throw errorIns;
                     return res.send({ error: false, data: itemsIns, message: 'Calendar added' });
                  });
-                 */
+                 
                 clearInterval(interval)
                 return res.send({ error: false, message: errori });
               } else {
@@ -697,7 +724,7 @@ app.post('/calendar/importLessons', async function (req, res) {
                  return res.send({ error: false, message: errori });
               }           
          }, 500);
-         
+         */
       });
    }
    res.end();
