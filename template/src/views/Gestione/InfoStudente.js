@@ -14,6 +14,7 @@ class infoStudente extends React.Component {
       dateOfBirth: this.props.studente.dateOfBirth,
       residence: this.props.studente.residence,
       fiscalCode: this.props.studente.fiscalCode,
+      percentage: this.props.studente.percentage,
       ritirato: this.props.studente.ritirato,
       displayCard: this.props.displayCard,
       changeInfo: false,
@@ -91,34 +92,35 @@ class infoStudente extends React.Component {
   changeInfo = (changeInfo) => {
     if (!changeInfo) {
       return (
+        <>
+          <Row className="mb-4">
+            <Col xs='8'>
+            <h2>{this.state.firstName.toUpperCase()} {this.state.lastName.toUpperCase()}</h2>
+            <h4>{this.state.email}</h4>
+            </Col>
+            <Col xs='auto' className="text-center">
+            <h3>{this.state.percentage}</h3><h5>presenze</h5>
+            </Col>
+          </Row>
+        <hr />
         <Table borderless responsive>
-          <tbody>
-            <tr>
-              <td><h5>Email:</h5></td>
-              <td><h5 id="infoEmail">{this.state.email}</h5></td>
-            </tr>
-            <tr>
-              <td><h5>Nome:</h5></td>
-              <td><h5 id="infoNome">{this.state.firstName}</h5></td>
-            </tr>
-            <tr>
-              <td><h5>Cognome:</h5></td>
-              <td><h5 id="infoCognome">{this.state.lastName}</h5></td>
-            </tr>
+          <tbody className="">
             <tr>
               <td><h5>Residenza:</h5></td>
-              <td><h5 id="infoResidenza">{this.state.residence}</h5></td>
+              <td><h4 id="infoResidenza">{this.state.residence}</h4></td>
             </tr>
             <tr>
               <td><h5>Data di nascita:</h5></td>
-              <td><h5 id="infoDataNascita">{this.state.dateOfBirth}</h5></td>
+              <td><h4 id="infoDataNascita">{this.state.dateOfBirth}</h4></td>
             </tr>
             <tr>
               <td><h5>Codice fiscale:</h5></td>
-              <td><h5 id="infoCodice">{this.state.fiscalCode}</h5></td>
+              <td><h4 id="infoCodice">{this.state.fiscalCode}</h4></td>
             </tr>
           </tbody>
         </Table>
+        
+        </>
       )
     }
     else {
@@ -218,12 +220,12 @@ class infoStudente extends React.Component {
             <b>{this.state.firstName}  {this.state.lastName}</b>
           </CardHeader> */}
           <Row>
-            <Col md="9">
+            <Col>
               <div className="m-5" xs="auto">
                 {this.changeInfo(this.state.changeInfo)}
               </div>
             </Col>
-            <Col md="3" className="my-auto mx-auto pr-5">
+            <Col xs="auto" className="my-auto mx-auto pr-5">
               {this.renderButtons(this.state.changeInfo)}
               {this.openModal()}
             </Col>

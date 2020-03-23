@@ -151,7 +151,7 @@ class Studenti extends Component {
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
+                      <Button  outline color="success"><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>
@@ -198,7 +198,7 @@ class Studenti extends Component {
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
+                      <Button outline color="success"><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>

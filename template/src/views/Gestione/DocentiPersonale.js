@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Table, Card, CardHeader, CardBody, Button, Input } from 'reactstrap';
+import {Table, Card, CardHeader, CardBody, Button, Input, Row, Col } from 'reactstrap';
 import { MDBDataTable } from 'mdbreact';
 import axios from 'axios'
 import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
@@ -17,7 +17,9 @@ class DocentiPersonale extends Component {
             lezioni: [],
             docenti: [],
             dettagliDocente: [],
-            value: '',
+            value:'',
+            changeState: false,
+            
         }
     }
 
@@ -26,7 +28,7 @@ class DocentiPersonale extends Component {
     componentDidMount() {
         this.getTeachers();
         this.getTeacherDetails();
-
+    console.log(this.state.changeState)
     }
 
 
@@ -68,7 +70,7 @@ class DocentiPersonale extends Component {
                 }));
                 let groupedPeople = this.groupBy(dettagliDocente, 'emailDocente');
 
-                dettagliDocente = groupedPeople[(dettagliDocente.find((docente) => docente.emailDocente === 'matteo@info.com'))['emailDocente']]
+                dettagliDocente = groupedPeople[(dettagliDocente.find((docente) => docente.emailDocente === this.props.user.email))['emailDocente']]
                 this.setState({
                     dettagliDocente,
                     value: dettagliDocente['0'].lessonName
@@ -90,7 +92,7 @@ class DocentiPersonale extends Component {
     }
 
     getLesson = () => {
-        let docente = this.state.docenti.find(docente => docente.emailDocente === 'matteo@info.com')
+        let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
 
         axios.get('http://localhost:8080/lessonsTeacher/' + docente.companyId)
             .then(res => {
@@ -138,6 +140,16 @@ class DocentiPersonale extends Component {
         }
     }
 
+    changeState = () => {
+        this.setState({
+            changeState: !this.state.changeState
+        })
+    }
+    changeState2 = () => {
+        this.setState({
+            changeState2: !this.state.changeState2
+        })
+    }
     getPercentage() {
         var initialValue = 0;
         let tipoLezione = this.state.lezioni.filter(item => item.lessonName === this.state.value)
@@ -149,10 +161,21 @@ class DocentiPersonale extends Component {
         return (sum / tipoLezione.length).toFixed(0)+"%"
     }
 
+    formattedDate = (d) => {
+        let date = new Date(d)
+        let month = String(date.getMonth() + 1);
+        let day = String(date.getDate());
+        const year = String(date.getFullYear());
+      
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+      
+        return `${day}/${month}/${year}`;
+      }
+
+
     selectLesson = () => {
-
-
-        let docente = this.state.docenti.find(docente => docente.emailDocente === 'matteo@info.com')
+        let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
         let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
 
         if (this.state.dettagliDocente.length === 1) {
@@ -180,27 +203,22 @@ class DocentiPersonale extends Component {
             let totalHours = (this.state.dettagliDocente.find(item => item.lessonName === this.state.value))
             return (
                 <>
-
-                    <tr>
-                        <td><h5>Lezione:</h5></td>
-                        <td><h5>
+                    {/* <th>
                             <Input type="select" name="select" id="select" className="w-auto" onChange={(e) => this.setState({ value: e.target.value })}>
                                 {this.state.dettagliDocente.map((item, i) => <option key={i} value={item.lessonName}>{item.lessonName}</option>)}
                             </Input>
-                        </h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore fatte:</h5></td>
-                        <td><h5>{this.state.value && totalHours['hoursOfLessons']}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Percentuale presenze:</h5></td>
-                        <td><h5>{this.getPercentage()}</h5></td>
-                    </tr>
+                        </th> */}
+                    <div className="d-flex justify-content-start mt-3 ml-3 mb-3">{this.state.dettagliDocente.map((item, i) => <Button value={item.lessonName} color={this.state.value === item.lessonName ? 'primary' : 'ghost-primary'} className={this.state.value === item.lessonName ? 'disabled active btn btn-pill mr-3 h-50' : 'btn btn-pill mr-3 h-50'} onClick={(e) => this.setState({ value: e.target.value })} key={i}>{item.lessonName}</Button>)}</div>
+                    <Row>
+                        <Col xs="6" className="mt-4 mb-4 text-center">
+                            <h6 className="mb-2">Ore fatte:</h6>
+                            <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
+                        </Col>
+                        <Col xs="6" className="mt-4 mb-4 text-center">
+                            <h6 className="mb-2">Percentuale presenze:</h6>
+                            <h2><b>{this.getPercentage()}</b></h2>
+                        </Col>
+                    </Row>
                 </>
             )
 
@@ -208,21 +226,7 @@ class DocentiPersonale extends Component {
 
     }
 
-    /* formatDate() {
-         var d = new Date(),
-             month = '' + (d.getMonth() + 1),
-             day = '' + d.getDate(),
-             year = d.getFullYear();
- 
-         if (month.length < 2)
-             month = '0' + month;
-         if (day.length < 2)
-             day = '0' + day;
- 
-         this.setState({ currDate : [year, month, day].join('-') })
- 
-         
-     }*/
+    
 
 
     pastLessons() {
@@ -240,6 +244,7 @@ class DocentiPersonale extends Component {
 
         const pastLesson = this.state.lezioni.filter(lezione => lezione.date < currDate).map(filtredDate => (filtredDate));
 
+        console.log(pastLesson.map(i => this.formattedDate(i.date)))
 
         const data = {
             columns: [
@@ -248,34 +253,24 @@ class DocentiPersonale extends Component {
                     field: 'date',
                 },
                 {
-                    label: 'Classe',
-                    field: 'classroom',
+                    label: 'Presenze',
+                    field: 'percentage',
                 },
                 {
                     label: 'Lezione',
                     field: 'lessonName',
                 },
                 {
-                    label: 'Orario Inizio',
-                    field: 'startTime',
+                    label: 'Classe',
+                    field: 'classroom',
                 },
-                {
-                    label: 'Orario Fine',
-                    field: 'endTime',
-                },
-                {
-                    label: 'Presenze',
-                    field: 'percentage',
-                }
             ],
             row: pastLesson
         };
 
+        if(this.state.changeState){
         return (
-            <div>
-                <CardHeader className="text-center font-weight-bold">
-                    <h5>Lezioni Passate</h5>
-                </CardHeader>
+            <div className="mb-4">
                 <CardBody>
                     <MDBDataTable
                         responsive
@@ -289,7 +284,7 @@ class DocentiPersonale extends Component {
 
             </div>
         );
-
+        }   
     }
 
     
@@ -307,11 +302,7 @@ class DocentiPersonale extends Component {
 
         const currDate = [year, month, day].join('-');
 
-
         const futureLesson = this.state.lezioni.filter(lezione => lezione.date > currDate).map(filtredDate => (filtredDate));
-
-        
-
 
         const data = {
             columns: [
@@ -324,27 +315,23 @@ class DocentiPersonale extends Component {
                     field: 'classroom',
                 },
                 {
-                    label: 'Lezione',
-                    field: 'lessonName',
-                },
-                {
                     label: 'Orario Inizio',
                     field: 'startTime',
                 },
                 {
                     label: 'Orario Fine',
                     field: 'endTime',
-                }
+                },
+                {
+                    label: 'Lezione',
+                    field: 'lessonName',
+                },
             ],
             row: futureLesson
         };
-
+        if(futureLesson.length !== 0 && !this.state.changeState){
         return (
-            <div>
-
-                <CardHeader className="text-center font-weight-bold">
-                    <h5>Lezioni Future</h5>
-                </CardHeader>
+            <div className="mb-4">
                 <CardBody>
                     <MDBDataTable
                         responsive
@@ -357,8 +344,7 @@ class DocentiPersonale extends Component {
                 </CardBody>
 
             </div>
-        );
-
+        )}else if (!this.state.changeState){return <h3 className="mb-4 text-center">A quanto pare non hai lezioni in programma!</h3>}
     }
 
 
@@ -375,128 +361,95 @@ class DocentiPersonale extends Component {
 
         const currDate = [year, month, day].join('-');
 
-        let todayLesson = [];
+        let data = new Date();
 
-        todayLesson = this.state.lezioni.filter(lezione => lezione.date === currDate);
+        let giorno = data.getDay();
+        let mese = data.getMonth();
 
-        const dataControl = this.state.lezioni.filter(lezione => (lezione.date))
 
         
-        const data = {
-            columns: [
-                {
-                    label: 'Data',
-                    field: 'date',
-                },
-                {
-                    label: 'Classe',
-                    field: 'classroom',
-                },
-                {
-                    label: 'Lezione',
-                    field: 'lessonName',
-                },
-                {
-                    label: 'Orario Inizio',
-                    field: 'startTime',
-                },
-                {
-                    label: 'Orario Fine',
-                    field: 'endTime',
-                }
-            ],
-            row: todayLesson
-        };
+        if(giorno == 0) giorno = "Domenica";
+        if(giorno == 1) giorno = "Lunedì";
+        if(giorno == 2) giorno = "Martedì";
+        if(giorno == 3) giorno = "Mercoledì";
+        if(giorno == 4) giorno = "Giovedì";
+        if(giorno == 5) giorno = "Venerdì";
+        if(giorno == 6) giorno = "Sabato";
+        
+        if(mese == 0) mese = "Gennaio";
+        if(mese == 1) mese = "Febbraio";
+        if(mese == 2) mese = "Marzo";
+        if(mese == 3) mese = "Aprile";
+        if(mese == 4) mese = "Maggio";
+        if(mese == 5) mese = "Giugno";
+        if(mese == 6) mese = "Luglio";
+        if(mese == 7) mese = "Agosto";
+        if(mese == 8) mese = "Settembre";
+        if(mese == 9) mese = "Ottobre";
+        if(mese == 10) mese = "Novembre";
+        if(mese == 11) mese = "Dicembre";
 
-
-        //console.log(this.state.lezioni.map(lezione => lezione.date === currDate))
-       
-       console.log(todayLesson.length)
+        const todayLesson = this.state.lezioni.filter(lezione => lezione.date === currDate)
 
         if (todayLesson.length !== 0) {
             return (
-                <div>
-                <div>
-                    <Button color="success" size="lg" block> TIMBRA </Button>
-                </div>
-                <div>
-
-                </div>
-                <div>
-
-
-                    <CardHeader className="text-center font-weight-bold">
-                        <h5>Lezioni Odierne</h5>
-                    </CardHeader>
+                <Card>
+                <CardHeader className="my-auto text-center">
+                   <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
+                </CardHeader>
+                <div>   
                     <CardBody>
-                        <MDBDataTable
-                            responsive
-                            hover
-                            data={{ columns: data.columns, rows: data.row }}
-                            searching={false}
-                            paging={false}
-                            noBottomColumns={true}
-                        />
+                    <Button color="success" size="lg" className="mb-3" block> TIMBRA </Button>
+                    <h3 className="text-center">{todayLesson['0'].startTime} - {todayLesson['0'].endTime}</h3>
+                    <h5 className="text-center">{todayLesson['0'].classroom}, {todayLesson['0'].lessonName}</h5>
+                    
                     </CardBody>
-
                 </div>
-            </div>
-            
-                
+            </Card>
             )
-        } else {
+        }else{
             return (
-                <Button color="success" size="lg" block disabled> TIMBRA </Button>
-               
+                <Card>
+                <CardHeader className="my-auto text-center">
+                   <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
+                </CardHeader>
+                </Card>
             )
         }
-
-
     }
 
     infoTeacher() {
-
-        let docente = this.state.docenti.find(docente => docente.emailDocente === 'matteo@info.com')
+        let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
         let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
 
-
         return (
+            <div>
+                <div>
+                    {this.todayLesson()}
+                    <div className="text-center mb-4">
+                    <h3>{docente && docente.firstName} {docente && docente.lastName}</h3>
+                    <h5>{docente && docente.emailDocente}</h5>
+                </div>
+           
+                   
+                <hr />
+                            {this.selectLesson()}
+                     
+         
+              
+                </div>
+                <hr />
+                <div className="d-flex justify-content-around mb-4">
+                    {this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button>}
 
-            <div className="d-flex justify-content-center ml-3">   
-                <Card className="w-75">
-                {this.todayLesson()}
-                    <CardHeader className="text-center font-weight-bold">
-                        <h5>AREA PERSONALE</h5>
-                    </CardHeader>
-                    <CardBody>
-                        <Table borderless responsive>
-                            <tbody>
-                                <tr>
-                                    <td><h5>Nome:</h5></td>
-                                    <td><h5>{docente && docente.firstName}</h5></td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Cognome: </h5></td>
-                                    <td><h5 >{docente && docente.lastName}</h5></td>
-                                </tr>
-                                <tr>
-                                    <td><h5>Nome azienda:</h5></td>
-                                    <td><h5>{dettaglioDocente && dettaglioDocente.companyName === 'matteo@info.com' ? '' : dettaglioDocente && dettaglioDocente.companyName}</h5> </td>
-                                </tr>
-                                {this.selectLesson()}
-                            </tbody>
-                        </Table>
-
-                    </CardBody>
-                    {this.futureLessons()}
-                    {this.pastLessons()}
-                </Card>
+                    {!this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button>}
+                </div>
+                
+                {this.futureLessons()}
+                {this.pastLessons()}
             </div>
         );
     }
-
-
-
 
     render() {
         return this.infoTeacher()

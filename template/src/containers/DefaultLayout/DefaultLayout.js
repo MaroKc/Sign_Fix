@@ -81,17 +81,19 @@ class DefaultLayout extends Component {
 
   render() {
     const classe = this.state.classe;
+    const user = this.state.user
     return (
-      <div className="app">
-        {classe && (
+      <div className="app" style={user && user.responsible_level !== 2  ? {background: "white"} : null}>
+
+      
           <AppHeader fixed>
             <Suspense fallback={this.loading()}>
-              <DefaultHeader onLogout={e => this.signOut(e)} />
+              <DefaultHeader onLogout={e => this.signOut(e)} classe={this.state.classe} />
             </Suspense>
           </AppHeader>)
-        }
-        <div className="app-body">
+    
 
+        <div className="app-body">
           {classe  && (
             <AppSidebar fixed display="lg">
               <AppSidebarHeader />
@@ -106,7 +108,7 @@ class DefaultLayout extends Component {
           )}
 
           <main className="main">
-            <AppBreadcrumb appRoutes={this.state.routes} router={router} />
+          {classe &&  <AppBreadcrumb appRoutes={this.state.routes} router={router} /> }
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
