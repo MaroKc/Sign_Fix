@@ -21,15 +21,15 @@ class DefaultHeader extends Component {
 
     return (
       <React.Fragment>
-        <AppSidebarToggler className="d-lg-none"  mobile />
+        {this.props.classe && <AppSidebarToggler className="d-lg-none"  mobile /> }
        
         {/* <AppNavbarBrand
         className=""
           full={{ src: logo, width: 89, height: 25, alt: 'SignFix' }}
           minimized={{ src: sygnet, width: 30, height: 30, alt: 'SignFix' }}
         /> */}
-        <AppSidebarToggler className="d-md-down-none mr-auto"/>
-      </React.Fragment>
+           {this.props.classe && <AppSidebarToggler className="d-md-down-none mr-auto"/> }
+      </React.Fragment>     
     );
   }
 }

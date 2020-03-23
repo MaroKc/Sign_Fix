@@ -91,9 +91,8 @@ class Docenti extends Component {
       if (res.data.message === "ok") {
         this.refresh();
         ToastsStore.success(" è stato aggiunto alla lista docenti!");
-      }else if (res.data.message === "esistente") {
-        ToastsStore.warning(" OPS");
-      }
+      }else if (res.data.message === "esistente") ToastsStore.warning("OPS, la mail è stata già inserita");
+
     })
     this.setState({
      firstName: '', lastName: '', emailDocente: '', companyName: ''
@@ -206,7 +205,7 @@ handleChange = (event) => {
                     <span className="font-weight-bold"><h3><b>DOCENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                    <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
+                    <span> <Button outline color="success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
                   </Col>
                 </Row>
               </CardHeader>
@@ -252,7 +251,7 @@ handleChange = (event) => {
                     <span className="font-weight-bold"><h3><b>DOCENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                    <span> <Button color="ghost-success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
+                    <span> <Button outline color="success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
                   </Col>
                 </Row>
               </CardHeader>
@@ -337,6 +336,7 @@ handleChange = (event) => {
           </CardBody>
           <Button onClick={this.refresh} outline color="dark"> Indietro </Button>
         </Card>
+        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
       </div>
     )
   }

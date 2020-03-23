@@ -3,6 +3,7 @@ import { Route, Redirect, Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 import axios from 'axios';
 import { GoogleLogin } from 'react-google-login';
+import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 
 class Login extends Component {
@@ -19,7 +20,7 @@ class Login extends Component {
     this.state = {
       user: null,
       pswd: null,
-      status: false
+      status: false,
     }
   }
 
@@ -33,34 +34,30 @@ class Login extends Component {
 
   renderRedirect = () => {
     if (this.state.status) {
-      return <Redirect to='/classi' />
+      return <Redirect to='/' />
     }
   }
+
 
   login() {
     axios.post('http://localhost:8080/auth', { email: this.state.user, pass: this.state.pswd })
       .then(res => {
-        if (res.data.error) {
-          console.log("FAILs")
+        console.log(res.data.message)
+        if (res.data.message === false) {
+          ToastsStore.warning("Username o Password errati");
         } else {
-          console.log(res.data.message)
           sessionStorage.setItem("utente", JSON.stringify(res.data.message));
-
           this.setState({ status: true });
         }
       })
   }
 
   googleauth = (cod) => {
-
     if (cod.code) {
-
       axios.post('http://localhost:8080/tokensignin', { code: cod.code })
         .then(res => {
-
-          sessionStorage.setItem("utente", JSON.stringify(res.data.message));
+          sessionStorage.setItem("utente", JSON.stringify(res.data.data));
           this.setState({ status: true });
-
         })
     } else {
       // There was an error.
@@ -72,6 +69,7 @@ class Login extends Component {
     return (
       <div className="app flex-row align-items-center">
         {this.renderRedirect()}
+        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
         <Container>
           <Row className="justify-content-center">
             <Col md="8">
@@ -80,7 +78,6 @@ class Login extends Component {
                   <CardBody>
                     <Form>
                       <h2 className="py-2">Supervisori</h2>
-
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
