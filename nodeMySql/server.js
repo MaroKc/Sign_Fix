@@ -545,7 +545,7 @@ app.post('/calendar/importLessons', async function (req, res) {
 
    const email = escape(req.body.email);
    const idCalendar = escape(req.body.token);
-   const courseID = escape(req.body.courseID);
+   const courseID = escape(req.body.corso);
 
 
    const oAuth2Client = new OAuth2Client(
@@ -603,10 +603,10 @@ app.post('/calendar/importLessons', async function (req, res) {
 
    let ProfCheck = (teacher) => {
       return new Promise(function (resolve, reject) {
-         const queryProf = 'SELECT id FROM companies WHERE name like "%?%" ';
-         connection.query(queryProf, [teacher], function (errorProf, resultsProf, fields) {
+         const queryProf = 'SELECT id FROM companies WHERE name like "%'+teacher+'%" ';
+         connection.query(queryProf, function (errorProf, resultsProf, fields) {
             if (errorProf) { throw reject(new Error(errorProf)); }
-            if (resultsProf.length == 0) { resolve(false); } else { resolve(queryProf[0].id); }
+            if (resultsProf.length == 0) { resolve(false); } else { resolve(resultsProf[0].id); }
          });
       });
    }
@@ -635,40 +635,32 @@ app.post('/calendar/importLessons', async function (req, res) {
          timeMin: (new Date()).toISOString(),
          singleEvents: true,
          orderBy: 'startTime',
-      }, async (err, resu) => {
+      },  async(err, resu) => {
          if (err) return console.log('The API returned an error: ' + err);
          const events = resu.data.items;
 
-         const errori = [];
-         const datiInsert = [];
+         var errori = [];
+         var datiInsert = [];
 
          if (events.length) {
 
             events.map(async (event, i) => {
-               const riga = {}
+               var riga = {}
 
                try {
                   const classroom = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[0]));
                   const teacher = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[1].split(',')[0]));
                   const lessontype = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[1].split(',')[1]));
-
                   const dateStart = new Date(event.start.dateTime);
                   const dateEnd = new Date(event.end.dateTime);
-
                   const timeStart = dateStart.getHours() + dateStart.getMinutes() / 60;
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
-
                   const totalHours = timeEnd - timeStart;
-               
-
                   const checkProf = await ProfCheck(teacher);
-                  const checkLeasson = await LeassonCheck(lessontype);
-                  console.log(event.summary)
+                  const checkLeasson =lessontype;
+
                   if (checkProf === false) {
                      riga.prof = false;
-                  }
-                  if (checkLeasson === false) {
-                     riga.leasson = false;
                   }
 
                   if (Object.entries(riga).length !== 0) {
@@ -676,36 +668,36 @@ app.post('/calendar/importLessons', async function (req, res) {
                      riga.dataEnd = dateEnd;
                      errori.push(riga);
                   } else {
-                     datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
-                     console.log('dati da inserire')
+                     datiInsert.push([lessontype,checkProf, classroom, courseID, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
                   }
 
                } catch (err) {
-                  return res.send({ error: false, data: error, message: 'Errore di salvataggio dei dati' });
+                  return res.send({ error: false, data: err, message: 'Errore di salvataggio dei dati' });
                }
-
-
-            });
+            }); //fine map
+                        
          } else {
-            return res.send({ error: false, data: error, message: 'Non sono stati trovanti eventi salvati nel calendario' });
+            return res.send({ error: false, message: 'Non sono stati trovanti eventi salvati nel calendario' });
          }
-         console.log(errori)
-         if (errori.length === 0) {
-            console.log("Dati inseriti con successo")
-            console.log(datiInsert)
-
-            /*
-            const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
-           
-            connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
-               if (errorIns) throw errorIns;
-               return res.send({ error: false, data: items, message: 'Calendar added' });
-            });*/
-         } else {
-            console.log("Dati non inseriti, ci sono degli errori")
-            console.log(errori);
-         }
-
+         var interval= setInterval(() => {
+               if (errori.length === 0) {
+                  console.log(datiInsert)
+                 /*
+                 const queryIns = 'INSERT INTO lessons (`lesson`, `companies_id`,`classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+                
+                 connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
+                    if (errorIns) throw errorIns;
+                    return res.send({ error: false, data: itemsIns, message: 'Calendar added' });
+                 });
+                 */
+                clearInterval(interval)
+                return res.send({ error: false, message: errori });
+              } else {
+               clearInterval(interval)
+                 return res.send({ error: false, message: errori });
+              }           
+         }, 500);
+         
       });
    }
    res.end();
