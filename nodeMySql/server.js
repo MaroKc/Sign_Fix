@@ -3,6 +3,7 @@ var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
 app.use(bodyParser.json());
+var nodemailer = require('nodemailer');
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
 
@@ -330,6 +331,7 @@ app.post('/createTeacher', function (req, res) {
                })
                connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0) ", function (error, result, fields) {
                   if (error) throw error;
+                  tools.sendEmails(emailDocente,"credenziali","questa è la tua pass")
                   return res.send({ error: false, result: result, message: 'ok' });
                });
             } else {
@@ -348,6 +350,7 @@ app.post('/createTeacher', function (req, res) {
                      })
                      connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                         if (error) throw error;
+                        tools.sendEmails(emailDocente,"credenziali","questa è la tua pass")
                         return res.send({ error: false, result: result, message: 'ok' });
                      });
                   }
@@ -611,20 +614,6 @@ app.post('/calendar/importLessons', async function (req, res) {
       });
    }
 
-   let addLessons = (list) => {
-      return new Promise( function (resolve, reject) {
-
-         const queryIns = 'INSERT INTO lessons (`lesson`, `companies_id`,`classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
-         if (list) { resolve (list); } else { resolve (false); }
-         /*
-         connection.query(queryIns, [list], function (errorIns, itemsIns, fields) {
-            if (errorIns) throw errorIns;
-            if (itemsIns) { resolve(false); } else { resolve(true); }
-         });
-         */
-      });
-
-   }
 
    let LeassonCheck =  (lessontype) => {
       return new Promise( function (resolve, reject) {
@@ -675,7 +664,7 @@ app.post('/calendar/importLessons', async function (req, res) {
                   const checkLeasson =lessontype;
 
                   if (checkProf === false) {
-                     riga.prof = false;
+                     riga.prof = "Sconosciuto";
                   }
 
                   if (Object.entries(riga).length !== 0) {
@@ -695,39 +684,26 @@ app.post('/calendar/importLessons', async function (req, res) {
             return res.send({ error: false, message: 'Non sono stati trovanti eventi salvati nel calendario' });
          }  
 
-         (async function() {
-            const PrintLEssons=  await addLessons(datiInsert)
-            console.log(PrintLEssons);
-
-         // outputs `[2, 3, 5]` after five seconds
-          })();
-
-           
-         //console.log(datiInsert)
-         /*
          var interval= setInterval(() => {
-               if (errori.length === 0) {
-                  console.log(datiInsert)
-                 
-
+               if (errori.length === 0) {                 
+            
                  const queryIns = 'INSERT INTO lessons (`lesson`, `companies_id`,`classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
                 
                  connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
                     if (errorIns) throw errorIns;
-                    return res.send({ error: false, data: itemsIns, message: 'Calendar added' });
+                   
                  });
-                 
-                clearInterval(interval)
-                return res.send({ error: false, message: errori });
-              } else {
-               clearInterval(interval)
-                 return res.send({ error: false, message: errori });
-              }           
+                 clearInterval(interval)
+                 return res.send({ error: false, message: 'calendaroOk' });
+              }  
+              else{
+                 clearInterval(interval)
+                 console.log(errori)
+                 return res.send({ error: false,data:errori, message: 'calendarioKo' });
+              }     
          }, 500);
-         */
       });
    }
-   res.end();
 });
 
 

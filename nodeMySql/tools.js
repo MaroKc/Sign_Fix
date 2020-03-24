@@ -43,3 +43,28 @@ exports.formattedDecimal = (hoursToFormats) =>{
     return hoursToFormats="0"
   }  
 }
+
+exports.sendEmails = (emailTo,objectEmail,text) => {
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'registro.luca.pw@gmail.com',
+      pass: 'fitstic2020'
+    }
+  });
+  
+  var mailOptions = {
+    from: 'registro.luca.pw@gmail.com',
+    to: emailTo,
+    subject: objectEmail,
+    text: text
+  };
+  
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+     return true;
+    } else {
+      return false;
+    }
+  }); 
+}
