@@ -1,4 +1,6 @@
 
+
+
 exports.stringTrim =(textToTrim) => {
     return textToTrim.replace(/^\s+|\s+$/gm,'');
   }
@@ -43,3 +45,4 @@ exports.formattedDecimal = (hoursToFormats) =>{
     return hoursToFormats="0"
   }  
 }
+

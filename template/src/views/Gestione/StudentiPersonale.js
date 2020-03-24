@@ -18,7 +18,9 @@ class StudentiPersonale extends Component {
 
 
     getStudents = () => {
-        axios.get('http://localhost:8080/listStudents/'+ this.props.user.id_course)
+        console.log(this.props.user)
+        console.log(this.props.user['0'].id_course)
+        axios.get('http://localhost:8080/listStudents/'+ this.props.user['0'].id_course)
           .then(res => res.data)
           .then((data, index) => {
             const studenti = [];
@@ -56,7 +58,7 @@ class StudentiPersonale extends Component {
 
     infoStudent = () => {
 
-        let studente = this.state.studenti.find(studente => studente.email === this.props.user.email)
+        let studente = this.state.studenti.find(studente => studente.email === this.props.user['0'].email)
 
         return(
 

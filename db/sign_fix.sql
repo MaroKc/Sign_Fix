@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 10, 2020 at 02:01 PM
+-- Generation Time: Mar 24, 2020 at 05:19 PM
 -- Server version: 8.0.19-0ubuntu0.19.10.3
 -- PHP Version: 7.3.11-0ubuntu0.19.10.3
 
@@ -77,8 +77,8 @@ CREATE TABLE `companies` (
 
 INSERT INTO `companies` (`id`, `name`) VALUES
 (1, 'flowing'),
-(2, 'matteo@info.com'),
-(3, 'brizio@info.com');
+(2, 'matteo mascellani'),
+(3, 'cesare brizio');
 
 -- --------------------------------------------------------
 
@@ -124,7 +124,8 @@ CREATE TABLE `google_token` (
 --
 
 INSERT INTO `google_token` (`email`, `access_token`, `refresh_token`, `scope`, `token_type`, `expiry_date`) VALUES
-('daniele.marocchi.studio@fitstic-edu.com', 'ya29.a0Adw1xeUlZ-2Dn5pjoRTOvevZ5SiV-2NSkCtjVQ7W5R0p-qWaEr8jAGzrMQ1JqQel7i341OWnITojHqcwVnlyny62J8LvRHWEXkAz7Cw_EI9eZrjh50gusl7NK2POiKTIlnWeS-BibPqbo60IavuBYY_htluKcRBOdnc', '1//0cQV1XdDEBcMfCgYIARAAGAwSNwF-L9Ir2E1AWn9Qt7fhWQgRCJWlLAvQUurt6DQN7aDM9VU6f0-XMXUmvXTZ3iwlhVdKHXI3Ru4', 'openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar.readonly', 'Bearer', '1582508544511');
+('daniele.marocchi.studio@fitstic-edu.com', 'ya29.a0Adw1xeWc_fd_JThCVm5vTyvyqIWMVTsZM6uEBqRzPTxhfe_KsTB9UETqAEhlfVEbG044GzIfP7sfBUnCnH1ozrFYty3VKT0nXXeHZriptSIgz5OMwg_XWmKmnsJKX08jZw1tzLYjy1ZIGsbauPSFmYD56Te1XbPA9OGE6Q', '1//0cQV1XdDEBcMfCgYIARAAGAwSNwF-L9Ir2E1AWn9Qt7fhWQgRCJWlLAvQUurt6DQN7aDM9VU6f0-XMXUmvXTZ3iwlhVdKHXI3Ru4', 'openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar.readonly', 'Bearer', '1584984776718'),
+('niccolo.zona.studio@fitstic-edu.com', 'ya29.a0Adw1xeWN56EqJkTFDwrtLz9qYrxVQMdNwos0yXVqIddKIHG8LPIedXebGvc0xed_ZIyy7yLaaD5s-FtJdEfp4St_sOO0fdZl5PC4TG1qxrC5MBV_wJze3GmH4-5imKmCl_ScenhrOse4N1df-hXrX9pY-WHyVjTLlPY', '1//09jKZjQvcnHwRCgYIARAAGAkSNwF-L9IrvRPF_E9vcn0JRgKiPtivzXBhY87XVvm342r9bu9ZhCI6--rFCdNpZWQEKX7tq1rgf88', 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/calendar.readonly', 'Bearer', '1584692520574');
 
 -- --------------------------------------------------------
 
@@ -181,8 +182,12 @@ INSERT INTO `lessons` (`id`, `lesson`, `email_signature`, `companies_id`, `class
 (119, 'database', 'brizio@info.com', 3, 'comandini', 1, '2020-02-12', 14, 18, 4, '07/02/2020', NULL, NULL, NULL),
 (120, 'php', 'matteo@info.com', 2, 'comandini', 1, '2020-02-11', 9, 13, 4, '07/02/2020', NULL, NULL, NULL),
 (121, 'metodologia agile', 'michele@info.com', 1, 'maggioli', 1, '2020-02-11', 14, 17, 3, '07/02/2020', NULL, NULL, NULL),
-(124, 'metodologia agile', 'michele@info.com', 1, 'comandini', 3, '2020-02-10', 8.5, 11, 2.5, '07/02/2020', NULL, NULL, NULL),
-(125, 'php recupero', 'matteo@info.com', 2, 'comandini', 1, '2020-03-06', 9, 13, 4, '07/02/2020', NULL, NULL, NULL);
+(124, 'agile II', 'michele@info.com', 1, 'comandini', 3, '2020-03-10', 14, 17, 3, '07/02/2020', NULL, NULL, NULL),
+(125, 'php recupero', 'matteo@info.com', 2, 'comandini', 1, '2020-03-06', 9, 13, 4, '07/02/2020', NULL, NULL, NULL),
+(153, 'metodologia agile', NULL, 1, 'lezione online', 1, '2020-03-24', 9, 11, 2, '2020-03-23', NULL, NULL, NULL),
+(154, 'php', NULL, 2, 'lezione online', 1, '2020-03-26', 9, 13, 4, '2020-03-23', NULL, NULL, NULL),
+(155, 'php', NULL, 2, 'lezione online', 1, '2020-03-31', 14, 17, 3, '2020-03-23', NULL, NULL, NULL),
+(156, 'python', NULL, 0, 'lezione online', 1, '2020-04-01', 13, 16.5, 3.5, '2020-03-23', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -204,9 +209,7 @@ CREATE TABLE `questionnaires` (
 
 CREATE TABLE `responsibles_auth` (
   `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `password` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `first_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `last_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `responsible_level` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -214,8 +217,9 @@ CREATE TABLE `responsibles_auth` (
 -- Dumping data for table `responsibles_auth`
 --
 
-INSERT INTO `responsibles_auth` (`email`, `password`, `first_name`, `last_name`, `responsible_level`) VALUES
-('luca@info.com', '12345', 'Luca', 'Arcangeli', 2);
+INSERT INTO `responsibles_auth` (`email`, `password`, `responsible_level`) VALUES
+('luca@info.com', '$2b$10$yaO5ym2QPHILziGZKs/z1eWygyig9aCO9OZORyEHLqTtiQsbJaz6S', 2),
+('matteo@info.com', '12345', 4);
 
 -- --------------------------------------------------------
 
@@ -245,9 +249,9 @@ CREATE TABLE `signatures_students` (
 --
 
 INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`, `date`, `current_start_time`, `current_end_time`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`, `lost_hours`, `mattinaPomeriggio`, `email_supervisor_modify`, `modify_date`) VALUES
-(1, '1', 'acookek@nps.gov', '2020-02-10', NULL, NULL, 8.5, 11.5, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
+(1, '1', 'acookek@nps.gov', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-11'),
 (2, '2', 'ajardeinl@163.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
-(3, '3', 'azeale0@linkedin.com', '2020-02-10', NULL, NULL, 8.5, 8.33, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
+(3, '3', 'azeale0@linkedin.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-11'),
 (4, '4', 'bjuggingj@alibaba.com', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-06'),
 (5, '4', 'chackinga@g.co', '2020-02-10', NULL, NULL, 8.5, 11, 1, 2.5, NULL, 0, NULL, '2020-03-05'),
 (6, '4', 'cweineb@businessinsider.com', '2020-02-10', NULL, NULL, 8.53, 11, 1, 2.5, NULL, 0, NULL, '2020-03-06'),
@@ -274,29 +278,29 @@ INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`,
 (28, '3', 'azeale0@linkedin.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (29, '4', 'bjuggingj@alibaba.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (30, '4', 'chackinga@g.co', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
-(31, '4', 'cweineb@businessinsider.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, '2020-03-05'),
+(31, '4', 'cweineb@businessinsider.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, '2020-03-10'),
 (32, '4', 'ecoalburnm@cnbc.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
-(33, '4', 'dmycockf@posterous.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
+(33, '4', 'dmycockf@posterous.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, '2020-03-12'),
 (34, '4', 'evellad@fc2.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
-(35, '4', 'fdecourtc@hp.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
+(35, '4', 'fdecourtc@hp.com', '2020-02-10', NULL, NULL, 15.42, 18, 2, 2.58, NULL, 1, NULL, '2020-03-12'),
 (36, '4', 'hnatalie6@networkadvertising.org', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (37, '4', 'iallnatto@e-recht24.de', '2020-02-10', NULL, NULL, 15.28, 17.83, 2, 4, NULL, 1, NULL, '2020-03-06'),
 (38, '4', 'jbenniee@epa.gov', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (39, '4', 'ktrouel4@alexa.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (40, '4', 'lblasiak2@amazonaws.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
-(41, '4', 'lrodnight5@123-reg.co.uk', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
+(41, '4', 'lrodnight5@123-reg.co.uk', '2020-02-10', NULL, NULL, 16.33, 18, 2, 1.67, NULL, 1, NULL, '2020-03-12'),
 (42, '2', 'zvanhault8@twitpic.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (43, '4', 'rclynmans9@gravatar.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (44, '4', 'rferrandn@wufoo.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
-(45, '4', 'storri3@surveymonkey.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
+(45, '4', 'storri3@surveymonkey.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, '2020-03-12'),
 (46, '4', 'tbeldani@google.fr', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (47, '4', 'tgrimes1@linkedin.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (48, '4', 'ustouteh@paginegialle.it', '2020-02-10', NULL, NULL, 14, 18, 2, 4, NULL, 1, NULL, NULL),
 (50, '4', 'hszachniewicz7@eventbrite.com', '2020-02-10', NULL, NULL, 14, 18, 2, 4, 0, 1, NULL, NULL),
 (51, '1', 'acookek@nps.gov', '2020-02-11', NULL, NULL, 9, 13, 120, 4, NULL, 0, NULL, NULL),
-(52, '2', 'ajardeinl@163.com', '2020-02-11', NULL, NULL, 9, 13, 120, 4, NULL, 0, NULL, NULL),
-(53, '3', 'azeale0@linkedin.com', '2020-02-11', NULL, NULL, 9, 13, 120, 4, NULL, 0, NULL, NULL),
-(54, '4', 'bjuggingj@alibaba.com', '2020-02-11', NULL, NULL, 9, 13, 120, 4, NULL, 0, NULL, NULL),
+(52, '2', 'ajardeinl@163.com', '2020-02-11', NULL, NULL, 9, 10, 120, 1, NULL, 0, NULL, '2020-03-20'),
+(53, '3', 'azeale0@linkedin.com', '2020-02-11', NULL, NULL, 9.5, 10, 120, 0.5, NULL, 0, NULL, '2020-03-20'),
+(54, '4', 'bjuggingj@alibaba.com', '2020-02-11', NULL, NULL, 9, 10, 120, 1, NULL, 0, NULL, '2020-03-20'),
 (55, '4', 'chackinga@g.co', '2020-02-11', NULL, NULL, 9, 13, 120, 4, NULL, 0, NULL, NULL),
 (56, '4', 'cweineb@businessinsider.com', '2020-02-11', NULL, NULL, 9, 13, 120, 4, NULL, 0, NULL, NULL),
 (57, '4', 'ecoalburnm@cnbc.com', '2020-02-11', NULL, NULL, 9, 13, 120, 4, NULL, 0, NULL, NULL),
@@ -424,8 +428,8 @@ INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`,
 (179, '2', 'ajardeinl@163.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (180, '3', 'azeale0@linkedin.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (181, '4', 'bjuggingj@alibaba.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
-(182, '4', 'chackinga@g.co', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
-(183, '4', 'cweineb@businessinsider.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
+(182, '4', 'chackinga@g.co', '2020-02-17', NULL, NULL, 11.5, 12, 113, 2.5, NULL, 0, NULL, '2020-03-10'),
+(183, '4', 'cweineb@businessinsider.com', '2020-02-17', NULL, NULL, 10.5, 12, 113, 2.5, NULL, 0, NULL, '2020-03-10'),
 (184, '4', 'ecoalburnm@cnbc.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (185, '4', 'dmycockf@posterous.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (186, '4', 'evellad@fc2.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
@@ -441,7 +445,7 @@ INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`,
 (196, '4', 'rclynmans9@gravatar.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (197, '4', 'rferrandn@wufoo.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (198, '4', 'storri3@surveymonkey.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
-(199, '4', 'tbeldani@google.fr', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
+(199, '4', 'tbeldani@google.fr', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, '2020-03-10'),
 (200, '4', 'tgrimes1@linkedin.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (201, '4', 'ustouteh@paginegialle.it', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, NULL, 0, NULL, NULL),
 (202, '4', 'hszachniewicz7@eventbrite.com', '2020-02-17', NULL, NULL, 9.5, 12, 113, 2.5, 0, 0, NULL, NULL),
@@ -545,17 +549,17 @@ INSERT INTO `signatures_students` (`id`, `code_authentication`, `email_student`,
 (300, '4', 'tgrimes1@linkedin.com', '2020-02-19', NULL, NULL, 9, 13, 4, 4, NULL, 0, NULL, NULL),
 (301, '4', 'ustouteh@paginegialle.it', '2020-02-19', NULL, NULL, 9, 13, 4, 4, NULL, 0, NULL, NULL),
 (302, '4', 'hszachniewicz7@eventbrite.com', '2020-02-19', NULL, NULL, 1, 1, 4, 0, 4, 0, NULL, NULL),
-(303, '1', 'acookek@nps.gov', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(304, '2', 'ajardeinl@163.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(305, '3', 'azeale0@linkedin.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(306, '4', 'bjuggingj@alibaba.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(307, '4', 'chackinga@g.co', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(308, '4', 'cweineb@businessinsider.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(309, '4', 'ecoalburnm@cnbc.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(310, '4', 'dmycockf@posterous.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(311, '4', 'evellad@fc2.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(312, '4', 'fdecourtc@hp.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
-(313, '4', 'hnatalie6@networkadvertising.org', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
+(303, '1', 'acookek@nps.gov', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(304, '2', 'ajardeinl@163.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(305, '3', 'azeale0@linkedin.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(306, '4', 'bjuggingj@alibaba.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(307, '4', 'chackinga@g.co', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(308, '4', 'cweineb@businessinsider.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(309, '4', 'ecoalburnm@cnbc.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(310, '4', 'dmycockf@posterous.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(311, '4', 'evellad@fc2.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(312, '4', 'fdecourtc@hp.com', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
+(313, '4', 'hnatalie6@networkadvertising.org', '2020-02-26', NULL, NULL, 1, 1, 110, 0, NULL, 1, NULL, NULL),
 (314, '4', 'iallnatto@e-recht24.de', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
 (315, '4', 'jbenniee@epa.gov', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
 (316, '4', 'ktrouel4@alexa.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, 1, NULL, NULL),
@@ -632,7 +636,8 @@ INSERT INTO `signatures_teachers` (`id`, `email_responsible`, `date`, `current_s
 (11, 'brizio@info.com', '2020-02-18', NULL, NULL, 14, 18, 112, 4, NULL, NULL, NULL),
 (12, 'michele@info.com', '2020-02-19', NULL, NULL, 9, 13, 4, 4, NULL, NULL, NULL),
 (13, 'michele@info.com', '2020-02-26', NULL, NULL, 14, 17, 110, 3, NULL, NULL, NULL),
-(15, 'matteo@info.com', '2020-03-06', NULL, NULL, 9, 13, 125, 4, NULL, NULL, NULL);
+(15, 'matteo@info.com', '2020-03-06', NULL, NULL, 9, 13, 125, 4, NULL, NULL, NULL),
+(16, 'michele@info.com', '2020-03-10', NULL, NULL, 14, 17, 124, 3, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -656,7 +661,7 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES
-('acookek@nps.gov', 'Angila', 'Cooke', '30/08/2019', 'Kanye', 'VLLRNN10E21L736C', 1, 0),
+('acookek@nps.gov', 'Angilo', 'Cooke', '30/08/2019', 'Kanye', 'VLLRNN10E21L736C', 1, 0),
 ('ajardeinl@163.com', 'Antonio', 'Jasd', '08/01/2020', 'España', 'VLLRNN10E21L736C', 1, 0),
 ('alberto.spinardi.jr@outlook.it', 'alberto junior', 'spinardi', '08/07/1999', 'via nino bixio n. 35', 'SPNLRT99L08H294M', 3, 0),
 ('amicoexe@gmail.com', 'leonardo', 'grandolfo', '17/04/1999', 'via san michele 22', 'GRNLRD99D17L219L', 3, 0),
@@ -703,26 +708,34 @@ INSERT INTO `students` (`email`, `first_name`, `last_name`, `date_of_birth`, `re
 ('ustouteh@paginegialle.it', 'Ursuline', 'Stoute', '11/11/2019', 'Zhonggang', 'VLLRNN10E21L736C', 1, 0),
 ('valmori.paolo@gmail.com', 'paolo', 'valmori', '29/03/1993', 'via risorgimento n. 252', 'VLMPLA93C29A944O', 3, 0),
 ('zh.colombarone@gmail.com', 'zakaria', 'habibi', '02/10/1996', 'strada di vincolungo n. 4', 'HBBZKR96R02L500X', 3, 0),
-('zonaniccolo92@gmail.com', 'niccol�', 'zona', '30/09/1992', 'via bizzarri n. 70', 'ZNONCL92P30G596T', 3, 0),
+('zonaniccolo92@gmail.com', 'niccolò', 'zona', '30/09/1992', 'via bizzarri n. 70', 'ZNONCL92P30G596T', 3, 0),
 ('zvanhault8@twitpic.com', 'Zabrina', 'Van Hault', '24/08/2019', 'La Agustina', 'ZNONCL65P24G596T', 1, 0);
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `supervisors`
 --
+
 CREATE TABLE `supervisors` (
   `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `id_course` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 --
 -- Dumping data for table `supervisors`
 --
+
 INSERT INTO `supervisors` (`email_responsible`, `id_course`) VALUES
 ('luca@info.com', 1),
 ('luca@info.com', 3);
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `teachers`
 --
+
 CREATE TABLE `teachers` (
   `email_responsible` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `first_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -731,13 +744,15 @@ CREATE TABLE `teachers` (
   `companies_id` int DEFAULT NULL,
   `ritirato` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 --
 -- Dumping data for table `teachers`
 --
+
 INSERT INTO `teachers` (`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES
-('brizio@info.com', 'Brizia', 'rossi', 1, 3, 0),
-('matteo@info.com', 'mattea', 'morandi', 1, 2, 0),
-('michele@info.com', 'michele', 'lampada', 1, 1, 0),
+('brizio@info.com', 'Cesare', 'Brizio', 1, 3, 0),
+('matteo@info.com', 'Matteo', 'Mascellani', 1, 2, 0),
+('michele@info.com', 'Michele', 'lampado', 1, 1, 0),
 ('simone@info.com', 'simone', 'd\'amico', 1, 1, 0);
 
 -- --------------------------------------------------------
@@ -859,7 +874,7 @@ ALTER TABLE `anagrafica`
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `courses`
@@ -877,7 +892,7 @@ ALTER TABLE `judgments`
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=157;
 
 --
 -- AUTO_INCREMENT for table `questionnaires`
@@ -895,7 +910,7 @@ ALTER TABLE `signatures_students`
 -- AUTO_INCREMENT for table `signatures_teachers`
 --
 ALTER TABLE `signatures_teachers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `type_lesson`

@@ -2,6 +2,9 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
+const nodemailer = require('nodemailer');
+var bcrypt = require('bcrypt');
+
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
@@ -9,9 +12,6 @@ app.use(bodyParser.json());
 const { google } = require('googleapis');
 const tools = require('./tools');
 const keys = require('./outh2.key.json');
-
-const nodemailer = require('nodemailer');
-const md5 = require('md5');
 
 const connectionDB = require('./connectionDB');
 const connection = connectionDB.createConnectionDB();
@@ -140,18 +140,27 @@ app.post('/tokensignin', function (req, res) {
 
 
 app.post('/auth', function (req, res) {
-
-   connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(req.body.email) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
-      if (error) throw error;
-
-      if(results.length == 1) {
-
-         //DA CRIPTARE LA PSWD perchè si salva nel client
-         res.send({ error: false, message: results[0] });
-      } else {
-         res.send({ error: true, message: false });
-      }
-   });
+   var pass =req.body.pass
+   console.log(typeof(pass))
+   var query = 'SELECT * FROM responsibles_auth WHERE email = ?'
+   connection.query(query,[req.body.email], function (error, results, fields) {
+      if (error) {
+         throw error;
+         }else{
+         if(results.length >0){
+               bcrypt.compare(pass, results[0].password, function(err, ress) {
+                  if(!ress){
+                      res.send({ error: true, message: false });
+                  }else{                    
+                      res.send({ error: false, message: results[0] });
+                  }
+               });         
+         }
+         else{
+          res.send({ error: true, message: false });
+         }
+         }
+      });
    
 });
 
@@ -346,6 +355,8 @@ app.post('/createTeacher', function (req, res) {
    var objectEmail = 'Credenziali Fitstic'
    var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
   
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password.toString(), salt);
 
    connection.query("SELECT * FROM teachers where email_responsible='"+emailDocente+"'", function (e, row, fields) {
       if (e) throw error;
@@ -362,8 +373,8 @@ app.post('/createTeacher', function (req, res) {
                })
                connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0) ", function (error, result, fields) {
                   if (error) throw error;
-                  sendEmails(emailDocente, objectEmail, textEmail)
-                  connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+(password)+"',4)", function (errorAuth, resultAuth, fields) {
+                  sendEmails(emailDocente,objectEmail,textEmail)
+                  connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+hash+"',4)", function (errorAuth, resultAuth, fields) {
                      if (errorAuth) throw errorAuth;
                   });
                   return res.send({ error: false, result: result, message: 'ok' });
@@ -384,8 +395,8 @@ app.post('/createTeacher', function (req, res) {
                      })
                      connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                         if (error) throw error;
-                        sendEmails(emailDocente, objectEmail, textEmail)
-                        connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+(password)+"',4)", function (errorAuth, resultAuth, fields) {
+                        sendEmails(emailDocente,objectEmail,textEmail)
+                        connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+hash+"',4)", function (errorAuth, resultAuth, fields) {
                            if (errorAuth) throw errorAuth;
                         });
                         return res.send({ error: false, result: result, message: 'ok' });
@@ -421,6 +432,22 @@ app.put('/updateSignature/:id_lesson',function(req,res){
    } catch (error) {
       return res.send({ error: false, data: error, message: 'ko' });
    }
+});
+
+app.get('/modifyPassword',function(req,res){
+   
+   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+   var objectEmail = 'Credenziali Fitstic'
+   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
+  
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password.toString(), salt);
+
+   sendEmails(emailDocente,objectEmail,textEmail)
+   connection.query("", function (errorAuth, resultAuth, fields) {
+      if (errorAuth) throw errorAuth;
+   });
+   return res.send({ error: false, result: result, message: 'ok' });
 });
 
 app.get('/lessons/:date/:id_course', function (req, res) {
@@ -585,7 +612,7 @@ app.post('/calendar/importLessons', async function (req, res) {
 
    const email = escape(req.body.email);
    const idCalendar = escape(req.body.token);
-   const courseID = escape(req.body.courseID);
+   const courseID = escape(req.body.corso);
 
 
    const oAuth2Client = new OAuth2Client(
@@ -643,13 +670,14 @@ app.post('/calendar/importLessons', async function (req, res) {
 
    let ProfCheck = (teacher) => {
       return new Promise(function (resolve, reject) {
-         const queryProf = 'SELECT id FROM companies WHERE name like "%?%" ';
-         connection.query(queryProf, [teacher], function (errorProf, resultsProf, fields) {
+         const queryProf = 'SELECT id FROM companies WHERE name like "%'+teacher+'%" ';
+         connection.query(queryProf, function (errorProf, resultsProf, fields) {
             if (errorProf) { throw reject(new Error(errorProf)); }
-            if (resultsProf.length == 0) { resolve(false); } else { resolve(queryProf[0].id); }
+            if (resultsProf.length == 0) { resolve(false); } else { resolve(resultsProf[0].id); }
          });
       });
    }
+
 
    let LeassonCheck =  (lessontype) => {
       return new Promise( function (resolve, reject) {
@@ -675,40 +703,32 @@ app.post('/calendar/importLessons', async function (req, res) {
          timeMin: (new Date()).toISOString(),
          singleEvents: true,
          orderBy: 'startTime',
-      }, async (err, resu) => {
+      },  async(err, resu) => {
          if (err) return console.log('The API returned an error: ' + err);
          const events = resu.data.items;
 
-         const errori = [];
-         const datiInsert = [];
+         var errori = [];
+         var datiInsert = [];
 
          if (events.length) {
 
             events.map(async (event, i) => {
-               const riga = {}
+               var riga = {}
 
                try {
                   const classroom = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[0]));
                   const teacher = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[1].split(',')[0]));
                   const lessontype = tools.stringLowerCase(tools.stringTrim(event.summary.split(':')[1].split(',')[1]));
-
                   const dateStart = new Date(event.start.dateTime);
                   const dateEnd = new Date(event.end.dateTime);
-
                   const timeStart = dateStart.getHours() + dateStart.getMinutes() / 60;
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
-
                   const totalHours = timeEnd - timeStart;
-               
-
                   const checkProf = await ProfCheck(teacher);
-                  const checkLeasson = await LeassonCheck(lessontype);
-                  console.log(event.summary)
+                  const checkLeasson =lessontype;
+
                   if (checkProf === false) {
-                     riga.prof = false;
-                  }
-                  if (checkLeasson === false) {
-                     riga.leasson = false;
+                     riga.prof = "Sconosciuto";
                   }
 
                   if (Object.entries(riga).length !== 0) {
@@ -716,39 +736,37 @@ app.post('/calendar/importLessons', async function (req, res) {
                      riga.dataEnd = dateEnd;
                      errori.push(riga);
                   } else {
-                     datiInsert.push([checkLeasson, checkProf, classroom, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
-                     console.log('dati da inserire')
+                     datiInsert.push([lessontype,checkProf, classroom, courseID, tools.formattedDate(dateStart), timeStart, timeEnd, totalHours, tools.formattedDate()])
                   }
 
                } catch (err) {
-                  return res.send({ error: false, data: error, message: 'Errore di salvataggio dei dati' });
+                  return res.send({ error: false, data: err, message: 'Errore di salvataggio dei dati' });
                }
-
-
-            });
+            }); //fine map
+                        
          } else {
-            return res.send({ error: false, data: error, message: 'Non sono stati trovanti eventi salvati nel calendario' });
-         }
-         console.log(errori)
-         if (errori.length === 0) {
-            console.log("Dati inseriti con successo")
-            console.log(datiInsert)
+            return res.send({ error: false, message: 'Non sono stati trovanti eventi salvati nel calendario' });
+         }  
 
-            /*
-            const queryIns = 'INSERT INTO lessons (`lesson`, `email_responsible`, `classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
-           
-            connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
-               if (errorIns) throw errorIns;
-               return res.send({ error: false, data: items, message: 'Calendar added' });
-            });*/
-         } else {
-            console.log("Dati non inseriti, ci sono degli errori")
-            console.log(errori);
-         }
-
+         var interval= setInterval(() => {
+               if (errori.length === 0) {                 
+            
+                 const queryIns = 'INSERT INTO lessons (`lesson`, `companies_id`,`classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';                           
+                
+                 connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
+                    if (errorIns) throw errorIns;
+                   
+                 });
+                 clearInterval(interval)
+                 return res.send({ error: false, message: 'calendaroOk' });
+              }  
+              else{
+                 clearInterval(interval)
+                 return res.send({ error: false,data:errori, message: 'calendarioKo' });
+              }     
+         }, 500);
       });
    }
-   res.end();
 });
 
 
