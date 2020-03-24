@@ -355,8 +355,6 @@ app.post('/createTeacher', function (req, res) {
    var objectEmail = 'Credenziali Fitstic'
    var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
   
-
-   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
 
@@ -375,7 +373,7 @@ app.post('/createTeacher', function (req, res) {
                })
                connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0) ", function (error, result, fields) {
                   if (error) throw error;
-                  sendEmails(emailDocente,"credenziali","questa è la tua pass "+password)
+                  sendEmails(emailDocente,objectEmail,textEmail)
                   connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+hash+"',4)", function (errorAuth, resultAuth, fields) {
                      if (errorAuth) throw errorAuth;
                   });
@@ -397,7 +395,7 @@ app.post('/createTeacher', function (req, res) {
                      })
                      connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                         if (error) throw error;
-                        sendEmails(emailDocente,"credenziali","questa è la tua pass "+password)
+                        sendEmails(emailDocente,objectEmail,textEmail)
                         connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+hash+"',4)", function (errorAuth, resultAuth, fields) {
                            if (errorAuth) throw errorAuth;
                         });
@@ -436,20 +434,7 @@ app.put('/updateSignature/:id_lesson',function(req,res){
    }
 });
 
-app.get('/getPassword',function(req,res){
 
-   var hash = bcrypt.hashSync('12345', 10);
-   console.log(hash)
-   bcrypt.compare('12345', '12345', function(err, ress) {
-      if(ress){
-         res.send({
-            status:true,                  
-            message:"Email and password does not match"
-         });
-      }
-   })
-   res.end()
-});
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
