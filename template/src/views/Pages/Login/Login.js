@@ -5,7 +5,7 @@ import axios from 'axios';
 import { GoogleLogin } from 'react-google-login';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
- import Background from 'C:/React/Sign_Fix/template/src/views/Pages/LandingPage/img/libro2.jpg';
+import Background from '../LandingPage/img/libro2.jpg';
 
 
 class Login extends Component {

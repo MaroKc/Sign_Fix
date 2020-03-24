@@ -434,7 +434,21 @@ app.put('/updateSignature/:id_lesson',function(req,res){
    }
 });
 
+app.get('/modifyPassword',function(req,res){
+   
+   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+   var objectEmail = 'Credenziali Fitstic'
+   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
+  
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password.toString(), salt);
 
+   sendEmails(emailDocente,objectEmail,textEmail)
+   connection.query("", function (errorAuth, resultAuth, fields) {
+      if (errorAuth) throw errorAuth;
+   });
+   return res.send({ error: false, result: result, message: 'ok' });
+});
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
