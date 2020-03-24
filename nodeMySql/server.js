@@ -18,6 +18,8 @@ const connection = connectionDB.createConnectionDB();
 connection.connect();
  
 
+
+
 app.use(function (req, res, next) {
    res.header('Access-Control-Allow-Methods', 'DELETE, PUT');
    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
@@ -348,6 +350,11 @@ app.post('/createTeacher', function (req, res) {
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
    var company = []
+   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+
+   var objectEmail = 'Credenziali Fitstic'
+   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
+  
 
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
    var salt = bcrypt.genSaltSync(10);
