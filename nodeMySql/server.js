@@ -2,16 +2,16 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
+const nodemailer = require('nodemailer');
+var bcrypt = require('bcrypt');
+
 app.use(bodyParser.json());
-var nodemailer = require('nodemailer');
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.raw());
 
 const { google } = require('googleapis');
 const tools = require('./tools');
 const keys = require('./outh2.key.json');
-
-var errorDataInsert = [];
 
 const connectionDB = require('./connectionDB');
 const connection = connectionDB.createConnectionDB();
@@ -25,6 +25,30 @@ app.use(function (req, res, next) {
    next();
 });
 
+function sendEmails (emailTo,objectEmail,text) {
+   var transporter = nodemailer.createTransport({
+     service: 'gmail',
+     auth: {
+       user: 'registro.luca.pw@gmail.com',
+       pass: 'fitstic2020'
+     }
+   });
+   
+   var mailOptions = {
+     from: 'registro.luca.pw@gmail.com',
+     to: emailTo,
+     subject: objectEmail,
+     text: text
+   };
+   
+   transporter.sendMail(mailOptions, function(error, info){
+     if (error) {
+      return true;
+     } else {
+       return false;
+     }
+   }); 
+ }
 
 //CONTROLLO UTENTE e JWT
 async function chekUser(email) {
@@ -114,18 +138,27 @@ app.post('/tokensignin', function (req, res) {
 
 
 app.post('/auth', function (req, res) {
-
-   connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(req.body.email) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
-      if (error) throw error;
-
-      if(results.length == 1) {
-
-         //DA CRIPTARE LA PSWD perchè si salva nel client
-         res.send({ error: false, message: results[0] });
-      } else {
-         res.send({ error: true, message: false });
-      }
-   });
+   var pass =req.body.pass
+   console.log(typeof(pass))
+   var query = 'SELECT * FROM responsibles_auth WHERE email = ?'
+   connection.query(query,[req.body.email], function (error, results, fields) {
+      if (error) {
+         throw error;
+         }else{
+         if(results.length >0){
+               bcrypt.compare(pass, results[0].password, function(err, ress) {
+                  if(!ress){
+                      res.send({ error: true, message: false });
+                  }else{                    
+                      res.send({ error: false, message: results[0] });
+                  }
+               });         
+         }
+         else{
+          res.send({ error: true, message: false });
+         }
+         }
+      });
    
 });
 
@@ -316,6 +349,10 @@ app.post('/createTeacher', function (req, res) {
    var companyName = req.body.companyName
    var company = []
 
+   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password.toString(), salt);
+
    connection.query("SELECT * FROM teachers where email_responsible='"+emailDocente+"'", function (e, row, fields) {
       if (e) throw error;
       if(row.length==0){
@@ -331,7 +368,10 @@ app.post('/createTeacher', function (req, res) {
                })
                connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0) ", function (error, result, fields) {
                   if (error) throw error;
-                  tools.sendEmails(emailDocente,"credenziali","questa è la tua pass")
+                  sendEmails(emailDocente,"credenziali","questa è la tua pass "+password)
+                  connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+hash+"',4)", function (errorAuth, resultAuth, fields) {
+                     if (errorAuth) throw errorAuth;
+                  });
                   return res.send({ error: false, result: result, message: 'ok' });
                });
             } else {
@@ -350,7 +390,10 @@ app.post('/createTeacher', function (req, res) {
                      })
                      connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                         if (error) throw error;
-                        tools.sendEmails(emailDocente,"credenziali","questa è la tua pass")
+                        sendEmails(emailDocente,"credenziali","questa è la tua pass "+password)
+                        connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+hash+"',4)", function (errorAuth, resultAuth, fields) {
+                           if (errorAuth) throw errorAuth;
+                        });
                         return res.send({ error: false, result: result, message: 'ok' });
                      });
                   }
@@ -384,6 +427,21 @@ app.put('/updateSignature/:id_lesson',function(req,res){
    } catch (error) {
       return res.send({ error: false, data: error, message: 'ko' });
    }
+});
+
+app.get('/getPassword',function(req,res){
+
+   var hash = bcrypt.hashSync('12345', 10);
+   console.log(hash)
+   bcrypt.compare('12345', '12345', function(err, ress) {
+      if(ress){
+         res.send({
+            status:true,                  
+            message:"Email and password does not match"
+         });
+      }
+   })
+   res.end()
 });
 
 app.get('/lessons/:date/:id_course', function (req, res) {
@@ -698,7 +756,6 @@ app.post('/calendar/importLessons', async function (req, res) {
               }  
               else{
                  clearInterval(interval)
-                 console.log(errori)
                  return res.send({ error: false,data:errori, message: 'calendarioKo' });
               }     
          }, 500);
