@@ -10,12 +10,15 @@ const { google } = require('googleapis');
 const tools = require('./tools');
 const keys = require('./outh2.key.json');
 
-var errorDataInsert = [];
+const nodemailer = require('nodemailer');
+const md5 = require('md5');
 
 const connectionDB = require('./connectionDB');
 const connection = connectionDB.createConnectionDB();
 connection.connect();
  
+
+
 
 app.use(function (req, res, next) {
    res.header('Access-Control-Allow-Methods', 'DELETE, PUT');
@@ -24,6 +27,30 @@ app.use(function (req, res, next) {
    next();
 });
 
+function sendEmails (emailTo,objectEmail,text) {
+   var transporter = nodemailer.createTransport({
+     service: 'gmail',
+     auth: {
+       user: 'registro.luca.pw@gmail.com',
+       pass: 'fitstic2020'
+     }
+   });
+   
+   var mailOptions = {
+     from: 'registro.luca.pw@gmail.com',
+     to: emailTo,
+     subject: objectEmail,
+     text: text
+   };
+   
+   transporter.sendMail(mailOptions, function(error, info){
+     if (error) {
+      return true;
+     } else {
+       return false;
+     }
+   }); 
+ }
 
 //CONTROLLO UTENTE e JWT
 async function chekUser(email) {
@@ -314,6 +341,11 @@ app.post('/createTeacher', function (req, res) {
    var idCorso = req.body.idCorso
    var companyName = req.body.companyName
    var company = []
+   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+
+   var objectEmail = 'Credenziali Fitstic'
+   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
+  
 
    connection.query("SELECT * FROM teachers where email_responsible='"+emailDocente+"'", function (e, row, fields) {
       if (e) throw error;
@@ -330,6 +362,10 @@ app.post('/createTeacher', function (req, res) {
                })
                connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0) ", function (error, result, fields) {
                   if (error) throw error;
+                  sendEmails(emailDocente, objectEmail, textEmail)
+                  connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+(password)+"',4)", function (errorAuth, resultAuth, fields) {
+                     if (errorAuth) throw errorAuth;
+                  });
                   return res.send({ error: false, result: result, message: 'ok' });
                });
             } else {
@@ -348,6 +384,10 @@ app.post('/createTeacher', function (req, res) {
                      })
                      connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('"+emailDocente+"','"+firstName+"','"+lastName+"',"+idCorso+","+company[0].id+",0)", function (error, result, fields) {
                         if (error) throw error;
+                        sendEmails(emailDocente, objectEmail, textEmail)
+                        connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('"+emailDocente+"','"+(password)+"',4)", function (errorAuth, resultAuth, fields) {
+                           if (errorAuth) throw errorAuth;
+                        });
                         return res.send({ error: false, result: result, message: 'ok' });
                      });
                   }
