@@ -39,32 +39,59 @@ class DefaultLayout extends Component {
     const cookieCorso = JSON.parse(sessionStorage.getItem("corso"));
     const cookieUser = JSON.parse(sessionStorage.getItem("utente"));
 
+    var navM = null;
+    var navR = [];
+    var navTo = '/';
+    if (cookieUser) {
+      switch (cookieUser['responsible_level']) {
+        case 1:
+          navM = navigationCor;
+          navR = routesCor;
+          navTo = '/classi';
+          break;
+
+        case 2:
+          navM = navigationCor;
+          navR = routesCor;
+          navTo = '/classi';
+          break;
+
+        case 3:
+          navM = navigationCor;
+          navR = routesCor;
+          navTo = '/classi';
+          break;
+
+        case 4:
+          navM = navigationDoc;
+          navR = routesDoc;
+          navTo = '/docentiPersonale';
+          break;
+
+        case 5:
+          navM = navigationStud;
+          navR = routesStud;
+          navTo = '/studentiPersonale';
+          break;
+      }
+    }
+
     this.state = {
       classe: cookieCorso ? cookieCorso : null,
       user: cookieUser ? cookieUser : null,
-      navMenu: null,
-      routes: [],
-      to : '/'
-    } 
-  
-  }
-
-  componentDidMount() {
-
-    if(this.state.user === null) {
-      return  <Redirect to='/login'/>
-     
-    } else if(this.state.user && this.state.user['responsible_level'] === 2) {
-      this.setState({navMenu: navigationCor, to: '/classi', routes: routesCor})
-    } else if (this.state.user && this.state.user['responsible_level'] === 4){
-      //RUOLO
-      this.setState({navMenu: navigationDoc, to: '/docentiPersonale', routes: routesDoc})
-    }else{
-      this.setState({navMenu: navigationStud, to: '/studentiPersonale', routes: routesStud})
+      navMenu: navM,
+      routes: navR,
+      to: navTo
     }
 
   }
 
+  componentDidMount() {
+    
+    if (this.state.user === null) {
+      return <Redirect to='/login' />
+    } 
+  }
 
 
   changeCorso = (corso) => {
@@ -82,23 +109,23 @@ class DefaultLayout extends Component {
     const classe = this.state.classe;
     const user = this.state.user
     return (
-      <div className="app" style={user && user.responsible_level !== 2  ? {background: "white"} : null}>
-          {classe && (
+      <div className="app" style={user && user.responsible_level !== 2 ? { background: "white" } : null}>
+        {classe && (
           <AppHeader fixed>
             <Suspense fallback={this.loading()}>
               <DefaultHeader onLogout={e => this.signOut(e)} classe={this.state.classe} />
             </Suspense>
           </AppHeader>
-          )}
+        )}
 
         <div className="app-body">
-          {classe  && (
+          {classe && (
             <AppSidebar fixed display="lg">
               <AppSidebarHeader />
               <AppSidebarForm />
               <Suspense>
                 <h4 className="text-center mt-2">{this.state.classe['start_year']} - {this.state.classe['end_year']}</h4>
-               <AppSidebarNav navConfig={this.state.navMenu} {...this.props} router={router} classe={this.state.classe} user={this.state.user}/>
+                <AppSidebarNav navConfig={this.state.navMenu} {...this.props} router={router} classe={this.state.classe} user={this.state.user} />
               </Suspense>
               <AppSidebarFooter />
               <AppSidebarMinimizer />
@@ -106,11 +133,11 @@ class DefaultLayout extends Component {
           )}
 
           <main className="main">
-          {classe &&  <AppBreadcrumb appRoutes={this.state.routes} router={router} /> }
+            {classe && <AppBreadcrumb appRoutes={this.state.routes} router={router} />}
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
-                 
+
                   {this.state.routes.map((route, idx) => {
                     return route.component ? (
                       <Route
@@ -120,13 +147,13 @@ class DefaultLayout extends Component {
                         name={route.name}
                         render={props =>
                           route.render ? (
-                            <route.component {...props} {...route.extraProps}  route={route} />
+                            <route.component {...props} {...route.extraProps} route={route} />
                           ) : (
                               <route.component {...props} classe={this.state.classe} to={this.state.to} user={this.state.user} changeCorso={this.changeCorso} route={route} />
                             )} />
                     ) : (null);
                   })}
-                  {this.state.user === null ? <Redirect from="/" to='/login'/> : <Redirect from="/" to={this.state.to}/>}
+                  {this.state.user === null ? <Redirect from="/" to='/login' /> : <Redirect from="/" to={this.state.to} />}
                 </Switch>
               </Suspense>
             </Container>
