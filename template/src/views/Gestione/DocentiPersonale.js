@@ -5,11 +5,7 @@ import axios from 'axios'
 import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
 
 
-
-
-
 class DocentiPersonale extends Component {
-
 
     constructor(props) {
         super(props);
@@ -19,16 +15,14 @@ class DocentiPersonale extends Component {
             dettagliDocente: [],
             value:'',
             changeState: false,
-            
+            pastLesson: []
         }
     }
-
 
 
     componentDidMount() {
         this.getTeachers();
         this.getTeacherDetails();
-    console.log(this.state.changeState)
     }
 
 
@@ -49,9 +43,9 @@ class DocentiPersonale extends Component {
                 this.getLesson();
             })
             .catch(err => console.error(err));
-
     }
 
+    
     getTeacherDetails = () => {
         axios.get('http://localhost:8080/teacherDetails')
             .then(res => {
@@ -145,20 +139,38 @@ class DocentiPersonale extends Component {
             changeState: !this.state.changeState
         })
     }
+
+
     changeState2 = () => {
         this.setState({
             changeState2: !this.state.changeState2
         })
     }
+
+
     getPercentage() {
-        var initialValue = 0;
-        let tipoLezione = this.state.lezioni.filter(item => item.lessonName === this.state.value)
+
+        var d = new Date(),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+
+        const currDate = [year, month, day].join('-');
+
+        const pastLesson = this.state.lezioni.filter(lezione => lezione.date < currDate).map(filtredDate => (filtredDate));
+            var initialValue = 0;
+        let tipoLezione = pastLesson.filter(item => item.lessonName === this.state.value)
+        console.log(tipoLezione)
         var sum = tipoLezione.reduce(
             (accumulator, currentValue) => accumulator + parseInt(currentValue.percentage.split("%"), 10)
             ,initialValue
         );
-        
-        return (sum / tipoLezione.length).toFixed(0)+"%"
+        return (sum / tipoLezione.length) ? (sum / tipoLezione.length).toFixed(0)+"%" : 0+'%'
     }
 
     formattedDate = (d) => {
@@ -221,13 +233,8 @@ class DocentiPersonale extends Component {
                     </Row>
                 </>
             )
-
         }
-
     }
-
-    
-
 
     pastLessons() {
         var d = new Date(),
@@ -243,9 +250,6 @@ class DocentiPersonale extends Component {
         const currDate = [year, month, day].join('-');
 
         const pastLesson = this.state.lezioni.filter(lezione => lezione.date < currDate).map(filtredDate => (filtredDate));
-
-        console.log(pastLesson.map(i => this.formattedDate(i.date)))
-
         const data = {
             columns: [
                 {
@@ -329,6 +333,7 @@ class DocentiPersonale extends Component {
             ],
             row: futureLesson
         };
+
         if(futureLesson.length !== 0 && !this.state.changeState){
         return (
             <div className="mb-4">
@@ -430,13 +435,9 @@ class DocentiPersonale extends Component {
                     <h3>{docente && docente.firstName} {docente && docente.lastName}</h3>
                     <h5>{docente && docente.emailDocente}</h5>
                 </div>
-           
                    
                 <hr />
-                            {this.selectLesson()}
-                     
-         
-              
+                    {this.selectLesson()} 
                 </div>
                 <hr />
                 <div className="d-flex justify-content-around mb-4">
