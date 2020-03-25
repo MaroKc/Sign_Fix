@@ -141,7 +141,6 @@ app.post('/tokensignin', function (req, res) {
 
 app.post('/auth', function (req, res) {
    var pass =req.body.pass
-   console.log(typeof(pass))
    var query = 'SELECT * FROM responsibles_auth WHERE email = ?'
    connection.query(query,[req.body.email], function (error, results, fields) {
       if (error) {
@@ -412,6 +411,44 @@ app.post('/createTeacher', function (req, res) {
    });
 });
 
+app.put('/modifyPassword',function(req,res){
+   
+   var password1 = req.body.password1
+   var password2 = req.body.password2
+   var email = req.body.email
+   
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password1.toString(), salt);
+   if(password1 === password2){
+      connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?",[hash,email], function (error, result, fields) {
+         if (error) throw error;
+         return res.send({ error: false, data: result, message: 'ok' });
+      });
+   }else{
+      return res.send({ error: false, message: 'ko' });
+   }
+});
+
+app.put('/forgotPassword',function(req,res){
+   var email= req.body.email
+   var firstName= req.body.firstName
+   var lastName = req.body.lastName
+   
+   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+   var objectEmail = 'Password dimenticata'
+   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che in seguito alla sua richiesta la password è stata resettata. La nuova password è : '+ password
+  
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password.toString(), salt);
+
+   sendEmails(email,objectEmail,textEmail)
+
+      connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?",[hash,email], function (error, result, fields) {
+         if (error) throw error;
+         return res.send({ error: false, data: result, message: 'ok' });
+      });
+});
+
 app.put('/updateSignature/:id_lesson',function(req,res){
 
    try {
@@ -434,21 +471,7 @@ app.put('/updateSignature/:id_lesson',function(req,res){
    }
 });
 
-app.get('/modifyPassword',function(req,res){
-   
-   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-   var objectEmail = 'Credenziali Fitstic'
-   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
-  
-   var salt = bcrypt.genSaltSync(10);
-   var hash = bcrypt.hashSync(password.toString(), salt);
 
-   sendEmails(emailDocente,objectEmail,textEmail)
-   connection.query("", function (errorAuth, resultAuth, fields) {
-      if (errorAuth) throw errorAuth;
-   });
-   return res.send({ error: false, result: result, message: 'ok' });
-});
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
@@ -586,11 +609,9 @@ app.put('/retireStudent/:email', function (req, res) {
    
    try {
       var email = req.params.email;
-         console.log("arrivo", email)
       var ritirato = req.body.ritirato
    
       var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
-      console.log(query)
       connection.query(query, [ritirato, email], function (error, results, fields) {
          if (error) throw error;
          res.send({ error: false, data: results, message: 'ok' });
@@ -641,7 +662,7 @@ app.post('/calendar/importLessons', async function (req, res) {
       connection.query(query, async function (error, results, fields) {
          if (error) throw error;
          if (results.length == 0) {
-            console.log('Token Non Trovato');
+           // console.log('Token Non Trovato');
             return res.send({ error: false, data: error, message: 'Token Non Trovato' });
          }
 
@@ -654,7 +675,7 @@ app.post('/calendar/importLessons', async function (req, res) {
             const query = "UPDATE google_token SET access_token = ?, expiry_date = ? WHERE email = ?";
             connection.query(query, [newToken.token, newToken.res.data.expiry_date, email], function (error, results, fields) {
                if (error) throw error;
-               console.log("Acces Token Refreshato e Salvato");
+              // console.log("Acces Token Refreshato e Salvato");
             });
             oAuth2Client.setCredentials({ access_token: newToken.token });
             callback(oAuth2Client);
