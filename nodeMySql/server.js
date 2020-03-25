@@ -352,7 +352,7 @@ app.post('/createTeacher', function (req, res) {
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
 
    var objectEmail = 'Credenziali Fitstic'
-   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
+   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente password:'+ password
   
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
@@ -433,21 +433,28 @@ app.put('/forgotPassword',function(req,res){
    var email= req.body.email
    var firstName= req.body.firstName
    var lastName = req.body.lastName
-   
+
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-   var objectEmail = 'Password dimenticata'
-   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che in seguito alla sua richiesta la password è stata resettata. La nuova password è : '+ password
+   var objectEmail = 'Credenziali Fitstic'
+   var textEmail = 'Le comunichiamo che in seguito alla sua richiesta la password è stata resettata. La nuova password è : ' + password
   
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
+   
 
-   sendEmails(email,objectEmail,textEmail)
-
+   connection.query("SELECT * FROM teachers where email_responsible='"+email+"'", function (e, row, fields) {
+      if (e) throw error;
+      if(row.length==1){
       connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?",[hash,email], function (error, result, fields) {
          if (error) throw error;
+         sendEmails(email,objectEmail,textEmail)
          return res.send({ error: false, data: result, message: 'ok' });
-      });
+      });    
+   }else{
+         return res.send({ error: false, message: 'ko' });
+      }})
 });
+
 
 app.put('/updateSignature/:id_lesson',function(req,res){
 

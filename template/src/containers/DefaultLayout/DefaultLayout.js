@@ -83,14 +83,13 @@ class DefaultLayout extends Component {
     const user = this.state.user
     return (
       <div className="app" style={user && user.responsible_level !== 2  ? {background: "white"} : null}>
-
-      
+          {classe && (
           <AppHeader fixed>
             <Suspense fallback={this.loading()}>
               <DefaultHeader onLogout={e => this.signOut(e)} classe={this.state.classe} />
             </Suspense>
-          </AppHeader>)
-    
+          </AppHeader>
+          )}
 
         <div className="app-body">
           {classe  && (
@@ -132,7 +131,6 @@ class DefaultLayout extends Component {
               </Suspense>
             </Container>
           </main>
-
           <AppAside fixed>
             <Suspense fallback={this.loading()}>
               <DefaultAside />
