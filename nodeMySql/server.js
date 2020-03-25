@@ -353,7 +353,7 @@ app.post('/createTeacher', function (req, res) {
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
 
    var objectEmail = 'Credenziali Fitstic'
-   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
+   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente password:'+ password
   
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
@@ -412,6 +412,55 @@ app.post('/createTeacher', function (req, res) {
    });
 });
 
+
+
+app.put('/modifyPassword',function(req,res){
+   
+   var password1 = req.body.password1
+   var password2 = req.body.password2
+   var email = req.body.email
+   console.log(password1)
+   console.log(password2)
+   console.log(email)
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password1.toString(), salt);
+   if(password1 === password2){
+      connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?",[hash,email], function (error, result, fields) {
+         if (error) throw error;
+         return res.send({ error: false, data: result, message: 'ok' });
+      });
+   }else{
+      return res.send({ error: false, message: 'ko' });
+   }
+});
+
+app.put('/forgotPassword',function(req,res){
+   var email= req.body.email
+   var firstName= req.body.firstName
+   var lastName = req.body.lastName
+
+   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+   var objectEmail = 'Credenziali Fitstic'
+   var textEmail = 'Le comunichiamo che in seguito alla sua richiesta la password è stata resettata. La nuova password è : ' + password
+  
+   var salt = bcrypt.genSaltSync(10);
+   var hash = bcrypt.hashSync(password.toString(), salt);
+   
+
+   connection.query("SELECT * FROM teachers where email_responsible='"+email+"'", function (e, row, fields) {
+      if (e) throw error;
+      if(row.length==1){
+      connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?",[hash,email], function (error, result, fields) {
+         if (error) throw error;
+         sendEmails(email,objectEmail,textEmail)
+         return res.send({ error: false, data: result, message: 'ok' });
+      });    
+   }else{
+         return res.send({ error: false, message: 'ko' });
+      }})
+});
+
+
 app.put('/updateSignature/:id_lesson',function(req,res){
 
    try {
@@ -434,21 +483,7 @@ app.put('/updateSignature/:id_lesson',function(req,res){
    }
 });
 
-app.get('/modifyPassword',function(req,res){
-   
-   var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-   var objectEmail = 'Credenziali Fitstic'
-   var textEmail = 'Gentile ' + firstName +' '+ lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente '+ password
-  
-   var salt = bcrypt.genSaltSync(10);
-   var hash = bcrypt.hashSync(password.toString(), salt);
 
-   sendEmails(emailDocente,objectEmail,textEmail)
-   connection.query("", function (errorAuth, resultAuth, fields) {
-      if (errorAuth) throw errorAuth;
-   });
-   return res.send({ error: false, result: result, message: 'ok' });
-});
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];

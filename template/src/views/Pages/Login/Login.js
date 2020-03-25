@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route, Redirect, Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, Modal, ModalBody, ModalFooter, Table } from 'reactstrap';
 import axios from 'axios';
 import { GoogleLogin } from 'react-google-login';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
@@ -23,6 +23,8 @@ class Login extends Component {
       user: null,
       pswd: null,
       status: false,
+      warning: false,
+      email: ''
     }
   }
 
@@ -44,7 +46,6 @@ class Login extends Component {
   login() {
     axios.post('http://localhost:8080/auth', { email: this.state.user, pass: this.state.pswd })
       .then(res => {
-        console.log(res.data.message)
         if (res.data.message === false) {
           ToastsStore.warning("Username o Password errati");
         } else {
@@ -66,12 +67,58 @@ class Login extends Component {
     }
   }
 
+  toggleWarning = () => {
+    this.setState({
+      warning: !this.state.warning
+    })
+  }
+
+  forgotPassword = () => {
+    console.log(this.state.password1)
+    console.log(this.state.email)
+        axios.put('http://localhost:8080/forgotPassword',{
+            email: this.state.email,
+        })
+            .then(res => {
+                console.log('arrivato')
+                if (res.data.message === "ok") 
+                    {this.setState({warning: false})
+                    ToastsStore.success("La mail è stata inviata con successo")}
+                else if (res.data.message === "ko") ToastsStore.warning("Controlla di aver inserito la mail corretta")
+            })
+            .catch(err => {
+                return console.log(err);
+            });
+}
+
+
+  openModalPassword = () => {
+    return (
+      <>
+        <Modal isOpen={this.state.warning} toggle={this.toggleWarning}
+          className={'modal-primary ' + this.props.className}>
+          <ModalBody>
+            <div>
+              Se la tua mail risulterà registrata ti invieremo una nuova password
+              </div>
+            <div>
+              <Input name='email' onChange={(e) => this.setState({ email: e.target.value })} />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={this.forgotPassword}>Continua</Button>{' '}
+            <Button outline color="dark" onClick={this.toggleWarning}>Cancella</Button>
+          </ModalFooter>
+        </Modal>
+      </> 
+    )
+}
 
   render() {
     return (
       <div className="app flex-row align-items-center" style={{backgroundImage: `url(${Background})`, backgroundRepeat: 'no-repeat', backgroundPosition: 'center'}}>
         {this.renderRedirect()}
-        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
+        {this.openModalPassword()}
         <Container>
           <Row className="justify-content-center">
             <Col md="8">
@@ -101,7 +148,7 @@ class Login extends Component {
                           <Button style={{background: '#2c7d7d'}} onClick={this.login} className="px-4 text-white">Login</Button>
                         </Col>
                         <Col xs="6" className="text-right">
-                          <Button  color='link' className="px-0">Forgot password?</Button>
+                          <Button  color='link' className="px-0" onClick={this.toggleWarning}>Forgot password?</Button>
                         </Col>
                       </Row>
                     </Form>
@@ -131,6 +178,7 @@ class Login extends Component {
               </CardGroup>
             </Col>
           </Row>
+          <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
         </Container>
       </div>
     );

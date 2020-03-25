@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Table, Card, CardHeader, CardBody, Button, Input, Row, Col } from 'reactstrap';
+import {Table, Card, CardHeader, CardBody, Button, Input, Row, Col, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { MDBDataTable } from 'mdbreact';
 import axios from 'axios'
 import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
@@ -19,6 +19,9 @@ class DocentiPersonale extends Component {
             dettagliDocente: [],
             value:'',
             changeState: false,
+            warning: false,
+            password1: '',
+            password2: ''
             
         }
     }
@@ -28,7 +31,6 @@ class DocentiPersonale extends Component {
     componentDidMount() {
         this.getTeachers();
         this.getTeacherDetails();
-    console.log(this.state.changeState)
     }
 
 
@@ -49,7 +51,26 @@ class DocentiPersonale extends Component {
                 this.getLesson();
             })
             .catch(err => console.error(err));
+    }
 
+    modifyPassword = () => {
+        console.log(this.state.password1)
+        console.log(this.state.warning)
+            axios.put('http://localhost:8080/modifyPassword', {
+                password1: this.state.password1,
+                password2: this.state.password2,
+                email: this.props.user.email
+            })
+                .then(res => {
+                    
+                    if (res.data.message === "ok") 
+                        {this.setState({warning: false})
+                        ToastsStore.success("la password è stata cambiata con successo")}
+                    else if (res.data.message === "ko") ToastsStore.warning("le due password non sono uguali")
+                })
+                .catch(err => {
+                    return console.log(err);
+                });
     }
 
     getTeacherDetails = () => {
@@ -93,7 +114,6 @@ class DocentiPersonale extends Component {
 
     getLesson = () => {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
-
         axios.get('http://localhost:8080/lessonsTeacher/' + docente.companyId)
             .then(res => {
                 const lezioni = [];
@@ -150,15 +170,30 @@ class DocentiPersonale extends Component {
             changeState2: !this.state.changeState2
         })
     }
+    
     getPercentage() {
-        var initialValue = 0;
-        let tipoLezione = this.state.lezioni.filter(item => item.lessonName === this.state.value)
+
+        var d = new Date(),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+
+        const currDate = [year, month, day].join('-');
+
+        const pastLesson = this.state.lezioni.filter(lezione => lezione.date < currDate).map(filtredDate => (filtredDate));
+            var initialValue = 0;
+        let tipoLezione = pastLesson.filter(item => item.lessonName === this.state.value)
+        console.log(tipoLezione)
         var sum = tipoLezione.reduce(
             (accumulator, currentValue) => accumulator + parseInt(currentValue.percentage.split("%"), 10)
             ,initialValue
         );
-        
-        return (sum / tipoLezione.length).toFixed(0)+"%"
+        return (sum / tipoLezione.length) ? (sum / tipoLezione.length).toFixed(0)+"%" : 0+'%'
     }
 
     formattedDate = (d) => {
@@ -208,7 +243,26 @@ class DocentiPersonale extends Component {
                                 {this.state.dettagliDocente.map((item, i) => <option key={i} value={item.lessonName}>{item.lessonName}</option>)}
                             </Input>
                         </th> */}
-                    <div className="d-flex justify-content-start mt-3 ml-3 mb-3">{this.state.dettagliDocente.map((item, i) => <Button value={item.lessonName} color={this.state.value === item.lessonName ? 'primary' : 'ghost-primary'} className={this.state.value === item.lessonName ? 'disabled active btn btn-pill mr-3 h-50' : 'btn btn-pill mr-3 h-50'} onClick={(e) => this.setState({ value: e.target.value })} key={i}>{item.lessonName}</Button>)}</div>
+                    <div className="d-flex justify-content-start mt-3 ml-3 mb-3">
+                        {this.state.dettagliDocente.map((item, i) =>
+                            <Button
+                                value={item.lessonName}
+                                color={this.state.value === item.lessonName
+                                    ?
+                                    'primary'
+                                    :
+                                    'ghost-primary'}
+                                className={this.state.value === item.lessonName
+                                    ?
+                                    'disabled active btn btn-pill mr-3 h-50'
+                                    :
+                                    'btn btn-pill mr-3 h-50'}
+                                onClick={(e) => this.setState({ value: e.target.value })}
+                                key={i}>
+                                {item.lessonName}
+                            </Button>
+                        )}
+                    </div>
                     <Row>
                         <Col xs="6" className="mt-4 mb-4 text-center">
                             <h6 className="mb-2">Ore fatte:</h6>
@@ -244,7 +298,6 @@ class DocentiPersonale extends Component {
 
         const pastLesson = this.state.lezioni.filter(lezione => lezione.date < currDate).map(filtredDate => (filtredDate));
 
-        console.log(pastLesson.map(i => this.formattedDate(i.date)))
 
         const data = {
             columns: [
@@ -366,7 +419,6 @@ class DocentiPersonale extends Component {
         let giorno = data.getDay();
         let mese = data.getMonth();
 
-
         
         if(giorno == 0) giorno = "Domenica";
         if(giorno == 1) giorno = "Lunedì";
@@ -418,39 +470,77 @@ class DocentiPersonale extends Component {
         }
     }
 
+    toggleWarning = () => {
+        this.setState({
+            warning: !this.state.warning,
+        });
+    }
+    handleChange = (event) => {
+        let name = event.target.name;
+        let val = event.target.value;
+
+        this.setState({
+            [name]: val,
+        });
+    }
+    openModalPassword = () => {
+            return (
+                <>
+                    <Modal isOpen={this.state.warning} toggle={this.toggleWarning}
+                        className={'modal-primary ' + this.props.className}>
+                        <ModalBody>
+                            <Table borderless responsive>
+                                <tbody>
+                                    <tr>
+                                        <td>Nuova password:</td>
+                                        <td><Input type='password' name='password1' onChange={this.handleChange} /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Conferma password:</td>
+                                        <td><Input type='password' name='password2' onChange={this.handleChange} /></td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="primary" onClick={this.modifyPassword}>Continua</Button>{' '}
+                            <Button outline color="dark" onClick={this.toggleWarning}>Cancella</Button>
+                        </ModalFooter>
+                    </Modal>
+                </>
+            )
+    }
+
     infoTeacher() {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
         let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
-
         return (
             <div>
-                <div>
+                <div  className="text-right">
+                    {this.openModalPassword()}
+                    <Button color='link' onClick={this.toggleWarning}> Cambia password </Button>
                     {this.todayLesson()}
                     <div className="text-center mb-4">
                     <h3>{docente && docente.firstName} {docente && docente.lastName}</h3>
                     <h5>{docente && docente.emailDocente}</h5>
                 </div>
-           
-                   
                 <hr />
-                            {this.selectLesson()}
+                       {this.selectLesson()}
                      
-         
-              
                 </div>
                 <hr />
                 <div className="d-flex justify-content-around mb-4">
-                    {this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button>}
+                    {this.state.changeState ? <Button disabled={true}  color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button>}
 
                     {!this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button>}
                 </div>
-                
+
                 {this.futureLessons()}
                 {this.pastLessons()}
+                <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
             </div>
         );
     }
-
     render() {
         return this.infoTeacher()
     }
