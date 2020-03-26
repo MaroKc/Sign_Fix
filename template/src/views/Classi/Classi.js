@@ -98,7 +98,7 @@ class Classi extends Component {
           xs={12} sm={12} md={6} 
           key={this.state.corsi[i].id} 
           onClick={() => this.state.changeCorso(this.state.corsi[i])} 
-          style={this.props.classe !== null && this.props.classe['id'] === 1  ? {border: 'rounded', background: '#2c7d7d' } : null}>
+          style={this.props.classe !== null && this.props.classe['id'] === 1  ? {border: 'rounded', background: '#2f353a' } : null}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i].end_year, curse: this.state.corsi[i].start_year < this.state.corsi[i+1].start_year ? "Classe 2" : ""})} >
               <div className="chart-wrapper">
                 <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />
@@ -110,7 +110,7 @@ class Classi extends Component {
           xs={12} sm={12} md={6} 
           key={this.state.corsi[i + 1].id} 
           onClick={() => this.state.changeCorso(this.state.corsi[i + 1])} 
-          style={this.props.classe !== null && this.props.classe['id'] === 3  ? {border: 'rounded', background: '#2c7d7d' } : null}>
+          style={this.props.classe !== null && this.props.classe['id'] === 3  ? {border: 'rounded', background: '#2f353a' } : null}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i + 1].name, anno: this.state.corsi[i + 1].start_year + "-" + this.state.corsi[i + 1].end_year, curse: this.state.corsi[i].start_year < this.state.corsi[i+1].start_year ? "Classe 1" : "" })} >
               <div className="chart-wrapper">
                 <Line data={makeSocialBoxData(0)} options={socialChartOpts} height={90} />

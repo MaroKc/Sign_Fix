@@ -125,23 +125,24 @@ changeInfo = (changeInfo) => {
 
     if (!changeInfo) {
         return (
+            <>
+            <Row className="m4">
+            <Col xs='8'>
+            <h2>{this.state.firstName.toUpperCase()} {this.state.lastName.toUpperCase()}</h2>
+            <h4>{this.props.docente['0'].emailDocente}</h4>
+            </Col>
+          </Row>
+          <hr />
             <Table borderless responsive>
                 <tbody>
                     <tr>
-                        <td><h5>Nome:</h5></td>
-                        <td><h5 name="firstName">{this.state.firstName}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Cognome: </h5></td>
-                        <td><h5 name="lastName">{this.state.lastName}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Nome azienda:</h5></td>
+                        <td><h5>Nome compagnia:</h5></td>
                         <td><h5>{this.props.docente['0'].companyName}</h5> </td>
                     </tr>
                     {this.selectLesson()}
                 </tbody>
             </Table>
+            </>
         )
     }
     else {
@@ -193,8 +194,8 @@ renderButtons = (changeInfo) => {
         if (!changeInfo) {
             return (
                 <>
-                    <Button id="modifica" color="ghost-dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4"></i>&nbsp;<p>modifica</p></Button>
-                    <Button color="ghost-danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
+                    <Button id="modifica" color="dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4"></i>&nbsp;<p>modifica</p></Button>
+                    <Button color="danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
                 </>
             )
         } else {

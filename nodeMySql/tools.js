@@ -46,3 +46,16 @@ exports.formattedDecimal = (hoursToFormats) =>{
   }  
 }
 
+exports.formattedToDecimal = (hoursToFormats) =>{
+  //13: 00
+    hoursToFormats = (hoursToFormats.toString()).split(':')
+    if(hoursToFormats[1] == ' 00'){
+      return hoursToFormats[0]
+    }
+    else{
+      var hours=  hoursToFormats[0] +'.'+ (parseInt(hoursToFormats[1].trim(),10)/0.60).toFixed(0)
+      console.log(hours)
+      return hours
+    }
+}
+
