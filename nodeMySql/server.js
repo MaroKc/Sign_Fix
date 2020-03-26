@@ -431,8 +431,7 @@ app.put('/modifyPassword',function(req,res){
 
 app.put('/forgotPassword',function(req,res){
    var email= req.body.email
-   var firstName= req.body.firstName
-   var lastName = req.body.lastName
+
 
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
    var objectEmail = 'Credenziali Fitstic'
@@ -454,6 +453,44 @@ app.put('/forgotPassword',function(req,res){
          return res.send({ error: false, message: 'ko' });
       }})
 });
+
+app.post('/teacherBadge', function (req, res) {
+  try {
+     
+      var email= req.body.email
+      var date = req.body.date
+      var startTime = tools.formattedToDecimal(req.body.startTime)
+      var endTime = tools.formattedToDecimal(req.body.endTime)
+      var lessonId = req.body.lessonId
+      var hourOfLessons = endTime - startTime
+      
+      /*
+      var email= 'capaneo92@gmail.com'
+      var date = '2020-02-20'
+      var startTime = tools.formattedToDecimal('13: 30')
+      var endTime = tools.formattedToDecimal('17: 00')
+      var lessonId =1
+      var hourOfLessons = endTime - startTime
+      */
+
+      var query ="INSERT INTO `signatures_teachers`(`email_responsible`, `date`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`) VALUES (?,?,?,?,?,?)"
+
+      connection.query(query,[email,date,startTime,endTime,lessonId,hourOfLessons], function (error, result, fields) {
+         if (error) throw error;
+         if(result){
+            connection.query("UPDATE `lessons` SET  `email_signature`=? where `id` = ?",[email,lessonId], function (error, result, fields) {
+               if (error) throw error;
+               return res.send({ error: false, message: 'ok' });
+            });
+         }
+         return res.send({ error: false, message: 'ok' });
+      });
+    
+  } catch (error) {
+   return res.send({ error: false,data:error, message: 'ko' });
+  }
+});
+
 
 
 app.put('/updateSignature/:id_lesson',function(req,res){
