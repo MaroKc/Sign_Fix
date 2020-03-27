@@ -74,8 +74,6 @@ class Login extends Component {
   }
 
   forgotPassword = () => {
-    console.log(this.state.password1)
-    console.log(this.state.email)
         axios.put('http://localhost:8080/forgotPassword',{
             email: this.state.email,
         })
@@ -83,7 +81,7 @@ class Login extends Component {
                 console.log('arrivato')
                 if (res.data.message === "ok") 
                     {this.setState({warning: false})
-                    ToastsStore.success("La mail è stata inviata con successo")}
+                    ToastsStore.success("A breve ti arriverà la mail!")}
                 else if (res.data.message === "ko") ToastsStore.warning("Controlla di aver inserito la mail corretta")
             })
             .catch(err => {

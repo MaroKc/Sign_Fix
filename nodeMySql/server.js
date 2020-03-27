@@ -429,26 +429,26 @@ app.put('/modifyPassword',function(req,res){
    }
 });
 
-app.put('/forgotPassword', function (req, res) {
-   var email = req.body.email
+app.put('/forgotPassword',function(req,res){
+   var email= req.body.email
 
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-   var objectEmail = 'Credenziali Fitstic'
-   var textEmail = 'Le comunichiamo che in seguito alla sua richiesta la password è stata resettata. La nuova password è : ' + password
-
+   var objectEmail = 'Credenziali Fitstic';
+   var text='In seguito alla sua richiesta la password è stata resettata. Nuova password: '+ password;
+  
+   // var html = "<div>In seguito alla sua richiesta la password è stata resettata. Nuova PASSWORD: <b> {{password}} </b></div>";
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
-
-
-   connection.query("SELECT * FROM teachers where email_responsible='" + email + "'", function (e, row, fields) {
+   console.log(password)
+   connection.query("SELECT * FROM teachers where email_responsible='"+email+"'", function (e, row, fields) {
       if (e) throw error;
-      if (row.length == 1) {
-         connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?", [hash, email], function (error, result, fields) {
-            if (error) throw error;
-            sendEmails(email, objectEmail, textEmail)
-            return res.send({ error: false, data: result, message: 'ok' });
-         });
-      } else {
+      if(row.length==1){
+      connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?",[hash,email], function (error, result, fields) {
+         if (error) throw error;
+         sendEmails(email,objectEmail,text)
+         return res.send({ error: false, data: result, message: 'ok' });
+      });    
+   }else{
          return res.send({ error: false, message: 'ko' });
       }
    })
@@ -516,6 +516,47 @@ app.put('/updateSignature/:id_lesson', function (req, res) {
 });
 
 
+app.put('/teacherBadge', function (req, res) {
+   try {
+       var email= req.body.email
+       var date = req.body.date
+       var startTime = tools.formattedToDecimal(req.body.startTime)
+       var endTime = tools.formattedToDecimal(req.body.endTime)
+       var lessonId = req.body.lessonId
+       var hourOfLessons = endTime - startTime
+       console.log(email,date,startTime,endTime,lessonId,hourOfLessons)
+       /*
+       var email= 'capaneo92@gmail.com'
+       var date = '2020-02-20'
+       var startTime = tools.formattedToDecimal('13: 30')
+       var endTime = tools.formattedToDecimal('17: 00')
+       var lessonId =1
+       var hourOfLessons = endTime - startTime
+       */
+ 
+       var query ="INSERT INTO `signatures_teachers`(`email_responsible`, `date`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`) VALUES (?,?,?,?,?,?)"
+ 
+       connection.query(query,[email,date,startTime,endTime,lessonId,hourOfLessons], function (error, result, fields) {
+          if (error) throw error;
+          if(result){
+             connection.query("UPDATE `lessons` SET  `email_signature`=? where `id` = ?",[email,lessonId], function (error, result, fields) {
+                if (error) throw error;
+                return res.send({ error: false, message: 'ok' });
+             });
+          }
+       });
+     
+   } catch (error) {
+    return res.send({ error: false,data:error, message: 'ko' });
+   }
+ });
+
+ app.get('/getSignature',function(req,res){
+   connection.query("SELECT email_signature, id FROM lessons WHERE DATE(date) = CURDATE()", function (error, items, fields) {
+      if (error) throw error;
+      return res.send({ error: false, data: items, message: 'users list.' });
+   });
+});
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
@@ -671,6 +712,8 @@ app.get('/calendar/listLessons', function (req, res) {
       return res.send({ error: false, items: items, message: 'users list.' });
    });
 });
+
+
 
 
 app.post('/calendar/importLessons', async function (req, res) {

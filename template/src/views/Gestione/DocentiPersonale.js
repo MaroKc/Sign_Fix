@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {Table, Card, CardHeader, CardBody, Button, Input, Row, Col, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { MDBDataTable } from 'mdbreact';
+import { MDBDataTable, MDBBtn, MDBAlert, MDBProgress } from 'mdbreact';
 import axios from 'axios'
 import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
+
+
 
 
 class DocentiPersonale extends Component {
@@ -17,8 +19,8 @@ class DocentiPersonale extends Component {
             changeState: false,
             warning: false,
             password1: '',
-            password2: ''
-            
+            password2: '',
+            signature: [],
         }
     }
 
@@ -26,6 +28,8 @@ class DocentiPersonale extends Component {
     componentDidMount() {
         this.getTeachers();
         this.getTeacherDetails();
+        this.getSignature()
+        console.log(this.state.signature)
     }
 
 
@@ -49,8 +53,6 @@ class DocentiPersonale extends Component {
     }
 
     modifyPassword = () => {
-        console.log(this.state.password1)
-        console.log(this.state.warning)
             axios.put('http://localhost:8080/modifyPassword', {
                 password1: this.state.password1,
                 password2: this.state.password2,
@@ -98,17 +100,50 @@ class DocentiPersonale extends Component {
             .catch(err => console.error(err));
     }
 
+    badgeTeacher = () => {
+        var d = new Date(),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
 
-    groupBy = (objectArray, property) => {
-        return objectArray.reduce(function (acc, obj) {
-            var key = obj[property];
-            if (!acc[key]) {
-                acc[key] = [];
-            }
-            acc[key].push(obj);
-            return acc;
-        }, {});
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+
+    const currDate = [year, month, day].join('-');
+    
+        const todayLesson = this.state.lezioni.filter(lezione => lezione.date === currDate)
+        const todayMattina =todayLesson.filter(lezione => lezione.startTime.split(':')[0] < 13)
+        const todayPomeriggio =todayLesson.filter(lezione => lezione.startTime.split(':')[0] >= 13)
+
+        axios.put('http://localhost:8080/teacherBadge', {
+            email: this.props.user.email,
+            date: currDate,
+            startTime: d.getHours() < 13 ? todayMattina['0'].startTime : todayPomeriggio['0'].startTime,
+            endTime: d.getHours() < 13 ? todayMattina['0'].endTime : todayPomeriggio['0'].endTime,
+            lessonId: d.getHours() < 13 ? todayMattina['0'].lessonId : todayPomeriggio['0'].lessonId,
+        })
+            .then(res => {
+                if (res.data.message === "ok") {
+                    this.getSignature()
+                }
+                else if (res.data.message === "ko")console.log('problema')
+            })
+            .catch(err => {
+                return console.log(err);
+            });
     }
+
+    getSignature = () => {
+        
+            axios.get('http://localhost:8080/getSignature')
+            .then(res => {
+                this.setState({signature: res.data.data})
+                })
+            .catch(err => console.error(err));
+        }
+    
 
     getLesson = () => {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
@@ -117,6 +152,7 @@ class DocentiPersonale extends Component {
                 const lezioni = [];
                 res.data.map(item => lezioni.push({
                     date: item.date,
+                    lessonId: item.id,
                     classroom: item.classroom,
                     lessonName: item.lesson,
                     startTime: this.formatHours(item.startTime),
@@ -126,6 +162,18 @@ class DocentiPersonale extends Component {
                 this.setState({ lezioni });
             })
             .catch(err => console.error(err));
+    }
+
+    
+    groupBy = (objectArray, property) => {
+        return objectArray.reduce(function (acc, obj) {
+            var key = obj[property];
+            if (!acc[key]) {
+                acc[key] = [];
+            }
+            acc[key].push(obj);
+            return acc;
+        }, {});
     }
 
     formatHoursSemplice(hours) {
@@ -172,7 +220,6 @@ class DocentiPersonale extends Component {
     }
     
     getPercentage() {
-
         var d = new Date(),
         month = '' + (d.getMonth() + 1),
         day = '' + d.getDate(),
@@ -188,7 +235,6 @@ class DocentiPersonale extends Component {
         const pastLesson = this.state.lezioni.filter(lezione => lezione.date < currDate).map(filtredDate => (filtredDate));
             var initialValue = 0;
         let tipoLezione = pastLesson.filter(item => item.lessonName === this.state.value)
-        console.log(tipoLezione)
         var sum = tipoLezione.reduce(
             (accumulator, currentValue) => accumulator + parseInt(currentValue.percentage.split("%"), 10)
             ,initialValue
@@ -212,30 +258,25 @@ class DocentiPersonale extends Component {
     selectLesson = () => {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
         let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
-
+        let totalHours = (this.state.dettagliDocente.find(item => item.lessonName === this.state.value))
         if (this.state.dettagliDocente.length === 1) {
             return (
                 <>
-                    <tr>
-                        <td><h5>Lezione:</h5></td>
-                        <td><h5>{dettaglioDocente['0'] && dettaglioDocente['0'].lessonName}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore fatte:</h5></td>
-                        <td><h5>{dettaglioDocente && dettaglioDocente.hoursOfLessons}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{dettaglioDocente && dettaglioDocente.totalHours}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Percentuale presenze:</h5></td>
-                        <td><h5>{this.getPercentage()}</h5></td>
-                    </tr>
+                              <h3 className="text-left text-info">{dettaglioDocente.lessonName}</h3>
+                    <Row>
+                        <Col xs="6" className="mt-4 mb-4 text-center">
+                            <h6 className="mb-2">Ore fatte:</h6>
+                            <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
+                        </Col>
+                        <Col xs="6" className="mt-4 mb-4 text-center">
+                            <h6 className="mb-2">Percentuale presenze:</h6>
+                            <h2><b>{this.getPercentage()}</b></h2>
+                        </Col>
+                    </Row>
                 </>
             )
         } else {
-            let totalHours = (this.state.dettagliDocente.find(item => item.lessonName === this.state.value))
+        
             return (
                 <>
                     {/* <th>
@@ -403,6 +444,7 @@ class DocentiPersonale extends Component {
             day = '' + d.getDate(),
             year = d.getFullYear();
 
+
         if (month.length < 2)
             month = '0' + month;
         if (day.length < 2)
@@ -415,7 +457,8 @@ class DocentiPersonale extends Component {
         let giorno = data.getDay();
         let mese = data.getMonth();
 
-        
+
+
         if(giorno == 0) giorno = "Domenica";
         if(giorno == 1) giorno = "Lunedì";
         if(giorno == 2) giorno = "Martedì";
@@ -438,22 +481,37 @@ class DocentiPersonale extends Component {
         if(mese == 11) mese = "Dicembre";
 
         const todayLesson = this.state.lezioni.filter(lezione => lezione.date === currDate)
+       console.log(todayLesson.map(item => this.state.signature.filter(it =>it.email_signature === this.props.user.email && it.id === item.lessonId).length === 0))
 
         if (todayLesson.length !== 0) {
             return (
+                todayLesson.map(item =>
+                   
                 <Card>
                 <CardHeader className="my-auto text-center">
                    <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
                 </CardHeader>
                 <div>   
                     <CardBody>
-                    <Button color="success" size="lg" className="mb-3" block> TIMBRA </Button>
-                    <h3 className="text-center">{todayLesson['0'].startTime} - {todayLesson['0'].endTime}</h3>
-                    <h5 className="text-center">{todayLesson['0'].classroom}, {todayLesson['0'].lessonName}</h5>
-                    
+                    {
+                    data.getHours() >= item.startTime.split(':')[0] && data.getHours() <= item.endTime.split(':')[0] 
+                    // && data.getMinutes() >= parseInt(item.startTime.split(':')[1].trim()) && data.getMinutes() <= parseInt(item.endTime.split(':')[1].trim())
+                    ? 
+                        ((this.state.signature.filter(it =>it.email_signature === this.props.user.email && it.id === item.lessonId).length === 0) 
+                        ? 
+                        <Button color="success" size="lg" className="mb-3" onClick={this.badgeTeacher} block> TIMBRA </Button> 
+                        : 
+                        <h5 className="text-center mb3 text-info">Hai già firmato!</h5>)
+                    : 
+                    <Button color="success" size="lg" className="mb-3" disabled block> timbra</Button>
+                }
+                    <h3 className="text-center">{item.startTime} - {item.endTime}</h3>
+                    <h5 className="text-center">{item.classroom}, {item.lessonName}</h5>
+                 
                     </CardBody>
                 </div>
             </Card>
+                )
             )
         }else{
             return (
@@ -533,6 +591,7 @@ class DocentiPersonale extends Component {
 
                 {this.futureLessons()}
                 {this.pastLessons()}
+
                 <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
             </div>
         );
