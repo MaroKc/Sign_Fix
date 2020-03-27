@@ -22,4 +22,8 @@ Per far partire il sito:
 
 - npm install line-reader
 
+- npm install forever -g
+
+- npm install bcrypt
+
 --> node server.js (avvio)

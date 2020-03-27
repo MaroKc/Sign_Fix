@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, Col, Row, Modal, ModalBody, ModalFooter, ModalHeader, Button, Input, Table } from 'reactstrap';
 import axios from 'axios'
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
+import { MDBBtn } from "mdbreact";
 
 
 class infoStudente extends React.Component {
@@ -177,14 +178,14 @@ class infoStudente extends React.Component {
       if (!changeInfo) {
         return (
           <> 
-            <Button id="modifica" color="ghost-dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4"></i>&nbsp;<p>modifica</p></Button>
-            <Button color="ghost-danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
+            <Button id="modifica"  color="dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4 text-white"></i>&nbsp;<p>modifica</p></Button>
+            <Button color="danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
           </>
         )
       } else {
         return (
           <>
-            <Button outline color="dark" onClick={this.callForUpdate} disabled={!validationInput}> <i className="cui-check icons font-2xl d-block mt-2"></i>conferma <br /> modifica</Button>
+            <Button style={{background:'#2c7d7d', color:'white'}} onClick={this.callForUpdate} disabled={!validationInput}> <i className="cui-check icons font-2xl d-block mt-2 text-white"></i>conferma <br /> modifica</Button>
             {/* <Button outline color="dark" onClick={this.onclickModifyState}>torna <br /> indietro</Button> */}
           </>
         )
