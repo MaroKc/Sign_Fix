@@ -92,6 +92,8 @@ class DocentiPersonale extends Component {
                     dettagliDocente,
                     value: dettagliDocente['0'].lessonName
                 })
+                console.log(dettagliDocente)
+
             })
             .catch(err => console.error(err));
     }
