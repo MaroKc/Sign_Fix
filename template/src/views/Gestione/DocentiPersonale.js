@@ -588,7 +588,7 @@ class DocentiPersonale extends Component {
                 <div className="d-flex justify-content-around mb-4">
                     {this.state.changeState ? <Button disabled={true}  color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button>}
 
-                    {!this.state.changeState ? <MDBBtn disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></MDBBtn> : <MDBBtn outline color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></MDBBtn>}
+                    {!this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button>}
                 </div>
 
                 {this.futureLessons()}
