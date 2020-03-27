@@ -146,7 +146,6 @@ app.post('/auth', function (req, res) {
       if (error) {
          throw error;
       } else {
-         console.log(results)
          if (results.length > 0) {
             bcrypt.compare(pass, results[0].password, function (err, ress) {
                if (!ress) {
