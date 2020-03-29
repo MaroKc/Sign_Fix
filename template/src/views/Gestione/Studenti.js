@@ -151,7 +151,7 @@ class Studenti extends Component {
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button  outline color="success"><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
+                      <Button className="custom-btn"><label className="m-0" htmlFor="result"><i className="cui-user-follow icons font-2xl d-block"></i>Importa file studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>
@@ -198,7 +198,7 @@ class Studenti extends Component {
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button outline color="success"><label className="m-0" htmlFor="result">Importa file <br/> studenti</label></Button>      
+                      <Button className="custom-btn"><label className="m-0" htmlFor="result"><i className="cui-user-follow icons font-2xl d-block"></i>Importa file studenti</label></Button>      
                   </Col>
                 </Row>
               </CardHeader>
@@ -249,7 +249,7 @@ class Studenti extends Component {
         </ModalBody>
         <ModalFooter>
           <Button onClick={this.getCsv} color="danger">Continua</Button>{' '}
-          <Button color="secondary" onClick={this.toggleWarning}>Cancella</Button>
+          <Button className="secondary" onClick={this.toggleWarning}>Cancella</Button>
         </ModalFooter>
       </Modal>
     )

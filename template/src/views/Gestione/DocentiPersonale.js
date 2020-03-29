@@ -259,7 +259,7 @@ class DocentiPersonale extends Component {
         if (this.state.dettagliDocente.length === 1) {
             return (
                 <>
-                              <h3 className="text-left text-info">{dettaglioDocente.lessonName}</h3>
+                        <h3 className="text-left text-info">{dettaglioDocente.lessonName}</h3>
                     <Row>
                         <Col xs="6" className="mt-4 mb-4 text-center">
                             <h6 className="mb-2">Ore fatte:</h6>
@@ -486,8 +486,7 @@ class DocentiPersonale extends Component {
 
         if (todayLesson.length !== 0) {
             return (
-                todayLesson.map(item =>
-                   
+                todayLesson.map((item, i) => 
                 <Card>
                 <CardHeader className="my-auto text-center">
                    <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
@@ -585,9 +584,9 @@ class DocentiPersonale extends Component {
                 </div>
                 <hr />
                 <div className="d-flex justify-content-around mb-4">
-                    {this.state.changeState ? <Button disabled={true}  color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button>}
+                    {this.state.changeState ? <Button disabled={true}  color="primary" onClick={this.changeState} style={{fontSize: '18px'}}>Lezioni Passate</Button> : <Button outline color="primary" onClick={this.changeState} style={{fontSize: '18px'}}>Lezioni Passate</Button>}
 
-                    {!this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button>}
+                    {!this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState} style={{fontSize: '18px'}}> Lezioni Future</Button> : <Button outline color="primary" onClick={this.changeState} style={{fontSize: '18px'}}>Lezioni Future</Button>}
                 </div>
 
                 {this.futureLessons()}

@@ -62,7 +62,7 @@ class Docenti extends Component {
     .then(res =>  {
       let dettagliDocente = [];
       res.data.data.map(item => dettagliDocente.push({
-        companyName: item.name === item.emailTeacher ? "" : item.name,
+        companyName: item.name,
         lessonName: item.lesson,
         firstName: item.firstName,
         lastName: item.lastName,
@@ -184,8 +184,8 @@ handleChange = (event) => {
             field: 'emailDocente',
           },
           {
-            label: 'Compagnia',
-            field: 'companyName'
+            label: 'Identificativo/Compagnia',
+            field: 'companyName',
           }
         ]
       };
@@ -205,7 +205,7 @@ handleChange = (event) => {
                     <span className="font-weight-bold"><h3><b>DOCENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                    <span> <Button outline color="success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
+                    <span> <Button className="custom-btn" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
                   </Col>
                 </Row>
               </CardHeader>
@@ -251,7 +251,7 @@ handleChange = (event) => {
                     <span className="font-weight-bold"><h3><b>DOCENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                    <span> <Button outline color="success" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
+                    <span> <Button className="custom-btn mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
                   </Col>
                 </Row>
               </CardHeader>
@@ -290,11 +290,12 @@ handleChange = (event) => {
   }
 
   formDocente(){
-    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
+    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\'\s]*$/;
     const regexEmail =	/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-    const {firstName, lastName, emailDocente} = this.state
+    const {firstName, lastName, emailDocente, companyName} = this.state
     const validationFirstName = firstName.length > 2 && regexLettere.test(firstName) 
     const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
+    const validationIdentificativo = companyName.length >= 2 && regexLettere.test(companyName)
     const validationEmail = emailDocente.length > 4 && regexEmail.test(emailDocente)
 
     return (
@@ -322,15 +323,15 @@ handleChange = (event) => {
                         <td><Input id="infoEmail" name='emailDocente' onChange={this.handleChange} value={this.state.emailDocente} invalid={!validationEmail && emailDocente.length !== 0} valid={validationEmail}/></td>
                       </tr>
                       <tr>
-                        <td><h5>Compagnia:</h5></td>
-                        <td><Input id="infoCompanyName" name='companyName' onChange={this.handleChange} value={this.state.companyName}/></td>
+                        <td><h5>Identificativo calendario <br/>o compagnia:</h5></td>
+                        <td><Input id="infoCompanyName" name='companyName' onChange={this.handleChange} value={this.state.companyName} invalid={!validationIdentificativo && companyName.length !== 0} valid={validationIdentificativo}/></td>
                       </tr>
                     </tbody>
                   </Table>
                 </div>
               </Col>
               <Col xs="auto" className="my-auto mx-auto pr-5">
-                <Button outline color="dark" disabled={!validationFirstName || !validationLastName || !validationEmail} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
+                <Button className="custom-btn" disabled={!validationFirstName || !validationLastName || !validationEmail || !validationIdentificativo} onClick={this.createTeacher}> <i className="cui-check icons font-2xl d-block mt-2"  ></i>Crea <br /> docente</Button>
               </Col>
             </Row>
           </CardBody>

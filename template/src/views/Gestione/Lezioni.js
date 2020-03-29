@@ -20,10 +20,15 @@ class Lezioni extends React.Component {
       accordion: [false, false],
       displayCard: null,
       displayId: null,
-      mattinaPomeriggio: null
+      mattinaPomeriggio: null,
+      companyNameMattina: null,
+      companyNamePomeriggio: null
     }
   }
 
+  componentDidMount(){
+    this.getLessons()
+  }
   handleChange = date => {
       this.setState({
         startDate: date
@@ -48,9 +53,10 @@ class Lezioni extends React.Component {
   }
 
   getLessons = () => {
+    
       var data_appoggio = new Intl.DateTimeFormat('usa', { year: 'numeric', month: '2-digit', day: '2-digit'}).format(this.state.startDate)
       var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
-      axios.get('http://localhost:8080/lessons/' + data_scelta+'/'+this.props.classe["id"])
+      axios.get('http://localhost:8080/lessons/'+ data_scelta+'/'+this.props.classe["id"])
       .then(res => res.data)
       .then((data) => {
         const lezioniMattina = [];
@@ -59,6 +65,7 @@ class Lezioni extends React.Component {
         data.map((item) => {
         if(item.startTime < 12){
         lezioniMattina.push({
+          name: item.name,
           id: item.id,
           lesson: item.lesson,
           email: item.email,
@@ -69,6 +76,7 @@ class Lezioni extends React.Component {
       }
       else{
         lezioniPomeriggio.push({
+          name: item.name,
           id: item.id,
           lesson: item.lesson,
           email: item.email,
@@ -82,6 +90,7 @@ class Lezioni extends React.Component {
           lezioniMattina ,
           lezioniPomeriggio
         });
+        
       })
       .catch(err => console.error(err));
 
@@ -123,8 +132,10 @@ class Lezioni extends React.Component {
               studentiPomeriggio 
            });
         })
+
         .catch(err => console.error(err));
     }
+
 
   formatHours (hours){
       var startLessonAppoggio= (hours.toString()).split('.')
@@ -145,19 +156,19 @@ class Lezioni extends React.Component {
       }
   }
 
-  lezioneMattina = () => {
-    let nomeLezione;
-    let inizioLezione;
-    let fineLezione;
-    let classe;
-    let email;
-    
-    this.state.lezioniMattina.map((mapItem) => {
+    lezioneMattina = () => {
+      let nomeLezione;
+      let inizioLezione;
+      let fineLezione;
+      let classe;
+      let identificativo;
+      
+      this.state.lezioniMattina.map((mapItem) => {
+        identificativo = mapItem.name;
         nomeLezione = mapItem.lesson;
         inizioLezione = mapItem.startTime;
         fineLezione = mapItem.endTime;
         classe = mapItem.classroom;
-        email = mapItem.email.split('@')[0];
     });
 
     let assenti = []
@@ -169,8 +180,6 @@ class Lezioni extends React.Component {
           lastName: item.lastName
         })
       }})
-   
-
 
     if (nomeLezione) {
       
@@ -185,7 +194,7 @@ class Lezioni extends React.Component {
                 <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5> 
                 </Col>
                 <Col className="col-sm-8 mt-3">
-                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Docente: <b>{email}</b></p></h5>
+                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
              {!assenti.length ? "" :  <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</h4> </div>}
@@ -206,14 +215,14 @@ class Lezioni extends React.Component {
     let inizioLezione;
     let fineLezione;
     let classe;
-    let email;
+    let identificativo;
 
     this.state.lezioniPomeriggio.map((mapItem) => {
+        identificativo = mapItem.name;
         nomeLezione = mapItem.lesson;
         inizioLezione = mapItem.startTime;
         fineLezione = mapItem.endTime;
         classe = mapItem.classroom;
-        email = mapItem.email.split('@')[0];
     });
 
     let assenti = []
@@ -238,7 +247,7 @@ class Lezioni extends React.Component {
                 <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
                 <Col className="col-sm-8 mt-3">
-                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Docente: <b>{email}</b></p></h5>
+                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
               {!assenti.length ? "" :  <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</h4></div>}
