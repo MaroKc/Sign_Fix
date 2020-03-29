@@ -196,7 +196,7 @@ let LeassonExist = (studentEmail,Data,ora,timeExtraEntrata,timeExtraUscita) => {
 app.post('/badge', function (req, res) {
 
    const qr = req.body.qr;
-   const datetimeNow = new Date('2020-02-10 8:24:00');
+   const datetimeNow = new Date();
    const Data = tools.formattedDate(datetimeNow);
    const ora = datetimeNow.getHours() + (datetimeNow.getMinutes() / 0.6) / 100;
    //DA FARE IN SETTINGS
