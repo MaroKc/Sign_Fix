@@ -279,6 +279,7 @@ app.get('/listTeachers', function (req, res) {
    }
 });
 
+
 app.get('/teacherDetails', function (req, res) {
    try {
       var data = []
@@ -314,12 +315,20 @@ app.put('/updateTeacher/:email', function (req, res) {
       var email = req.params.email
       var first_name = req.body.first_name
       var last_name = req.body.last_name
+      var company_name = req.body.company_name
 
       var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
-      connection.query(query, [first_name, last_name, email], function (error, results, fields) {
+      connection.query(query, [first_name, last_name, email], function (error, result, fields) {
          if (error) throw error;
-         res.send({ error: true, data: results, message: 'ok' });
+         connection.query("SELECT companies_id FROM teachers WHERE email_responsible ='"+email+"'", function (errore, results, fields) {
+            if (errore) throw errore;
+            connection.query("UPDATE companies SET name=? WHERE id=?",[company_name, results[0].companies_id], function (err, item, fields) {
+               if (err) throw err;
+               res.send({ error: true, message: 'ok' });
+            })
+         })
       });
+      
    } catch (error) {
       res.send({ error: true, data: error, message: 'ko' });
    }
@@ -419,9 +428,6 @@ app.put('/modifyPassword', function (req, res) {
    var password1 = req.body.password1
    var password2 = req.body.password2
    var email = req.body.email
-   console.log(password1)
-   console.log(password2)
-   console.log(email)
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password1.toString(), salt);
    if (password1 === password2) {
@@ -444,7 +450,7 @@ app.put('/forgotPassword',function(req,res){
    // var html = "<div>In seguito alla sua richiesta la password è stata resettata. Nuova PASSWORD: <b> {{password}} </b></div>";
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
-   console.log(password)
+
    connection.query("SELECT * FROM teachers where email_responsible='"+email+"'", function (e, row, fields) {
       if (e) throw error;
       if(row.length==1){
@@ -491,7 +497,6 @@ app.put('/teacherBadge', function (req, res) {
        var endTime = tools.formattedToDecimal(req.body.endTime)
        var lessonId = req.body.lessonId
        var hourOfLessons = endTime - startTime
-       console.log(email,date,startTime,endTime,lessonId,hourOfLessons)
        /*
        var email= 'capaneo92@gmail.com'
        var date = '2020-02-20'
@@ -532,11 +537,12 @@ app.get('/lessons/:date/:id_course', function (req, res) {
 
    var data_Scelta = date_appoggio.split('-');
    var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
-   connection.query("SELECT * FROM lessons WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
+   connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
             {
+               name: element.name,
                email: element.email_signature,
                classroom: element.classroom,
                id: element.id,
@@ -661,11 +667,9 @@ app.put('/retireStudent/:email', function (req, res) {
 
    try {
       var email = req.params.email;
-      console.log("arrivo", email)
       var ritirato = req.body.ritirato
 
       var query = "UPDATE `students` SET `ritirato` = ? WHERE `email` = ?";
-      console.log(query)
       connection.query(query, [ritirato, email], function (error, results, fields) {
          if (error) throw error;
          res.send({ error: false, data: results, message: 'ok' });
@@ -802,7 +806,7 @@ app.post('/calendar/importLessons', async function (req, res) {
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
                   const totalHours = timeEnd - timeStart;
                   const checkProf = await ProfCheck(teacher);
-                  const checkLeasson = lessontype;
+                  const checkLesson = lessontype;
 
                   if (checkProf === false) {
                      riga.prof = "Sconosciuto";
