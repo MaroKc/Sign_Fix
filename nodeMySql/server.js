@@ -31,8 +31,8 @@ function sendEmails(emailTo, objectEmail, text) {
    var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-         user: 'registro.luca.pw@gmail.com',
-         pass: 'fitstic2020'
+         user: 'user',
+         pass: 'pass'
       }
    });
 

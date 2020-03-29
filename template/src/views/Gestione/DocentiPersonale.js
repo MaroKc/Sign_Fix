@@ -16,7 +16,7 @@ class DocentiPersonale extends Component {
             lezioni: [],
             docenti: [],
             dettagliDocente: [],
-            value:'',
+            value: '',
             changeState: false,
             warning: false,
             password1: '',
@@ -156,7 +156,7 @@ class DocentiPersonale extends Component {
                     lessonName: item.lesson,
                     startTime: this.formatHours(item.startTime),
                     endTime: this.formatHours(item.endTime),
-                    percentage: item.percentuale.toFixed(0)+"%"
+                    percentage: item.percentuale.toFixed(0) + "%"
                 }));
                 this.setState({ lezioni });
             })
@@ -234,7 +234,7 @@ class DocentiPersonale extends Component {
         let tipoLezione = pastLesson.filter(item => item.lessonName === this.state.value)
         var sum = tipoLezione.reduce(
             (accumulator, currentValue) => accumulator + parseInt(currentValue.percentage.split("%"), 10)
-            ,initialValue
+            , initialValue
         );
         return (sum / tipoLezione.length) ? (sum / tipoLezione.length).toFixed(0)+"%" : 0+'%'
     }
@@ -244,12 +244,12 @@ class DocentiPersonale extends Component {
         let month = String(date.getMonth() + 1);
         let day = String(date.getDate());
         const year = String(date.getFullYear());
-      
+
         if (month.length < 2) month = '0' + month;
         if (day.length < 2) day = '0' + day;
-      
+
         return `${day}/${month}/${year}`;
-      }
+    }
 
 
     selectLesson = () => {
@@ -318,7 +318,7 @@ class DocentiPersonale extends Component {
 
     }
 
-    
+
 
 
     pastLessons() {
@@ -359,26 +359,26 @@ class DocentiPersonale extends Component {
             row: pastLesson
         };
 
-        if(this.state.changeState){
-        return (
-            <div className="mb-4">
-                <CardBody>
-                    <MDBDataTable
-                        responsive
-                        hover
-                        data={{ columns: data.columns, rows: data.row }}
-                        searching={false}
-                        paging={false}
-                        noBottomColumns={true}
-                    />
-                </CardBody>
+        if (this.state.changeState) {
+            return (
+                <div className="mb-4">
+                    <CardBody>
+                        <MDBDataTable
+                            responsive
+                            hover
+                            data={{ columns: data.columns, rows: data.row }}
+                            searching={false}
+                            paging={false}
+                            noBottomColumns={true}
+                        />
+                    </CardBody>
 
-            </div>
-        );
-        }   
+                </div>
+            );
+        }
     }
 
-    
+
 
     futureLessons() {
         var d = new Date(),
@@ -420,22 +420,23 @@ class DocentiPersonale extends Component {
             ],
             row: futureLesson
         };
-        if(futureLesson.length !== 0 && !this.state.changeState){
-        return (
-            <div className="mb-4">
-                <CardBody>
-                    <MDBDataTable
-                        responsive
-                        hover
-                        data={{ columns: data.columns, rows: data.row }}
-                        searching={false}
-                        paging={false}
-                        noBottomColumns={true}
-                    />
-                </CardBody>
+        if (futureLesson.length !== 0 && !this.state.changeState) {
+            return (
+                <div className="mb-4">
+                    <CardBody>
+                        <MDBDataTable
+                            responsive
+                            hover
+                            data={{ columns: data.columns, rows: data.row }}
+                            searching={false}
+                            paging={false}
+                            noBottomColumns={true}
+                        />
+                    </CardBody>
 
-            </div>
-        )}else if (!this.state.changeState){return <h3 className="mb-4 text-center">A quanto pare non hai lezioni in programma!</h3>}
+                </div>
+            )
+        } else if (!this.state.changeState) { return <h3 className="mb-4 text-center">A quanto pare non hai lezioni in programma!</h3> }
     }
 
 
@@ -513,12 +514,12 @@ class DocentiPersonale extends Component {
             </Card>
                 )
             )
-        }else{
+        } else {
             return (
                 <Card>
-                <CardHeader className="my-auto text-center">
-                   <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
-                </CardHeader>
+                    <CardHeader className="my-auto text-center">
+                        <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
+                    </CardHeader>
                 </Card>
             )
         }
