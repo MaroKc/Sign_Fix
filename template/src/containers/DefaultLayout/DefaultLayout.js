@@ -73,6 +73,12 @@ class DefaultLayout extends Component {
           navR = routesStud;
           navTo = '/studentiPersonale';
           break;
+
+        default:
+          navM = navigationStud;
+          navR = routesStud;
+          navTo = '/studentiPersonale';
+          break;
       }
     }
 
