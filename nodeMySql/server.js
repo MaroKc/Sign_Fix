@@ -758,8 +758,8 @@ app.get('/listSignaturesStudents/:data_scelta/:id_course', function (req, res) {
                email: element.email,
                idLesson: element.id_lesson,
                emailStudent: element.email,
-               startTime: tools.formattedDecimal(element.final_start_time) != null ? tools.formattedDecimal(element.final_start_time) : 'assente',
-               endTime: tools.formattedDecimal(element.final_end_time) != null ? tools.formattedDecimal(element.final_end_time) : 'assente'
+               startTime: tools.formattedDecimal(element.final_start_time) != '0' ? tools.formattedDecimal(element.final_start_time) : 'assente',
+               endTime: tools.formattedDecimal(element.final_end_time) != '0' ? tools.formattedDecimal(element.final_end_time) : 'assente'
             })
       })
       return res.send(JSON.stringify(data));
