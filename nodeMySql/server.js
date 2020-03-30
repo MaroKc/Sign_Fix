@@ -255,6 +255,34 @@ app.post('/importCsv/:id_course', function (req, res) {
    }
 });
 
+app.get('/getTeacher', function (req, res) {
+   var data = []
+
+   try {
+      /*
+      var emailMattina = req.body.emailMattina
+      var emailPomeriggio = req.body.emailPomeriggio
+*/
+connection.query("SELECT name FROM companies JOIN teachers ON companies.id = teachers.companies_id WHERE email_responsible =?", ['matteo@info.com'], function (error, results, fields) {
+   if (error) throw error;
+   results.forEach(element =>
+      {data.push({name: element.name, email: 'pippa'})}
+      )
+   });
+      connection.query("SELECT name FROM companies JOIN teachers ON companies.id = teachers.companies_id WHERE email_responsible =?", ['matteo@info.com'], function (error, results, fields) {
+         if (error) throw error;
+         results.forEach(element =>
+            {data.push({name: element.name, email: 'pippo'})}
+            )
+            return res.send({ error: true, data: data, message: 'ok' });
+
+         });
+
+   } catch (error) {
+      return res.send({ error: true, data: error, message: 'ko' });
+   }
+});
+
 app.get('/listTeachers', function (req, res) {
    try {
       var data = []
@@ -565,11 +593,12 @@ app.get('/lessons/:date/:id_course', function (req, res) {
 
    var data_Scelta = date_appoggio.split('-');
    var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
-   connection.query("SELECT * FROM lessons WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
+   connection.query("name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
             {
+               name: element.name,
                email: element.email_signature,
                classroom: element.classroom,
                id: element.id,
@@ -666,6 +695,83 @@ app.get('/listStudents/:id_course', function (req, res) {
       return res.send(JSON.stringify(data));
    });
 });
+
+
+app.get('/listPersonalStudent', function (req, res) {
+   var data = [];
+   var totalHours = []
+   var datetimeNow = new Date();
+  // var email = 'tgrimes1@linkedin.com'
+   var email = req.body.email
+   var id_course = req.body.id_course
+   
+   try {
+         connection.query("SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date <= '" + tools.formattedDate(datetimeNow) + "' and id_course= " + id_course + "", function (error, results, fields) {
+            if (error) throw error;
+            totalHours.push({
+               totalHours: results[0].total_hours
+            })
+         });
+         connection.query("SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student where email = ?",[email], function (err, items, fields) {
+            if (err) throw err;
+      
+            items.forEach(element => {
+               var percentage = ((element.hours_of_lessons * 100) / totalHours[0].totalHours).toFixed(0)
+      
+               data.push(
+                  {
+                     firstName: element.first_name,
+                     lastName: element.last_name,
+                     email: element.email,
+                     fiscalCode: element.fiscal_code,
+                     dateOfBirth: element.date_of_birth,
+                     residence: element.residence,
+                     hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
+                     percentage: (percentage) ? (percentage) + " %" : '0',
+                     ritirato: element.ritirato
+                  })
+            })
+            return res.send({ error: false, data: data, message: 'ok' });
+         });     
+   } catch (error) {
+      return res.send({ error: false, data: error, message: 'ko' });
+   }
+});
+
+
+app.get('/StudentPercentage', function (req, res) {
+   var data = []
+
+   try {
+      //var email= 'dmycockf@posterous.com'
+
+      var email= req.body.email
+      var query ="select lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons from signatures_students join lessons on signatures_students.id_lesson= lessons.id where email_student =? group by lesson"
+      connection.query(query,[email], function (error, results, fields) {
+         if (error) throw error;
+         if(results.length !==0){
+            results.forEach(element => {
+               data.push({
+                  lessonName : element.lesson,
+                  totalHours : element.total_hours,
+                  hoursOfLessons : element.hours_of_lessons,
+                  percentage : ((element.hours_of_lessons*100)/ element.total_hours).toFixed(0)
+               })
+            });
+            return res.send({ error: false,data:data, message: 'ok' });
+         }
+         else{
+            return res.send({ error: false, message: 'Errore' });
+         }
+         
+      });
+     
+   } catch (error) {
+      return res.send({ error: false, message: 'ko' });
+   }
+});
+
+
 
 app.put('/updateStudent/:email', function (req, res) {
 
@@ -848,7 +954,7 @@ app.post('/calendar/importLessons', async function (req, res) {
                   }
 
                } catch (err) {
-                  return res.send({ error: false, data: err, message: 'Errore di salvataggio dei dati' });
+                  return res.send({ error: false, data: errori, message: 'Errore di inserimento' });
                }
             }); //fine map
 
