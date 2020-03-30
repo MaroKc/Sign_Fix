@@ -4,13 +4,17 @@ import axios from 'axios'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
+var QRCode = require('qrcode.react');
+
 class StudentiPersonale extends Component {
     constructor(props) {
         super(props);
         this.state = {
            studenti: [],
            lessons: [],
-           lezione: []
+           lezione: [],
+           code: '',
+           changeState: false
         }
 
     }
@@ -19,8 +23,19 @@ class StudentiPersonale extends Component {
         this.getStudents();
         this.getLessonsPercentage();
         this.getLessons();
+        this.getCode();
     }
 
+    getCode = () => {
+        axios.get('http://localhost:8080/getCode/'+ this.props.user['0'].email)
+          .then(res => res.data)
+          .then((data, index) => {
+            let code = '';
+            code = data.data[0].code
+            this.setState({ code });
+          })
+          .catch(err => console.error(err));
+    }
 
     getStudents = () => {
         axios.get('http://localhost:8080/listStudents/'+ this.props.user['0'].id_course)
@@ -129,7 +144,7 @@ class StudentiPersonale extends Component {
                 <h2><b>{studente && studente.hoursOfLessons} / {studente && studente.totalHours}</b></h2>
             </Col>
             <Col xs="6" className="my-auto text-center">
-            <CircularProgressbar styles={buildStyles({pathColor: studente && studente.percentage <= 80 ? `red` : ''})} value={studente && studente.percentage} counterClockwise={true} text={`${studente && studente.percentage}%`} />
+            <CircularProgressbar styles={buildStyles({pathColor: studente && studente.percentage <= 80 ? `red` : ''})} value={studente && studente.percentage} counterClockwise={true} text={`${studente && studente.percentage}%`} className='mb-3'/>
             </Col>
         </Row>
         )
@@ -229,11 +244,17 @@ class StudentiPersonale extends Component {
                     ? 
                         // ((this.state.signature.filter(it =>it.email_signature === this.props.user.email && it.id === item.lessonId).length === 0) 
                         // ? 
-                        <Button color="success" size="lg" className="mb-3" onClick={this.badgeTeacher} block> TIMBRA </Button> 
+                        <>
+                        <Button color="success" size="lg" className="mb-3" onClick={this.badgeTeacher} block> firma INGRESSSO </Button> 
+                        <Button color="success" size="lg" className="mb-3" block> firma USCITA </Button> 
+                        </>
                         // : 
                         // <h5 className="text-center mb3 text-info">Hai già firmato!</h5>)
                     : 
-                    <Button color="success" size="lg" className="mb-3" disabled block> timbra</Button>
+                    <>
+                    <Button color="success" size="lg" className="mb-3" disabled block> firma INGRESSSO</Button>
+                    <Button color="success" size="lg" className="mb-3" disabled block> firma USCITA</Button>
+                    </>
                 }
                     <h3 className="text-center">{item.startTime} - {item.endTime}</h3>
                     <h5 className="text-center">{item.lesson} <br /> {item.classroom}</h5>
@@ -254,12 +275,34 @@ class StudentiPersonale extends Component {
         }
     }
 
+    changeState = () => {
+        this.setState({changeState: !this.state.changeState})
+    }
+
+    qr(){
+            return (
+                <>
+                <div>
+                <div className="text-right">
+                <Button onClick={this.changeState} className="mb-4 mr-2">X</Button>
+                </div>
+
+                <div className="d-flex justify-content-center my-auto">
+                <QRCode size={275} value={this.state.code} />
+                </div>
+                </div>
+                
+                </>
+                )
+}
     render() {
-        
         let studente = this.state.studenti.find(studente => studente.email === this.props.user['0'].email)
-        console.log(this.state.lezione)
+        if(!this.state.changeState){
         return (
             <>
+            <div className="text-center">
+            <Button color="primary" size="lg" className="btn-pill mb-3" onClick={this.changeState}> <b>QR code</b></Button> 
+            </div>
             {this.todayLesson()}
             <div  className="text-right">
             {/* {this.todayLesson()} */}
@@ -274,6 +317,9 @@ class StudentiPersonale extends Component {
         
         </>
         )
+        }else{
+            return <>{this.qr()}</>
+        }
     }
 
 }

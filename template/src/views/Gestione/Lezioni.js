@@ -53,9 +53,9 @@ class Lezioni extends React.Component {
   }
 
   getLessons = () => {
-    
       var data_appoggio = new Intl.DateTimeFormat('usa', { year: 'numeric', month: '2-digit', day: '2-digit'}).format(this.state.startDate)
       var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
+
       axios.get('http://localhost:8080/lessons/'+ data_scelta+'/'+this.props.classe["id"])
       .then(res => res.data)
       .then((data) => {
@@ -197,7 +197,7 @@ class Lezioni extends React.Component {
                 <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
-             {!assenti.length ? "" :  <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</h4> </div>}
+             {!assenti.length ? "" :  <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) => <span key={i}>{item.firstName} {item.lastName}, </span>)}</h4> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
@@ -250,7 +250,7 @@ class Lezioni extends React.Component {
                 <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
-              {!assenti.length ? "" :  <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map(item => <span>{item.firstName} {item.lastName}, </span>)}</h4></div>}
+              {!assenti.length ? "" :  <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) =>  <span ket={i}> {item.firstName} {item.lastName}, </span>)}</h4></div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[1]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">

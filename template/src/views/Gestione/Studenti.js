@@ -38,7 +38,7 @@ class Studenti extends Component {
           residence: item.residence,
           fiscalCode: item.fiscalCode,
           hoursOfLessons: this.formatHours(item.hoursOfLessons),
-          percentage: item.percentage < "80" ? <div className="text-danger">{item.percentage}</div> : <div className="text-success">{item.percentage}</div>,
+          percentage: item.percentage < "80" ? <div className="text-danger">{item.percentage}%</div> : <div className="text-success">{item.percentage}%</div>,
           ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
         }));
@@ -70,7 +70,7 @@ class Studenti extends Component {
     axios.post('http://localhost:8080/importCsv/'+this.state.idCorso, {data: this.state.result})
     .then(res => res.data)
     .then(res => {
-      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!");else{ToastsStore.warning("OPSSSSSSS")}
+      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!");else{ToastsStore.warning("OPS, qualcosa è andato storto")}
       this.refresh()
       this.toggleWarning()  
     })

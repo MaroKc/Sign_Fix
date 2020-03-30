@@ -12,6 +12,8 @@ Per far partire il sito:
 
 - npm install --save react-circular-progressbar
 
+- npm install qrcode.react
+
 --> npm start (avvio)
 
 ## Cartella nodeMysql:
