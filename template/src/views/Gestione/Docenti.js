@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import { MDBDataTable } from 'mdbreact';
+import { MDBDataTable, MDBBtn } from 'mdbreact';
 import InfoDocente from './InfoDocente';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 import {
