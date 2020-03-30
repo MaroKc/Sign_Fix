@@ -125,8 +125,7 @@ class infoStudente extends React.Component {
       )
     }
     else {
-
-      const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
+      const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\'\s]*$/;
       const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
       const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
       const {firstName, lastName, residence, fiscalCode, dateOfBirth} = this.state
@@ -169,7 +168,7 @@ class infoStudente extends React.Component {
   }
 
   renderButtons = (changeInfo) => {
-    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
+    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\'\s]*$/;
     const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
     const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
     const { firstName, lastName, residence, fiscalCode, dateOfBirth } = this.state
@@ -180,14 +179,14 @@ class infoStudente extends React.Component {
       if (!changeInfo) {
         return (
           <> 
-            <Button id="modifica" className="custom-btn" color="dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4 text-white "></i>&nbsp;<p>modifica</p></Button>
+            <Button id="modifica" className="custom-btn" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4 text-white"></i>&nbsp;<p>modifica</p></Button>
             <Button color="danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
           </>
         )
       } else {
         return (
           <>
-            <Button style={{background:'#2c7d7d', color:'white'}} onClick={this.callForUpdate} disabled={!validationInput}> <i className="cui-check icons font-2xl d-block mt-2 text-white"></i>conferma <br /> modifica</Button>
+            <Button className="custom-btn" onClick={this.callForUpdate} disabled={!validationInput}> <i className="cui-check icons font-2xl d-block mt-2 text-white"></i>conferma <br /> modifica</Button>
             {/* <Button outline color="dark" onClick={this.onclickModifyState}>torna <br /> indietro</Button> */}
           </>
         )
@@ -208,7 +207,7 @@ class infoStudente extends React.Component {
         </ModalBody>
         <ModalFooter>
           <Button color="danger" onClick={this.callForRetire}>Continua</Button>{' '}
-          <Button color="secondary" onClick={this.toggleWarning}>Cancella</Button>
+          <Button className="secondary" onClick={this.toggleWarning}>Cancella</Button>
         </ModalFooter>
       </Modal>
     )

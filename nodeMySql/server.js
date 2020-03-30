@@ -399,6 +399,7 @@ app.get('/listTeachers', function (req, res) {
    }
 });
 
+
 app.get('/teacherDetails', function (req, res) {
    try {
       var data = []
@@ -434,12 +435,20 @@ app.put('/updateTeacher/:email', function (req, res) {
       var email = req.params.email
       var first_name = req.body.first_name
       var last_name = req.body.last_name
+      var company_name = req.body.company_name
 
       var query = "UPDATE `teachers` SET `first_name`=?,`last_name`=? WHERE `email_responsible` = ?";
-      connection.query(query, [first_name, last_name, email], function (error, results, fields) {
+      connection.query(query, [first_name, last_name, email], function (error, result, fields) {
          if (error) throw error;
-         res.send({ error: true, data: results, message: 'ok' });
+         connection.query("SELECT companies_id FROM teachers WHERE email_responsible ='"+email+"'", function (errore, results, fields) {
+            if (errore) throw errore;
+            connection.query("UPDATE companies SET name=? WHERE id=?",[company_name, results[0].companies_id], function (err, item, fields) {
+               if (err) throw err;
+               res.send({ error: true, message: 'ok' });
+            })
+         })
       });
+      
    } catch (error) {
       res.send({ error: true, data: error, message: 'ko' });
    }
@@ -539,7 +548,6 @@ app.put('/modifyPassword',function(req,res){
    var password1 = req.body.password1
    var password2 = req.body.password2
    var email = req.body.email
-   
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password1.toString(), salt);
    if (password1 === password2) {
@@ -563,8 +571,8 @@ app.put('/forgotPassword', function (req, res) {
    // var html = "<div>In seguito alla sua richiesta la password è stata resettata. Nuova PASSWORD: <b> {{password}} </b></div>";
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
-   console.log(password)
-   connection.query("SELECT * FROM teachers where email_responsible='" + email + "'", function (e, row, fields) {
+
+   connection.query("SELECT * FROM teachers where email_responsible='"+email+"'", function (e, row, fields) {
       if (e) throw error;
       if (row.length == 1) {
          connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?", [hash, email], function (error, result, fields) {
@@ -642,34 +650,33 @@ app.put('/updateSignature/:id_lesson', function (req, res) {
 
 app.put('/teacherBadge', function (req, res) {
    try {
-      var email = req.body.email
-      var date = req.body.date
-      var startTime = tools.formattedToDecimal(req.body.startTime)
-      var endTime = tools.formattedToDecimal(req.body.endTime)
-      var lessonId = req.body.lessonId
-      var hourOfLessons = endTime - startTime
-      console.log(email, date, startTime, endTime, lessonId, hourOfLessons)
-      /*
-      var email= 'capaneo92@gmail.com'
-      var date = '2020-02-20'
-      var startTime = tools.formattedToDecimal('13: 30')
-      var endTime = tools.formattedToDecimal('17: 00')
-      var lessonId =1
-      var hourOfLessons = endTime - startTime
-      */
-
-      var query = "INSERT INTO `signatures_teachers`(`email_responsible`, `date`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`) VALUES (?,?,?,?,?,?)"
-
-      connection.query(query, [email, date, startTime, endTime, lessonId, hourOfLessons], function (error, result, fields) {
-         if (error) throw error;
-         if (result) {
-            connection.query("UPDATE `lessons` SET  `email_signature`=? where `id` = ?", [email, lessonId], function (error, result, fields) {
-               if (error) throw error;
-               return res.send({ error: false, message: 'ok' });
-            });
-         }
-      });
-
+       var email= req.body.email
+       var date = req.body.date
+       var startTime = tools.formattedToDecimal(req.body.startTime)
+       var endTime = tools.formattedToDecimal(req.body.endTime)
+       var lessonId = req.body.lessonId
+       var hourOfLessons = endTime - startTime
+       /*
+       var email= 'capaneo92@gmail.com'
+       var date = '2020-02-20'
+       var startTime = tools.formattedToDecimal('13: 30')
+       var endTime = tools.formattedToDecimal('17: 00')
+       var lessonId =1
+       var hourOfLessons = endTime - startTime
+       */
+ 
+       var query ="INSERT INTO `signatures_teachers`(`email_responsible`, `date`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`) VALUES (?,?,?,?,?,?)"
+ 
+       connection.query(query,[email,date,startTime,endTime,lessonId,hourOfLessons], function (error, result, fields) {
+          if (error) throw error;
+          if(result){
+             connection.query("UPDATE `lessons` SET  `email_signature`=? where `id` = ?",[email,lessonId], function (error, result, fields) {
+                if (error) throw error;
+                return res.send({ error: false, message: 'ok' });
+             });
+          }
+       });
+     
    } catch (error) {
       return res.send({ error: false, data: error, message: 'ko' });
    }
@@ -691,7 +698,7 @@ app.get('/lessons/:date/:id_course', function (req, res) {
 
    var data_Scelta = date_appoggio.split('-');
    var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
-   connection.query("name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
+   connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
@@ -787,7 +794,8 @@ app.get('/listStudents/:id_course', function (req, res) {
                dateOfBirth: element.date_of_birth,
                residence: element.residence,
                hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
-               percentage: (percentage) ? (percentage) + " %" : '0',
+               totalHours: totalHours[0].totalHours,
+               percentage: (percentage) ? (percentage) : 0,
                ritirato: element.ritirato
             })
       })
@@ -796,55 +804,12 @@ app.get('/listStudents/:id_course', function (req, res) {
 });
 
 
-app.get('/listPersonalStudent', function (req, res) {
-   var data = [];
-   var totalHours = []
-   var datetimeNow = new Date();
-  // var email = 'tgrimes1@linkedin.com'
-   var email = req.body.email
-   var id_course = req.body.id_course
-   
-   try {
-         connection.query("SELECT sum(total_hours) as total_hours FROM `lessons` WHERE date <= '" + tools.formattedDate(datetimeNow) + "' and id_course= " + id_course + "", function (error, results, fields) {
-            if (error) throw error;
-            totalHours.push({
-               totalHours: results[0].total_hours
-            })
-         });
-         connection.query("SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student where email = ?",[email], function (err, items, fields) {
-            if (err) throw err;
-      
-            items.forEach(element => {
-               var percentage = ((element.hours_of_lessons * 100) / totalHours[0].totalHours).toFixed(0)
-      
-               data.push(
-                  {
-                     firstName: element.first_name,
-                     lastName: element.last_name,
-                     email: element.email,
-                     fiscalCode: element.fiscal_code,
-                     dateOfBirth: element.date_of_birth,
-                     residence: element.residence,
-                     hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
-                     percentage: (percentage) ? (percentage) + " %" : '0',
-                     ritirato: element.ritirato
-                  })
-            })
-            return res.send({ error: false, data: data, message: 'ok' });
-         });     
-   } catch (error) {
-      return res.send({ error: false, data: error, message: 'ko' });
-   }
-});
-
-
-app.get('/StudentPercentage', function (req, res) {
+app.get('/StudentPercentage/:email', function (req, res) {
    var data = []
-
    try {
       //var email= 'dmycockf@posterous.com'
 
-      var email= req.body.email
+      var email= req.params.email
       var query ="select lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons from signatures_students join lessons on signatures_students.id_lesson= lessons.id where email_student =? group by lesson"
       connection.query(query,[email], function (error, results, fields) {
          if (error) throw error;
@@ -869,8 +834,6 @@ app.get('/StudentPercentage', function (req, res) {
       return res.send({ error: false, message: 'ko' });
    }
 });
-
-
 
 app.put('/updateStudent/:email', function (req, res) {
 
@@ -1038,7 +1001,7 @@ app.post('/calendar/importLessons', async function (req, res) {
                   const timeEnd = dateEnd.getHours() + dateEnd.getMinutes() / 60;
                   const totalHours = timeEnd - timeStart;
                   const checkProf = await ProfCheck(teacher);
-                  const checkLeasson = lessontype;
+                  const checkLesson = lessontype;
 
                   if (checkProf === false) {
                      riga.prof = "Sconosciuto";

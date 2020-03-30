@@ -150,7 +150,7 @@ class OreLezioniMattina extends React.Component {
                     </Col>
 
                     <Col md="3" className='text-center mb-3'>
-                        <Button disabled={!validation} outline color="dark" onClick={this.callForUpdateMattina}> <i className="cui-check icons d-block mt-2"></i> conferma <br /> modifiche </Button>
+                        <Button disabled={!validation} className="custom-btn" onClick={this.callForUpdateMattina}> <i className="cui-check icons d-block mt-2"></i> conferma <br /> modifiche </Button>
                     </Col>
                 </Row>
 

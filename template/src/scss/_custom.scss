@@ -1,1 +1,19 @@
 // Here you can add other styles
+@media screen and (max-width:400px)
+{
+body{
+margin:0px;
+    }
+}
+
+.custom-btn {
+    color: #fff;
+  background-color: rgb(58, 180, 180);
+  background-color: cutom-color;
+  border-color: rgb(44, 125, 125);
+  border-color: cutom-cor;
+  }
+  .custom-btn:hover{
+  background-color: rgb(69, 167, 167);
+  color: #fff;
+  }

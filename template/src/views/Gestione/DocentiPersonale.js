@@ -212,12 +212,6 @@ class DocentiPersonale extends Component {
         })
     }
 
-
-    changeState2 = () => {
-        this.setState({
-            changeState2: !this.state.changeState2
-        })
-    }
     
     getPercentage() {
         var d = new Date(),
@@ -262,14 +256,14 @@ class DocentiPersonale extends Component {
         if (this.state.dettagliDocente.length === 1) {
             return (
                 <>
-                              <h3 className="text-left text-info">{dettaglioDocente.lessonName}</h3>
+                        <h3 className="text-left text-info">{dettaglioDocente.lessonName}</h3>
                     <Row>
                         <Col xs="6" className="mt-4 mb-4 text-center">
                             <h6 className="mb-2">Ore fatte:</h6>
                             <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
                         </Col>
                         <Col xs="6" className="mt-4 mb-4 text-center">
-                            <h6 className="mb-2">Percentuale presenze:</h6>
+                            <h6 className="mb-2">Presenze alunni:</h6>
                             <h2><b>{this.getPercentage()}</b></h2>
                         </Col>
                     </Row>
@@ -310,7 +304,7 @@ class DocentiPersonale extends Component {
                             <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
                         </Col>
                         <Col xs="6" className="mt-4 mb-4 text-center">
-                            <h6 className="mb-2">Percentuale presenze:</h6>
+                            <h6 className="mb-2">Presenze alunni:</h6>
                             <h2><b>{this.getPercentage()}</b></h2>
                         </Col>
                     </Row>
@@ -488,8 +482,7 @@ class DocentiPersonale extends Component {
 
         if (todayLesson.length !== 0) {
             return (
-                todayLesson.map(item =>
-                   
+                todayLesson.map((item, i) => 
                 <Card>
                 <CardHeader className="my-auto text-center">
                    <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
@@ -570,6 +563,7 @@ class DocentiPersonale extends Component {
 
     infoTeacher() {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
+        console.log(docente)
         let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
         return (
             <div>
@@ -587,9 +581,9 @@ class DocentiPersonale extends Component {
                 </div>
                 <hr />
                 <div className="d-flex justify-content-around mb-4">
-                    {this.state.changeState ? <Button disabled={true}  color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Passate</h5></Button>}
+                    {this.state.changeState ? <Button disabled={true}  color="primary" onClick={this.changeState} style={{fontSize: '18px'}}>Lezioni Passate</Button> : <Button outline color="primary" onClick={this.changeState} style={{fontSize: '18px'}}>Lezioni Passate</Button>}
 
-                    {!this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button> : <Button outline color="primary" onClick={this.changeState}> <h5>Lezioni Future</h5></Button>}
+                    {!this.state.changeState ? <Button disabled={true} color="primary" onClick={this.changeState} style={{fontSize: '18px'}}> Lezioni Future</Button> : <Button outline color="primary" onClick={this.changeState} style={{fontSize: '18px'}}>Lezioni Future</Button>}
                 </div>
 
                 {this.futureLessons()}

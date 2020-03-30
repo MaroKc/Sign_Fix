@@ -49,7 +49,7 @@ class Calendario extends Component {
         <Row>
           <Col>
             <Card>
-              <CardBody>
+         
 
                 {this.state.calendario && (
                   <Iframe
@@ -62,7 +62,7 @@ class Calendario extends Component {
                   />
                 )}
                 
-              </CardBody>
+           
               <Collapse isOpen={this.state.collapse}>
                 <CardBody>
                   <InputGroup>
@@ -73,13 +73,13 @@ class Calendario extends Component {
                     </InputGroupAddon>
                     <Input className="col-lg-5" onChange={this.changeToken} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
                     <InputGroupAddon addonType="append">
-                      <Button onClick={() => this.importCalendar()} type="button" color="secondary">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
+                      <Button onClick={() => this.importCalendar()} type="button" className="custom-btn">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
                     </InputGroupAddon>
                   </InputGroup>
                 </CardBody>
               </Collapse>
               <CardFooter>
-                <Button color="dark" onClick={this.toggle} className={'mb-1'} id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;Impostazioni</Button>
+                <Button color="dark" onClick={this.toggle} className="custom-btn mb-1" id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;Impostazioni</Button>
               </CardFooter>
             </Card>
           </Col>
