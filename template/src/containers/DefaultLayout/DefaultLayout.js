@@ -93,7 +93,6 @@ class DefaultLayout extends Component {
   }
 
   componentDidMount() {
-    
     if (this.state.user === null) {
       return <Redirect to='/login' />
     } 

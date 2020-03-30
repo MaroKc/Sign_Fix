@@ -60,6 +60,7 @@ class Login extends Component {
       axios.post('http://localhost:8080/tokensignin', { code: cod.code })
         .then(res => {
           sessionStorage.setItem("utente", JSON.stringify(res.data.data));
+          console.log(res.data.data)
           this.setState({ status: true });
         })
     } else {
