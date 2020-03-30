@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
 const nodemailer = require('nodemailer');
 var bcrypt = require('bcrypt');
+var crypto = require('crypto')
+
 
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
@@ -67,6 +69,32 @@ async function chekUser(email) {
    });
 }
 
+
+let PrimoAccesso = (studentEmail) => {
+   return new Promise(function (resolve, reject) {
+
+      var shasum = crypto.createHash('sha1')
+      shasum.update(studentEmail)
+      const codice = shasum.digest('hex');
+
+      const queryPrimo = "INSERT INTO authentications (email_student, code) VALUES (?, ?)";
+      connection.query(queryPrimo, [studentEmail, codice], function (errorPrimo, resultsPrimo, fields) {
+         if (errorPrimo) { throw reject(new Error(errorPrimo)); }
+         console.log(resultsPrimo)
+         if (resultsPrimo.length == 0) {
+            resolve({ error: true, message: false });
+         } else {
+            resolve(
+               {
+                  error: false,
+                  code: codice
+               }
+            );
+         }
+      });
+   });
+}
+
 app.post('/tokensignin', function (req, res) {
 
    const code = req.body.code;
@@ -123,12 +151,20 @@ app.post('/tokensignin', function (req, res) {
             if (error) throw error;
          });
 
-         connection.query("SELECT id_course, email FROM students WHERE email ='" + email + "'", function (error, items, fields) {
+         connection.query("SELECT id_course, email, code FROM students s LEFT JOIN authentications a ON a.email_student = s.email WHERE email ='" + email + "'", async function (error, items, fields) {
 
             if (error) throw error;
+            var codice = null;
+
+           if(items[0].code === null) {
+               var tmp = await PrimoAccesso(items[0].email);
+               codice = tmp.code;
+            } else {
+               codice = items[0].code;
+            }
 
             return (
-               res.send({ error: false, data: items, message: 'studente trovato' })
+               res.send({ error: false, data: items, code: codice, message: 'Studente trovato' })
             );
          })
 
@@ -196,7 +232,7 @@ let LeassonExist = (studentEmail,Data,ora,timeExtraEntrata,timeExtraUscita) => {
 app.post('/badge', function (req, res) {
 
    const qr = req.body.qr;
-   const datetimeNow = new Date('2020-02-10 08:20');
+   const datetimeNow = new Date();
    const Data = tools.formattedDate(datetimeNow);
    const ora = datetimeNow.getHours() + (datetimeNow.getMinutes() / 0.6) / 100;
    //DA FARE IN SETTINGS
