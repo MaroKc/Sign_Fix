@@ -169,7 +169,7 @@ let LeassonExist = (studentEmail,Data,ora,timeExtraEntrata,timeExtraUscita) => {
    return new Promise(function (resolve, reject) {
 
 
-      const queryLeasson = "SELECT l.id, l.start_time, l.end_time, l.date, k.id as sign, l.total_hours FROM lessons l JOIN students s ON s.id_course = l.id_course JOIN signatures_students k ON k.id_lesson = l.id and k.email_student = s.email where s.email = '" + studentEmail + "' and l.date = '" + Data + "' and (l.start_time - " + timeExtraEntrata + " <= " + ora + " and end_time + " + timeExtraUscita + " >= " + ora + ")";
+      const queryLeasson = "SELECT l.id, l.start_time, l.end_time, l.date, k.id as sign, l.total_hours FROM lessons l LEFT JOIN students s ON s.id_course = l.id_course LEFT JOIN signatures_students k ON k.id_lesson = l.id and k.email_student = s.email where s.email = '" + studentEmail + "' and l.date = '" + Data + "' and (l.start_time - " + timeExtraEntrata + " <= " + ora + " and end_time + " + timeExtraUscita + " >= " + ora + ")";
       connection.query(queryLeasson, function (errorLeasson, resultsLeasson, fields) {
          if (errorLeasson) { throw reject(new Error(errorLeasson)); }
          if (resultsLeasson.length == 0) {
@@ -196,7 +196,7 @@ let LeassonExist = (studentEmail,Data,ora,timeExtraEntrata,timeExtraUscita) => {
 app.post('/badge', function (req, res) {
 
    const qr = req.body.qr;
-   const datetimeNow = new Date();
+   const datetimeNow = new Date('2020-02-10 08:20');
    const Data = tools.formattedDate(datetimeNow);
    const ora = datetimeNow.getHours() + (datetimeNow.getMinutes() / 0.6) / 100;
    //DA FARE IN SETTINGS
@@ -218,7 +218,7 @@ app.post('/badge', function (req, res) {
 
             if (dati.message.sign === null) {
                (dati.message.start <= ora ? firma = dati.message.start : firma = Math.ceil(ora/5)*5)
-               const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES ?';
+               const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
                connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
                   res.send({ error: false, message: "Entrata registrata" });
