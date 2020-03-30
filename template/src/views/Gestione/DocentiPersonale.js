@@ -210,11 +210,7 @@ class DocentiPersonale extends Component {
             changeState: !this.state.changeState
         })
     }
-    changeState2 = () => {
-        this.setState({
-            changeState2: !this.state.changeState2
-        })
-    }
+
     
     getPercentage() {
         var d = new Date(),
@@ -266,7 +262,7 @@ class DocentiPersonale extends Component {
                             <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
                         </Col>
                         <Col xs="6" className="mt-4 mb-4 text-center">
-                            <h6 className="mb-2">Percentuale presenze:</h6>
+                            <h6 className="mb-2">Presenze alunni:</h6>
                             <h2><b>{this.getPercentage()}</b></h2>
                         </Col>
                     </Row>
@@ -307,7 +303,7 @@ class DocentiPersonale extends Component {
                             <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
                         </Col>
                         <Col xs="6" className="mt-4 mb-4 text-center">
-                            <h6 className="mb-2">Percentuale presenze:</h6>
+                            <h6 className="mb-2">Presenze alunni:</h6>
                             <h2><b>{this.getPercentage()}</b></h2>
                         </Col>
                     </Row>
@@ -568,6 +564,7 @@ class DocentiPersonale extends Component {
 
     infoTeacher() {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
+        console.log(docente)
         let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
         return (
             <div>

@@ -10,6 +10,8 @@ Per far partire il sito:
 
 - npm install -S react-toasts
 
+- npm install --save react-circular-progressbar
+
 --> npm start (avvio)
 
 ## Cartella nodeMysql:

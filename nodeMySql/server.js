@@ -632,12 +632,45 @@ app.get('/listStudents/:id_course', function (req, res) {
                dateOfBirth: element.date_of_birth,
                residence: element.residence,
                hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
-               percentage: (percentage) ? (percentage) + " %" : '0',
+               totalHours: totalHours[0].totalHours,
+               percentage: (percentage) ? (percentage) : 0,
                ritirato: element.ritirato
             })
       })
       return res.send(JSON.stringify(data));
    });
+});
+
+
+app.get('/StudentPercentage/:email', function (req, res) {
+   var data = []
+   try {
+      //var email= 'dmycockf@posterous.com'
+
+      var email= req.params.email
+      var query ="select lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons from signatures_students join lessons on signatures_students.id_lesson= lessons.id where email_student =? group by lesson"
+      connection.query(query,[email], function (error, results, fields) {
+         if (error) throw error;
+         if(results.length !==0){
+            results.forEach(element => {
+               data.push({
+                  lessonName : element.lesson,
+                  totalHours : element.total_hours,
+                  hoursOfLessons : element.hours_of_lessons,
+                  percentage : ((element.hours_of_lessons*100)/ element.total_hours).toFixed(0)
+               })
+            });
+            return res.send({ error: false,data:data, message: 'ok' });
+         }
+         else{
+            return res.send({ error: false, message: 'Errore' });
+         }
+         
+      });
+     
+   } catch (error) {
+      return res.send({ error: false, message: 'ko' });
+   }
 });
 
 app.put('/updateStudent/:email', function (req, res) {
