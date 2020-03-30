@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 const { OAuth2Client } = require('google-auth-library');
 const nodemailer = require('nodemailer');
 var bcrypt = require('bcrypt');
+var crypto = require('crypto')
+
 
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
@@ -67,6 +69,32 @@ async function chekUser(email) {
    });
 }
 
+
+let PrimoAccesso = (studentEmail) => {
+   return new Promise(function (resolve, reject) {
+
+      var shasum = crypto.createHash('sha1')
+      shasum.update(studentEmail)
+      const codice = shasum.digest('hex');
+
+      const queryPrimo = "INSERT INTO authentications (email_student, code) VALUES (?, ?)";
+      connection.query(queryPrimo, [studentEmail, codice], function (errorPrimo, resultsPrimo, fields) {
+         if (errorPrimo) { throw reject(new Error(errorPrimo)); }
+         console.log(resultsPrimo)
+         if (resultsPrimo.length == 0) {
+            resolve({ error: true, message: false });
+         } else {
+            resolve(
+               {
+                  error: false,
+                  code: codice
+               }
+            );
+         }
+      });
+   });
+}
+
 app.post('/tokensignin', function (req, res) {
 
    const code = req.body.code;
@@ -123,12 +151,20 @@ app.post('/tokensignin', function (req, res) {
             if (error) throw error;
          });
 
-         connection.query("SELECT id_course, email FROM students WHERE email ='" + email + "'", function (error, items, fields) {
+         connection.query("SELECT id_course, email, code FROM students s LEFT JOIN authentications a ON a.email_student = s.email WHERE email ='" + email + "'", async function (error, items, fields) {
 
             if (error) throw error;
+            var codice = null;
+
+           if(items[0].code === null) {
+               var tmp = await PrimoAccesso(items[0].email);
+               codice = tmp.code;
+            } else {
+               codice = items[0].code;
+            }
 
             return (
-               res.send({ error: false, data: items, message: 'studente trovato' })
+               res.send({ error: false, data: items, code: codice, message: 'Studente trovato' })
             );
          })
 
@@ -164,24 +200,82 @@ app.post('/auth', function (req, res) {
 
 });
 
+
+let LeassonExist = (studentEmail,Data,ora,timeExtraEntrata,timeExtraUscita) => {
+   return new Promise(function (resolve, reject) {
+
+
+      const queryLeasson = "SELECT l.id, l.start_time, l.end_time, l.date, k.id as sign, l.total_hours FROM lessons l LEFT JOIN students s ON s.id_course = l.id_course LEFT JOIN signatures_students k ON k.id_lesson = l.id and k.email_student = s.email where s.email = '" + studentEmail + "' and l.date = '" + Data + "' and (l.start_time - " + timeExtraEntrata + " <= " + ora + " and end_time + " + timeExtraUscita + " >= " + ora + ")";
+      connection.query(queryLeasson, function (errorLeasson, resultsLeasson, fields) {
+         if (errorLeasson) { throw reject(new Error(errorLeasson)); }
+         if (resultsLeasson.length == 0) {
+            resolve({ error: true, message: false });
+         } else {
+            resolve(
+               {
+                  error: false,
+                  message: {
+                     id: resultsLeasson[0].id,
+                     start: resultsLeasson[0].start_time,
+                     end: resultsLeasson[0].end_time,
+                     date: resultsLeasson[0].date,
+                     sign: resultsLeasson[0].sign,
+                     hour: resultsLeasson[0].total_hours 
+                  }
+               }
+            );
+         }
+      });
+   });
+}
+
 app.post('/badge', function (req, res) {
 
-   const qr = req.body.email;
+   const qr = req.body.qr;
+   const datetimeNow = new Date();
+   const Data = tools.formattedDate(datetimeNow);
+   const ora = datetimeNow.getHours() + (datetimeNow.getMinutes() / 0.6) / 100;
+   //DA FARE IN SETTINGS
+   const timeExtraEntrata = 0.25;
+   const timeExtraUscita = 1;
 
    //Una volta che ho il QR faccio una select per trovare l'email associata
-   /*
-   connection.query('SELECT * FROM responsibles_auth WHERE email = ' + connection.escape(qr) + ' and password = ' + connection.escape(req.body.pass), function (error, results, fields) {
+   connection.query('SELECT * FROM authentications WHERE Code = ' + connection.escape(qr), async function (error, results, fields) {
       if (error) throw error;
 
-      if(results.length == 1) {
+      if (results.length == 1) {
 
-         //DA CRIPTARE LA PSWD perchè si salva nel client
-         res.send({ error: false, message: results[0] });
+         const email = results[0].email_student;
+         const dati = await LeassonExist(email,Data,ora,timeExtraEntrata,timeExtraUscita);
+         console.log(dati);
+         var firma = null;
+
+         if (!dati.error) {
+
+            if (dati.message.sign === null) {
+               (dati.message.start <= ora ? firma = dati.message.start : firma = Math.ceil(ora/5)*5)
+               const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
+               connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
+                  if (errorIns) throw errorIns;
+                  res.send({ error: false, message: "Entrata registrata" });
+               });
+            } else {
+               (dati.message.end <= ora ? firma = dati.message.end : firma = (Math.ceil(ora/5)*5) - 5)
+               var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ?, lost_hours = ? WHERE id = ?";
+               connection.query(query, [datetimeNow, firma, firma + ' - final_start_time', dati.message.end + ' - ' + firma + ' - final_start_time', dati.message.sign], function (error, results, fields) {
+                  if (error) throw error;
+                  res.send({ error: false, message: "Uscita registrata" });
+               });
+            }
+
+         } else {
+            res.send({ error: true, message: false });
+         }
       } else {
          res.send({ error: true, message: false });
       }
    });
-   */
+
 
 });
 
@@ -440,26 +534,26 @@ app.put('/modifyPassword', function (req, res) {
    }
 });
 
-app.put('/forgotPassword',function(req,res){
-   var email= req.body.email
+app.put('/forgotPassword', function (req, res) {
+   var email = req.body.email
 
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
    var objectEmail = 'Credenziali Fitstic';
-   var text='In seguito alla sua richiesta la password è stata resettata. Nuova password: '+ password;
-  
+   var text = 'In seguito alla sua richiesta la password è stata resettata. Nuova password: ' + password;
+
    // var html = "<div>In seguito alla sua richiesta la password è stata resettata. Nuova PASSWORD: <b> {{password}} </b></div>";
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
 
    connection.query("SELECT * FROM teachers where email_responsible='"+email+"'", function (e, row, fields) {
       if (e) throw error;
-      if(row.length==1){
-      connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?",[hash,email], function (error, result, fields) {
-         if (error) throw error;
-         sendEmails(email,objectEmail,text)
-         return res.send({ error: false, data: result, message: 'ok' });
-      });    
-   }else{
+      if (row.length == 1) {
+         connection.query("UPDATE `responsibles_auth` SET `password`=? WHERE email=?", [hash, email], function (error, result, fields) {
+            if (error) throw error;
+            sendEmails(email, objectEmail, text)
+            return res.send({ error: false, data: result, message: 'ok' });
+         });
+      } else {
          return res.send({ error: false, message: 'ko' });
       }
    })
@@ -519,11 +613,11 @@ app.put('/teacherBadge', function (req, res) {
        });
      
    } catch (error) {
-    return res.send({ error: false,data:error, message: 'ko' });
+      return res.send({ error: false, data: error, message: 'ko' });
    }
- });
+});
 
- app.get('/getSignature',function(req,res){
+app.get('/getSignature', function (req, res) {
    connection.query("SELECT email_signature, id FROM lessons WHERE DATE(date) = CURDATE()", function (error, items, fields) {
       if (error) throw error;
       return res.send({ error: false, data: items, message: 'users list.' });
