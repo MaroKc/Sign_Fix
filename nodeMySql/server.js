@@ -203,7 +203,6 @@ app.post('/auth', function (req, res) {
 let LeassonExist = (studentEmail,Data,ora,timeExtraEntrata,timeExtraUscita) => {
    return new Promise(function (resolve, reject) {
 
-
       const queryLeasson = "SELECT l.id, l.start_time, l.end_time, l.date, k.id as sign, l.total_hours FROM lessons l LEFT JOIN students s ON s.id_course = l.id_course LEFT JOIN signatures_students k ON k.id_lesson = l.id and k.email_student = s.email where s.email = '" + studentEmail + "' and l.date = '" + Data + "' and (l.start_time - " + timeExtraEntrata + " <= " + ora + " and end_time + " + timeExtraUscita + " >= " + ora + ")";
       connection.query(queryLeasson, function (errorLeasson, resultsLeasson, fields) {
          if (errorLeasson) { throw reject(new Error(errorLeasson)); }
@@ -463,6 +462,7 @@ app.put('/retireTeacher/:email', function (req, res) {
    }
 });
 
+
 app.post('/createTeacher', function (req, res) {
 
    var firstName = req.body.firstName
@@ -533,6 +533,7 @@ app.post('/createTeacher', function (req, res) {
    });
 });
 
+
 app.put('/modifyPassword',function(req,res){
    
    var password1 = req.body.password1
@@ -550,6 +551,7 @@ app.put('/modifyPassword',function(req,res){
       return res.send({ error: false, message: 'ko' });
    }
 });
+
 
 app.put('/forgotPassword', function (req, res) {
    var email = req.body.email
@@ -576,44 +578,44 @@ app.put('/forgotPassword', function (req, res) {
    })
 });
 
-app.post('/teacherBadge', function (req, res) {
-  try {
-     
-      var email= req.body.email
-      var date = req.body.date
-      var startTime = tools.formattedToDecimal(req.body.startTime)
-      var endTime = tools.formattedToDecimal(req.body.endTime)
-      var lessonId = req.body.lessonId
-      var hourOfLessons = endTime - startTime
+
+app.post('/studentBadge', function (req, res) {
+   try {
       
-      /*
-      var email= 'capaneo92@gmail.com'
-      var date = '2020-02-20'
-      var startTime = tools.formattedToDecimal('13: 30')
-      var endTime = tools.formattedToDecimal('17: 00')
-      var lessonId =1
-      var hourOfLessons = endTime - startTime
-      */
-
-      var query ="INSERT INTO `signatures_teachers`(`email_responsible`, `date`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`) VALUES (?,?,?,?,?,?)"
-
-      connection.query(query,[email,date,startTime,endTime,lessonId,hourOfLessons], function (error, result, fields) {
-         if (error) throw error;
-         if(result){
-            connection.query("UPDATE `lessons` SET  `email_signature`=? where `id` = ?",[email,lessonId], function (error, result, fields) {
-               if (error) throw error;
-               return res.send({ error: false, message: 'ok' });
-            });
-         }
-         return res.send({ error: false, message: 'ok' });
-      });
-    
-  } catch (error) {
-   return res.send({ error: false,data:error, message: 'ko' });
-  }
-});
-
-
+       var email= req.body.email
+       var date = req.body.date
+       var startTime = tools.formattedToDecimal(req.body.startTime)
+       var endTime = tools.formattedToDecimal(req.body.endTime)
+       var lessonId = req.body.lessonId
+       var hourOfLessons = endTime - startTime
+       
+       /*
+       var email= 'capaneo92@gmail.com'
+       var date = '2020-02-20'
+       var startTime = tools.formattedToDecimal('13: 30')
+       var endTime = tools.formattedToDecimal('17: 00')
+       var lessonId =1
+       var hourOfLessons = endTime - startTime
+       */
+ 
+       var query ="INSERT INTO `signatures_teachers`(`email_responsible`, `date`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`) VALUES (?,?,?,?,?,?)"
+ 
+       connection.query(query,[email,date,startTime,endTime,lessonId,hourOfLessons], function (error, result, fields) {
+          if (error) throw error;
+          if(result){
+             connection.query("UPDATE `lessons` SET  `email_signature`=? where `id` = ?",[email,lessonId], function (error, result, fields) {
+                if (error) throw error;
+                return res.send({ error: false, message: 'ok' });
+             });
+          }
+          return res.send({ error: false, message: 'ok' });
+       });
+     
+   } catch (error) {
+    return res.send({ error: false,data:error, message: 'ko' });
+   }
+ });
+ 
 
 app.put('/updateSignature/:id_lesson', function (req, res) {
 
@@ -673,12 +675,14 @@ app.put('/teacherBadge', function (req, res) {
    }
 });
 
+
 app.get('/getSignature', function (req, res) {
    connection.query("SELECT email_signature, id FROM lessons WHERE DATE(date) = CURDATE()", function (error, items, fields) {
       if (error) throw error;
       return res.send({ error: false, data: items, message: 'users list.' });
    });
 });
+
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
@@ -728,6 +732,7 @@ app.get('/lessonsTeacher/:id_company', function (req, res) {
    });
 });
 
+
 app.get('/listSignaturesStudents/:data_scelta/:id_course', function (req, res) {
    var data = []
    var date_appoggio = req.params.data_scelta
@@ -735,25 +740,25 @@ app.get('/listSignaturesStudents/:data_scelta/:id_course', function (req, res) {
    var data_Scelta = date_appoggio.split('-');
    var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
 
-   connection.query("SELECT final_start_time,final_end_time,mattinaPomeriggio,first_name,last_name,id_lesson,email from students join signatures_students on signatures_students.email_student=students.email where signatures_students.date='" + dataFinale + "' and ritirato=0 and id_course=" + id_course, function (error, results, fields) {
+   connection.query("SELECT s.final_start_time, s.final_end_time, a.first_name, a.last_name,l .id as id_lesson, a.email FROM students a LEFT JOIN lessons l ON l.id_course = a.id_course LEFT JOIN signatures_students s ON s.email_student = a.email AND s.id_lesson= l.id where ritirato=0 and a.id_course="+id_course+" and l.date='"+dataFinale+"'", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
-
          data.push(
             {
-               mattinaPomeriggio: element.mattinaPomeriggio,
+               mattinaPomeriggio: element.final_start_time >= 13 ? 1 : 0,
                firstName: element.first_name,
                lastName: element.last_name,
                email: element.email,
                idLesson: element.id_lesson,
                emailStudent: element.email,
-               startTime: tools.formattedDecimal(element.final_start_time) != 1 ? tools.formattedDecimal(element.final_start_time) : 'assente',
-               endTime: tools.formattedDecimal(element.final_end_time) != 1 ? tools.formattedDecimal(element.final_end_time) : 'assente'
+               startTime: tools.formattedDecimal(element.final_start_time) != null ? tools.formattedDecimal(element.final_start_time) : 'assente',
+               endTime: tools.formattedDecimal(element.final_end_time) != null ? tools.formattedDecimal(element.final_end_time) : 'assente'
             })
       })
       return res.send(JSON.stringify(data));
    });
 });
+
 
 app.get('/listStudents/:id_course', function (req, res) {
    var data = [];
