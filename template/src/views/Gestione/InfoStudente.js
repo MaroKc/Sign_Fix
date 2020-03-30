@@ -125,6 +125,7 @@ class infoStudente extends React.Component {
       )
     }
     else {
+
       const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\s]*$/;
       const regexFiscalCode = /^(?:[A-Z][AEIOU][AEIOUX]|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$/i
       const regexData =/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i
@@ -175,10 +176,11 @@ class infoStudente extends React.Component {
     const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName) && residence.length > 2 && dateOfBirth.length === 10 && regexData.test(dateOfBirth) && fiscalCode.length === 16 && regexFiscalCode.test(fiscalCode)
     
     if (this.state.ritirato === 0) {
+
       if (!changeInfo) {
         return (
           <> 
-            <Button id="modifica"  color="dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4 text-white"></i>&nbsp;<p>modifica</p></Button>
+            <Button id="modifica" className="custom-btn" color="dark" onClick={this.onclickModifyState}><i className="cui-settings icons font-2xl d-block mt-4 text-white "></i>&nbsp;<p>modifica</p></Button>
             <Button color="danger" onClick={this.toggleWarning} className="mr-1"><i className="cui-user-unfollow icons font-2xl d-block mt-4"></i>&nbsp;<p>ritira</p>  </Button>
           </>
         )

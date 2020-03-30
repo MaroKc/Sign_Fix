@@ -5,7 +5,6 @@ import { MDBDataTable } from 'mdbreact';
 import InfoStudente from './InfoStudente';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
-
 class Studenti extends Component {
   constructor(props) {
     super(props)

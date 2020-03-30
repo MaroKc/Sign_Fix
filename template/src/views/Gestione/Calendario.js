@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Iframe from 'react-iframe'
 import { Card, Collapse, CardBody, CardFooter, Button, Col, Row, InputGroup, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import axios from 'axios';
+import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
+
 
 class Calendario extends Component {
 
@@ -28,6 +30,8 @@ class Calendario extends Component {
     this.toggle();
     axios.post('http://localhost:8080/calendar/importLessons', { email: 'daniele.marocchi.studio@fitstic-edu.com', token: this.state.token, corso: this.classe.id})
       .then(res => {
+        if(res.data.message ==='calendaroOk')  ToastsStore.success("Il calendario è stato importato con successo")
+        if (res.data.message === 'calendarioKo') ToastsStore.warning("Errore durante l'importazione del calensario")
         //console.log(res);
         //console.log(res.data);
       })
@@ -80,6 +84,8 @@ class Calendario extends Component {
             </Card>
           </Col>
         </Row>
+        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
+
       </div>
     );
   }
