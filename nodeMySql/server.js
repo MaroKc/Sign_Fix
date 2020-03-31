@@ -936,7 +936,7 @@ app.get('/StudentPercentage/:email', function (req, res) {
       //var email= 'dmycockf@posterous.com'
 
       var email = req.params.email
-      var query = "select lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons from signatures_students left join lessons on signatures_students.id_lesson= lessons.id where email_student =? group by lesson"
+      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN (SELECT * FROM signatures_students where email_student = 'azeale0@linkedin.com') s ON l.id = s.id_lesson GROUP by lesson"
       connection.query(query, [email], function (error, results, fields) {
          if (error) throw error;
          if (results.length !== 0) {
@@ -1111,6 +1111,7 @@ app.post('/calendar/importLessons', async function (req, res) {
 
          var errori = [];
          var datiInsert = [];
+         var datierrore= false;
 
          if (events.length) {
 
@@ -1142,9 +1143,12 @@ app.post('/calendar/importLessons', async function (req, res) {
                   }
 
                } catch (err) {
-                  return res.send({ error: false, data: errori, message: 'Errore di inserimento' });
+                  datierrore= true
                }
             }); //fine map
+            if (datierrore===true){
+               return res.send({ error: false, data: errori, message: 'Errore di inserimento' });
+            }
 
          } else {
             return res.send({ error: false, message: 'Non sono stati trovanti eventi salvati nel calendario' });
