@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Route, Redirect, Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, Modal, ModalBody, ModalFooter, Table } from 'reactstrap';
+import { Redirect } from 'react-router-dom';
+import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, Modal, ModalBody, ModalFooter } from 'reactstrap';
 import axios from 'axios';
 import { GoogleLogin } from 'react-google-login';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';

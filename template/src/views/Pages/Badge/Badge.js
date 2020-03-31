@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Col, Container, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import { Col, Container, InputGroup, Row } from 'reactstrap';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 import axios from 'axios';
 
 class Badge extends Component {
-
-  constructor(props) {
-    super(props);
-
-  }
 
   componentDidMount() {
     this.nameInput.focus();

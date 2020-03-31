@@ -329,9 +329,19 @@ app.post('/badge', function (req, res) {
          res.send({ error: true, message: false });
       }
    });
-
-
 });
+
+
+app.get('/getCode/:email', function (req, res) {
+
+   var email =req.params.email
+   //var ruolo = 1;
+      connection.query("SELECT * FROM `authentications` WHERE email_student='"+email+"'", function (error, results, fields) {
+         if (error) throw error;
+         return res.send({ error: true, data: results, message: 'ok' });
+      });
+})
+
 
 /*
 fa il totale delle ore sulla tabella lessons a cominciare dalla data odierna meno un giorno.

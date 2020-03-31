@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import { MDBDataTable, MDBBtn } from 'mdbreact';
+import { MDBDataTable } from 'mdbreact';
 import InfoDocente from './InfoDocente';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 import {
@@ -105,7 +105,7 @@ formatHours (hours){
   var startLesson= ''
 
   if(startLessonAppoggio[1]){
-    var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+    var startLessonSecondaParte = startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
     startLesson= startLessonAppoggio[0]+': '+startLessonSecondaParte
     return startLesson
   }
@@ -192,8 +192,9 @@ handleChange = (event) => {
 
       const nonRitirato =this.state.docenti.filter(el => el.ritirato === 0) 
       const ritirato = this.state.docenti.filter(el => el.ritirato === 1)
+      console.log(ritirato)
     
-      if (ritirato != 0) {
+      if (ritirato.length !== 0) {
         return (
           <div>
             <Card>
@@ -205,7 +206,7 @@ handleChange = (event) => {
                     <span className="font-weight-bold"><h3><b>DOCENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                    <span> <Button className="custom-btn" className="mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
+                    <span> <Button className="custom-btn mr-1" onClick={this.displayForm}><i className="cui-user-follow icons font-2xl d-block"></i> Aggiungi docente </Button> </span>
                   </Col>
                 </Row>
               </CardHeader>
@@ -290,8 +291,8 @@ handleChange = (event) => {
   }
 
   formDocente(){
-    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\'\s]*$/;
-    const regexEmail =	/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
+    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF'\s]*$/;
+    const regexEmail =	/^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/;
     const {firstName, lastName, emailDocente, companyName} = this.state
     const validationFirstName = firstName.length > 2 && regexLettere.test(firstName) 
     const validationLastName = lastName.length > 2 && regexLettere.test(lastName)

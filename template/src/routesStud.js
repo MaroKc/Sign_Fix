@@ -43,7 +43,7 @@ const User = React.lazy(() => import('./views/Users/User'));
 const Studenti = React.lazy(() => import('./views/Gestione/Studenti'));
 const Docenti = React.lazy(() => import('./views/Gestione/Docenti'));
 
-const Classi = React.lazy(() => import('./views/Classi/Classi'));
+// const Classi = React.lazy(() => import('./views/Classi/Classi'));
 
 const Lezioni = React.lazy(() => import('./views/Gestione/Lezioni'));
 const Calendario = React.lazy(() => import('./views/Gestione/Calendario'));
