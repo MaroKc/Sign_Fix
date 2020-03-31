@@ -26,7 +26,7 @@ class StudentiPersonale extends Component {
 
     componentDidMount() {
         console.log(this.state.user.email)
-        if (!this.state.user.email) {
+        if (this.state.user.email !== false) {
             this.getStudents();
             this.getLessonsPercentage();
             this.getLessons();
@@ -391,7 +391,7 @@ class StudentiPersonale extends Component {
 
     render() {
 
-        if (!this.state.user.email) {
+        if (this.state.user.email !==false) {
             return this.normal();
         } else {
             return this.fitsticEmail();

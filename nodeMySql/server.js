@@ -54,6 +54,7 @@ function sendEmails(emailTo, objectEmail, text) {
    });
 }
 
+
 //CONTROLLO UTENTE e JWT
 async function chekUser(email) {
 
@@ -151,7 +152,7 @@ app.post('/tokensignin', function (req, res) {
             if (error) throw error;
          });
 
-         connection.query("SELECT id_course, email, email_fitstic, code, first_name, last_name FROM students s LEFT JOIN authentications a ON a.email_student = s.email WHERE email ='" + email + "'", async function (error, items, fields) {
+         connection.query("SELECT id_course, email, email_fitstic, code, first_name, last_name FROM students s LEFT JOIN authentications a ON a.email_student = s.email WHERE email_fitstic ='" + email + "'", async function (error, items, fields) {
 
             if (error) throw error;
 
@@ -182,7 +183,7 @@ app.post('/tokensignin', function (req, res) {
 
 app.get('/fitsticEmail/:email', function (req, res) {
 
-   emailStu = req.params.email;
+   var emailStu = req.params.email;
    connection.query("SELECT id_course, email, email_fitstic FROM students s WHERE email = ?", [emailStu], async function (error, items, fields) {
       if (error) throw error;
 
@@ -192,7 +193,7 @@ app.get('/fitsticEmail/:email', function (req, res) {
             var codice = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
             console.log(codice);
             var objectEmail = 'Conferma Mail'
-            var textEmail = 'Il Codice per confermare l\'identità è il seguente :' + codice
+            var textEmail = 'Il Codice per confermare l\'identità è il seguente : ' + codice
             sendEmails(emailStu, objectEmail, textEmail)
 
             connection.query("UPDATE students SET codice_conferma = ? WHERE email = ?", [codice, emailStu], function (error, result, fields) {
@@ -202,7 +203,6 @@ app.get('/fitsticEmail/:email', function (req, res) {
                } else {
                   return (res.send({ error: true, message: 'Righe Duplicate' }));
                }
-
             });
 
          } catch (error) {
@@ -377,7 +377,6 @@ app.get('/getCode/:email', function (req, res) {
          if (error) throw error;
          return res.send({ error: true, data: results, message: 'ok' });
       });
-      return res.send({ error: true, message: 'ko' });
 })
 
 
@@ -549,7 +548,7 @@ app.post('/createTeacher', function (req, res) {
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
 
    var objectEmail = 'Credenziali Fitstic'
-   var textEmail = 'Gentile ' + firstName + ' ' + lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente password:' + password
+   var textEmail = 'Gentile ' + firstName + ' ' + lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi all\'indirizzo : http://164.68.110.63/sing_fix/  con la seguente password:' + password
 
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
@@ -652,7 +651,7 @@ app.put('/forgotPassword', function (req, res) {
    })
 });
 
-
+/*
 app.post('/studentBadge', function (req, res) {
    try {
       const datetimeNow = new Date();
@@ -692,7 +691,7 @@ app.post('/studentBadge', function (req, res) {
       return res.send({ error: false, data: error, message: 'ko' });
    }
 });
-
+*/
 
 app.put('/updateSignature/:id_lesson', function (req, res) {
 
