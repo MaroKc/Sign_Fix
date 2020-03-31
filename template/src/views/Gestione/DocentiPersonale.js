@@ -1,6 +1,6 @@
-import React, { Component, Fragment } from 'react';
-import {Table, Card, CardHeader, CardBody, Button, Input, Row, Col, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { MDBDataTable, MDBBtn, MDBAlert, MDBProgress } from 'mdbreact';
+import React, { Component } from 'react';
+import {Table, Card, CardHeader, CardBody, Button, Input, Row, Col, Modal, ModalBody, ModalFooter } from 'reactstrap';
+import { MDBDataTable } from 'mdbreact';
 import axios from 'axios'
 import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
 
@@ -29,7 +29,6 @@ class DocentiPersonale extends Component {
         this.getTeachers();
         this.getTeacherDetails();
         this.getSignature()
-        console.log(this.state.signature)
     }
 
 
@@ -94,8 +93,6 @@ class DocentiPersonale extends Component {
                     dettagliDocente,
                     value: dettagliDocente['0'].lessonName
                 })
-                console.log(dettagliDocente)
-
             })
             .catch(err => console.error(err));
     }
@@ -181,7 +178,7 @@ class DocentiPersonale extends Component {
         var startLesson = ''
 
         if (startLessonAppoggio[1]) {
-            var startLessonSecondaParte = startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
+            var startLessonSecondaParte = startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
             startLesson = startLessonAppoggio[0] + ': ' + startLessonSecondaParte
             return startLesson
         }
@@ -194,9 +191,9 @@ class DocentiPersonale extends Component {
         var startLessonAppoggio = (hours.toString()).split('.')
         var startLesson = ''
 
-        var startLessonPrimaParte = startLessonAppoggio[0].length == 1 ? '0' + startLessonAppoggio[0] : startLessonAppoggio[0]
+        var startLessonPrimaParte = startLessonAppoggio[0].length === 1 ? '0' + startLessonAppoggio[0] : startLessonAppoggio[0]
         if (startLessonAppoggio[1]) {
-            var startLessonSecondaParte = startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
+            var startLessonSecondaParte = startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
             startLesson = startLessonPrimaParte + ': ' + startLessonSecondaParte
             return startLesson
         }
@@ -456,34 +453,32 @@ class DocentiPersonale extends Component {
 
 
 
-        if(giorno == 0) giorno = "Domenica";
-        if(giorno == 1) giorno = "Lunedì";
-        if(giorno == 2) giorno = "Martedì";
-        if(giorno == 3) giorno = "Mercoledì";
-        if(giorno == 4) giorno = "Giovedì";
-        if(giorno == 5) giorno = "Venerdì";
-        if(giorno == 6) giorno = "Sabato";
+        if(giorno === 0) giorno = "Domenica";
+        if(giorno === 1) giorno = "Lunedì";
+        if(giorno === 2) giorno = "Martedì";
+        if(giorno === 3) giorno = "Mercoledì";
+        if(giorno === 4) giorno = "Giovedì";
+        if(giorno === 5) giorno = "Venerdì";
+        if(giorno === 6) giorno = "Sabato";
         
-        if(mese == 0) mese = "Gennaio";
-        if(mese == 1) mese = "Febbraio";
-        if(mese == 2) mese = "Marzo";
-        if(mese == 3) mese = "Aprile";
-        if(mese == 4) mese = "Maggio";
-        if(mese == 5) mese = "Giugno";
-        if(mese == 6) mese = "Luglio";
-        if(mese == 7) mese = "Agosto";
-        if(mese == 8) mese = "Settembre";
-        if(mese == 9) mese = "Ottobre";
-        if(mese == 10) mese = "Novembre";
-        if(mese == 11) mese = "Dicembre";
+        if(mese === 0) mese = "Gennaio";
+        if(mese === 1) mese = "Febbraio";
+        if(mese === 2) mese = "Marzo";
+        if(mese === 3) mese = "Aprile";
+        if(mese === 4) mese = "Maggio";
+        if(mese === 5) mese = "Giugno";
+        if(mese === 6) mese = "Luglio";
+        if(mese === 7) mese = "Agosto";
+        if(mese === 8) mese = "Settembre";
+        if(mese === 9) mese = "Ottobre";
+        if(mese === 10) mese = "Novembre";
+        if(mese === 11) mese = "Dicembre";
 
         const todayLesson = this.state.lezioni.filter(lezione => lezione.date === currDate)
-       console.log(todayLesson.map(item => this.state.signature.filter(it =>it.email_signature === this.props.user.email && it.id === item.lessonId).length === 0))
-
         if (todayLesson.length !== 0) {
             return (
                 todayLesson.map((item, i) => 
-                <Card>
+                <Card key={i}>
                 <CardHeader className="my-auto text-center">
                    <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
                 </CardHeader>
@@ -564,7 +559,7 @@ class DocentiPersonale extends Component {
     infoTeacher() {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
         console.log(docente)
-        let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
+
         return (
             <div>
                 <div  className="text-right">

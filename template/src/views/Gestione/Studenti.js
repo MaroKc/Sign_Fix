@@ -83,7 +83,7 @@ class Studenti extends Component {
     var startLesson = ''
 
     if (startLessonAppoggio[1]) {
-      var startLessonSecondaParte = startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
+      var startLessonSecondaParte = startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
       startLesson = startLessonAppoggio[0] + ': ' + (startLessonSecondaParte.toString()).substring(0, 2)
       return startLesson
     }
@@ -137,7 +137,7 @@ class Studenti extends Component {
       const nonRitirato = this.state.studenti.filter(el => el.ritirato === 0)
       const ritirato = this.state.studenti.filter(el => el.ritirato === 1)
 
-      if (ritirato != 0) {
+      if (ritirato !== 0) {
         return (
           <div>
             <Card>
@@ -257,7 +257,7 @@ class Studenti extends Component {
   render() {
     return (
       <div>
-        {this.tabPane(), this.openModal()}
+        {this.tabPane()} {this.openModal()}
         <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
       </div>
     )

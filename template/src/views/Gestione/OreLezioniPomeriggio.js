@@ -171,13 +171,13 @@ formatHours (hours){
     var startLessonAppoggio= (hours.toString()).split('.')
     var startLesson= ''
 
-    var startLessonPrimaParte=  startLessonAppoggio[0].length == 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
+    var startLessonPrimaParte=  startLessonAppoggio[0].length === 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
     if(startLessonAppoggio[1]){
-      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
+      var startLessonSecondaParte=  startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
       startLesson= startLessonPrimaParte+': '+startLessonSecondaParte
       return startLesson
     }
-    else if(startLessonAppoggio[0]=='assente' ){
+    else if(startLessonAppoggio[0] ==='assente' ){
       return startLessonAppoggio[0]
     }
     else{

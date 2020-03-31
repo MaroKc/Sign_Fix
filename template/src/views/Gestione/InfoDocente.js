@@ -149,7 +149,7 @@ changeInfo = (changeInfo) => {
     else {
         let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
 
-        const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\'\s]*$/;
+        const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF'\s]*$/;
         const { firstName, lastName, companyName } = this.state
         const validationFirstName = firstName.length > 2 && regexLettere.test(firstName)
         const validationLastName = lastName.length > 2 && regexLettere.test(lastName)
@@ -189,7 +189,7 @@ changeInfo = (changeInfo) => {
 }
 
 renderButtons = (changeInfo) => {
-    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF\'\s]*$/;
+    const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF'\s]*$/;
     const { firstName, lastName, companyName } = this.state
     const validationInput = firstName.length > 2 && regexLettere.test(firstName) && lastName.length > 2 && regexLettere.test(lastName) && companyName.length >= 2 && regexLettere.test(companyName)
 

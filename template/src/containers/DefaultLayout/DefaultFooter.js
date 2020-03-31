@@ -16,8 +16,8 @@ class DefaultFooter extends Component {
     console.log(d.getFullYear())
     return (
       <React.Fragment>
-        <span><a href="https://fitstic.it" target="_blank">FITSTIC</a> &copy; {d.getFullYear()}</span>
-        <span className="ml-auto">Powered by <a href="http://www.cesarebrizio.it/Nonno_Laser.mp4" target="_blank">Sign_Fix</a></span>
+        <span><a href="https://fitstic.it" target="_blank"  rel="noopener noreferrer">FITSTIC</a> &copy; {d.getFullYear()}</span>
+        <span className="ml-auto">Powered by <a href="http://www.cesarebrizio.it/Nonno_Laser.mp4" target="_blank"  rel="noopener noreferrer">Sign_Fix</a></span>
       </React.Fragment>
     );
   }

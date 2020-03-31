@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Table, Card, CardHeader, CardBody, Button, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardBody, Button, Input } from 'reactstrap';
 import axios from 'axios'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -108,7 +108,7 @@ class StudentiPersonale extends Component {
         var startLesson = ''
 
         if (startLessonAppoggio[1]) {
-            var startLessonSecondaParte = startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
+            var startLessonSecondaParte = startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
             startLesson = startLessonAppoggio[0] + ': ' + startLessonSecondaParte
             return startLesson
         }
@@ -206,35 +206,32 @@ class StudentiPersonale extends Component {
         if (day.length < 2)
             day = '0' + day;
 
-        const currDate = [year, month, day].join('-');
-
         let data = new Date();
 
         let giorno = data.getDay();
         let mese = data.getMonth();
 
 
+        if (giorno === 0) giorno = "Domenica";
+        if (giorno === 1) giorno = "Lunedì";
+        if (giorno === 2) giorno = "Martedì";
+        if (giorno === 3) giorno = "Mercoledì";
+        if (giorno === 4) giorno = "Giovedì";
+        if (giorno === 5) giorno = "Venerdì";
+        if (giorno === 6) giorno = "Sabato";
 
-        if (giorno == 0) giorno = "Domenica";
-        if (giorno == 1) giorno = "Lunedì";
-        if (giorno == 2) giorno = "Martedì";
-        if (giorno == 3) giorno = "Mercoledì";
-        if (giorno == 4) giorno = "Giovedì";
-        if (giorno == 5) giorno = "Venerdì";
-        if (giorno == 6) giorno = "Sabato";
-
-        if (mese == 0) mese = "Gennaio";
-        if (mese == 1) mese = "Febbraio";
-        if (mese == 2) mese = "Marzo";
-        if (mese == 3) mese = "Aprile";
-        if (mese == 4) mese = "Maggio";
-        if (mese == 5) mese = "Giugno";
-        if (mese == 6) mese = "Luglio";
-        if (mese == 7) mese = "Agosto";
-        if (mese == 8) mese = "Settembre";
-        if (mese == 9) mese = "Ottobre";
-        if (mese == 10) mese = "Novembre";
-        if (mese == 11) mese = "Dicembre";
+        if (mese === 0) mese = "Gennaio";
+        if (mese === 1) mese = "Febbraio";
+        if (mese === 2) mese = "Marzo";
+        if (mese === 3) mese = "Aprile";
+        if (mese === 4) mese = "Maggio";
+        if (mese === 5) mese = "Giugno";
+        if (mese === 6) mese = "Luglio";
+        if (mese === 7) mese = "Agosto";
+        if (mese === 8) mese = "Settembre";
+        if (mese === 9) mese = "Ottobre";
+        if (mese === 10) mese = "Novembre";
+        if (mese === 11) mese = "Dicembre";
 
 
         let lezione = this.state.lezione
