@@ -3,7 +3,7 @@ import { Card, CardBody, CardHeader, Button, Row, Col, Modal, ModalBody, ModalFo
 import axios from 'axios'
 import { MDBDataTable } from 'mdbreact';
 import InfoStudente from './InfoStudente';
-import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
+import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
 
 class Studenti extends Component {
   constructor(props) {
@@ -26,7 +26,7 @@ class Studenti extends Component {
   }
 
   getStudents = () => {
-    axios.get('http://localhost:8080/listStudents/'+this.state.idCorso)
+    axios.get('http://localhost:8080/listStudents/' + this.state.idCorso)
       .then(res => res.data)
       .then((data, index) => {
         const studenti = [];
@@ -51,43 +51,43 @@ class Studenti extends Component {
     this.getStudents();
   }
 
-   handleChange = (event) => {
-     try {
+  handleChange = (event) => {
+    try {
       var file = event.target.files[0];
-      this.setState({file})
+      this.setState({ file })
       var reader = new FileReader();
       reader.onload = (e) => this.setState({ result: e.target.result })
       reader.readAsText(file);
       this.toggleWarning(event)
       event.target.value = ''
-     } catch (error) {
+    } catch (error) {
 
-     }
-   
+    }
+
   }
 
   getCsv = () => {
-    axios.post('http://localhost:8080/importCsv/'+this.state.idCorso, {data: this.state.result})
-    .then(res => res.data)
-    .then(res => {
-      if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!");else{ToastsStore.warning("OPS, qualcosa è andato storto")}
-      this.refresh()
-      this.toggleWarning()  
-    })
-    .catch(err => console.error(err));
-    
+    axios.post('http://localhost:8080/importCsv/' + this.state.idCorso, { data: this.state.result })
+      .then(res => res.data)
+      .then(res => {
+        if (res.message === "ok") ToastsStore.success("L'aggiunta del csv è avvenuta con successo!"); else { ToastsStore.warning("OPS, qualcosa è andato storto") }
+        this.refresh()
+        this.toggleWarning()
+      })
+      .catch(err => console.error(err));
+
   }
 
-  formatHours (hours){
-    var startLessonAppoggio= (hours.toString()).split('.')
-    var startLesson= ''
-  
-    if(startLessonAppoggio[1]){
-      var startLessonSecondaParte=  startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-      startLesson= startLessonAppoggio[0]+': '+ (startLessonSecondaParte.toString()).substring(0,2)
+  formatHours(hours) {
+    var startLessonAppoggio = (hours.toString()).split('.')
+    var startLesson = ''
+
+    if (startLessonAppoggio[1]) {
+      var startLessonSecondaParte = startLessonAppoggio[1].length == 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
+      startLesson = startLessonAppoggio[0] + ': ' + (startLessonSecondaParte.toString()).substring(0, 2)
       return startLesson
     }
-    else{
+    else {
       return startLessonAppoggio[0]
     }
   }
@@ -140,49 +140,49 @@ class Studenti extends Component {
       if (ritirato != 0) {
         return (
           <div>
-          <Card>
-          <CardHeader>
+            <Card>
+              <CardHeader>
                 <Row>
                   <Col sm="4">
-                  <Input type="file" id="result" name="result" onChange={this.handleChange} style={ { opacity: 0 } }  /> 
+                    <Input type="file" id="result" name="result" onChange={this.handleChange} style={{ opacity: 0 }} />
                   </Col>
                   <Col sm="4" className="my-auto text-center">
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button className="custom-btn"><label className="m-0" htmlFor="result"><i className="cui-user-follow icons font-2xl d-block"></i>Importa file studenti</label></Button>      
+                    <Button className="custom-btn"><label className="m-0" htmlFor="result"><i className="cui-user-follow icons font-2xl d-block"></i>Importa file studenti</label></Button>
                   </Col>
                 </Row>
               </CardHeader>
-            <CardBody className="ml-4 mr-4">
-              <MDBDataTable
-                responsive
-                hover
-                data={{ columns: data.columns, rows: nonRitirato }}
-                searching={false}
-                paging={false}
-                noBottomColumns={true}
-              />
-            </CardBody>
-          </Card>
-          <Card>
-            <CardHeader >
-              <h4 className="text-center font-weight-bold">STUDENTI  RITIRATI</h4>
-            </CardHeader>
-            <CardBody>
-              <MDBDataTable
-                responsive
-                hover
-                data={{ columns: data.columns, rows: ritirato }}
-                searching={false}
-                paging={false}
-                noBottomColumns={true}
-              // autoWidth={true}
-              // refresh
-              />
-            </CardBody>
-          </Card>
-        </div>
+              <CardBody className="ml-4 mr-4">
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={{ columns: data.columns, rows: nonRitirato }}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                />
+              </CardBody>
+            </Card>
+            <Card>
+              <CardHeader >
+                <h4 className="text-center font-weight-bold">STUDENTI  RITIRATI</h4>
+              </CardHeader>
+              <CardBody>
+                <MDBDataTable
+                  responsive
+                  hover
+                  data={{ columns: data.columns, rows: ritirato }}
+                  searching={false}
+                  paging={false}
+                  noBottomColumns={true}
+                // autoWidth={true}
+                // refresh
+                />
+              </CardBody>
+            </Card>
+          </div>
         );
       } else {
         return (
@@ -191,13 +191,13 @@ class Studenti extends Component {
               <CardHeader>
                 <Row>
                   <Col sm="4">
-                  <Input type="file" id="result" name="result" onChange={this.handleChange} style={ {opacity: 0 } }  /> 
+                    <Input type="file" id="result" name="result" onChange={this.handleChange} style={{ opacity: 0 }} />
                   </Col>
                   <Col sm="4" className="my-auto text-center">
                     <span className="font-weight-bold"><h3><b>STUDENTI</b></h3></span>
                   </Col>
                   <Col sm="4" className="text-right">
-                      <Button className="custom-btn"><label className="m-0" htmlFor="result"><i className="cui-user-follow icons font-2xl d-block"></i>Importa file studenti</label></Button>      
+                    <Button className="custom-btn"><label className="m-0" htmlFor="result"><i className="cui-user-follow icons font-2xl d-block"></i>Importa file studenti</label></Button>
                   </Col>
                 </Row>
               </CardHeader>
@@ -216,9 +216,9 @@ class Studenti extends Component {
         )
       }
     }
-    if(this.state.displayCard){
-      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable}/>
-    }else{
+    if (this.state.displayCard) {
+      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable} />
+    } else {
       return (
         <>
           {DatatablePage()}
@@ -232,7 +232,7 @@ class Studenti extends Component {
     this.setState({
       warning: !this.state.warning,
     });
-    
+
   }
 
   openModal = () => {
@@ -255,14 +255,14 @@ class Studenti extends Component {
   }
 
   render() {
-      return (
-        <div>
-          {this.tabPane()} {this.openModal()}
-          <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
-        </div>
-      )
+    return (
+      <div>
+        {this.tabPane(), this.openModal()}
+        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
+      </div>
+    )
   }
-  }
+}
 
 export default Studenti;
 
