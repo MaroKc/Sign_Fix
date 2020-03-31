@@ -10,7 +10,7 @@ class Calendario extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
+
     this.changeToken = this.changeToken.bind(this);
     this.classe = props.classe;
 
@@ -21,13 +21,9 @@ class Calendario extends Component {
     };
   }
 
-  toggle() {
-    this.setState({ collapse: !this.state.collapse });
-  }
 
   importCalendar() {
     this.setState({ calendario: this.state.token });
-    this.toggle();
     axios.post('http://localhost:8080/calendar/importLessons', { email: 'daniele.marocchi.studio@fitstic-edu.com', token: this.state.token, corso: this.classe.id})
       .then(res => {
         if(res.data.message ==='calendaroOk')  ToastsStore.success("Il calendario è stato importato con successo")
@@ -78,14 +74,10 @@ class Calendario extends Component {
                   </InputGroup>
                 </CardBody>
               </Collapse>
-              <CardFooter>
-                <Button color="dark" onClick={this.toggle} className="custom-btn mb-1" id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;Impostazioni</Button>
-              </CardFooter>
             </Card>
           </Col>
         </Row>
         <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
-
       </div>
     );
   }

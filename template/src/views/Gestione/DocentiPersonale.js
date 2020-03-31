@@ -248,7 +248,7 @@ class DocentiPersonale extends Component {
 
     selectLesson = () => {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
-        let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
+        let dettaglioDocente = this.state.dettagliDocente && this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
         let totalHours = (this.state.dettagliDocente.find(item => item.lessonName === this.state.value))
         if (this.state.dettagliDocente.length === 1) {
             return (
