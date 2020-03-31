@@ -54,6 +54,7 @@ function sendEmails(emailTo, objectEmail, text) {
    });
 }
 
+
 //CONTROLLO UTENTE e JWT
 async function chekUser(email) {
 
@@ -151,7 +152,7 @@ app.post('/tokensignin', function (req, res) {
             if (error) throw error;
          });
 
-         connection.query("SELECT id_course, email, email_fitstic, code, first_name, last_name FROM students s LEFT JOIN authentications a ON a.email_student = s.email WHERE email ='" + email + "'", async function (error, items, fields) {
+         connection.query("SELECT id_course, email, email_fitstic, code, first_name, last_name FROM students s LEFT JOIN authentications a ON a.email_student = s.email WHERE email_fitstic ='" + email + "'", async function (error, items, fields) {
 
             if (error) throw error;
 
@@ -182,7 +183,7 @@ app.post('/tokensignin', function (req, res) {
 
 app.get('/fitsticEmail/:email', function (req, res) {
 
-   emailStu = req.params.email;
+   var emailStu = req.params.email;
    connection.query("SELECT id_course, email, email_fitstic FROM students s WHERE email = ?", [emailStu], async function (error, items, fields) {
       if (error) throw error;
 
@@ -192,7 +193,7 @@ app.get('/fitsticEmail/:email', function (req, res) {
             var codice = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
             console.log(codice);
             var objectEmail = 'Conferma Mail'
-            var textEmail = 'Il Codice per confermare l\'identità è il seguente :' + codice
+            var textEmail = 'Il Codice per confermare l\'identità è il seguente : ' + codice
             sendEmails(emailStu, objectEmail, textEmail)
 
             connection.query("UPDATE students SET codice_conferma = ? WHERE email = ?", [codice, emailStu], function (error, result, fields) {
@@ -202,7 +203,6 @@ app.get('/fitsticEmail/:email', function (req, res) {
                } else {
                   return (res.send({ error: true, message: 'Righe Duplicate' }));
                }
-
             });
 
          } catch (error) {
@@ -379,6 +379,16 @@ app.get('/getCourses/:email', function (req, res) {
    }
 })
 
+app.get('/getCode/:email', function (req, res) {
+
+   var email =req.params.email
+   //var ruolo = 1;
+      connection.query("SELECT * FROM `authentications` WHERE email_student='"+email+"'", function (error, results, fields) {
+         if (error) throw error;
+         return res.send({ error: true, data: results, message: 'ok' });
+      });
+})
+
 
 app.post('/importCsv/:id_course', function (req, res) {
    var idCorso = req.params.id_course
@@ -548,7 +558,7 @@ app.post('/createTeacher', function (req, res) {
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
 
    var objectEmail = 'Credenziali Fitstic'
-   var textEmail = 'Gentile ' + firstName + ' ' + lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi con la seguente password:' + password
+   var textEmail = 'Gentile ' + firstName + ' ' + lastName + ', le comunichiamo che il suo account fitstic è stato abilitato, potrà accedervi all\'indirizzo : http://164.68.110.63/sing_fix/  con la seguente password:' + password
 
    var salt = bcrypt.genSaltSync(10);
    var hash = bcrypt.hashSync(password.toString(), salt);
@@ -651,44 +661,47 @@ app.put('/forgotPassword', function (req, res) {
    })
 });
 
-
+/*
 app.post('/studentBadge', function (req, res) {
    try {
+      const datetimeNow = new Date();
+      const Data = tools.formattedDate(datetimeNow);
+      const ora = datetimeNow.getHours() + (datetimeNow.getMinutes() / 0.6) / 100;
+      //DA FARE IN SETTINGS
+      const timeExtraEntrata = 0.25;
+      const timeExtraUscita = 1;
+      const email = req.body.email;
 
-      var email = req.body.email
-      var date = req.body.date
-      var startTime = tools.formattedToDecimal(req.body.startTime)
-      var endTime = tools.formattedToDecimal(req.body.endTime)
-      var lessonId = req.body.lessonId
-      var hourOfLessons = endTime - startTime
+      const dati = await LeassonExist(email,Data,ora,timeExtraEntrata,timeExtraUscita);
+      var firma = null;
 
-      /*
-      var email= 'capaneo92@gmail.com'
-      var date = '2020-02-20'
-      var startTime = tools.formattedToDecimal('13: 30')
-      var endTime = tools.formattedToDecimal('17: 00')
-      var lessonId =1
-      var hourOfLessons = endTime - startTime
-      */
+      if (!dati.error) {
 
-      var query = "INSERT INTO `signatures_teachers`(`email_responsible`, `date`, `final_start_time`, `final_end_time`, `id_lesson`, `hours_of_lessons`) VALUES (?,?,?,?,?,?)"
-
-      connection.query(query, [email, date, startTime, endTime, lessonId, hourOfLessons], function (error, result, fields) {
-         if (error) throw error;
-         if (result) {
-            connection.query("UPDATE `lessons` SET  `email_signature`=? where `id` = ?", [email, lessonId], function (error, result, fields) {
+         if (dati.message.sign === null) {
+            (dati.message.start <= ora ? firma = dati.message.start : firma = Math.ceil(ora/5)*5)
+            const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
+            connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
+               if (errorIns) throw errorIns;
+               res.send({ error: false, message: "Entrata registrata" });
+            });
+         } else {
+            (dati.message.end <= ora ? firma = dati.message.end : firma = (Math.ceil(ora/5)*5) - 5)
+            var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ?, lost_hours = ? WHERE id = ?";
+            connection.query(query, [datetimeNow, firma, firma + ' - final_start_time', dati.message.end + ' - ' + firma + ' - final_start_time', dati.message.sign], function (error, results, fields) {
                if (error) throw error;
-               return res.send({ error: false, message: 'ok' });
+               res.send({ error: false, message: "Uscita registrata" });
             });
          }
-         return res.send({ error: false, message: 'ok' });
-      });
 
+      } else {
+         res.send({ error: true, message: 'ko' });
+      }
+     
    } catch (error) {
       return res.send({ error: false, data: error, message: 'ko' });
    }
 });
-
+*/
 
 app.put('/updateSignature/:id_lesson', function (req, res) {
 
