@@ -15,11 +15,12 @@ class Calendario extends Component {
     this.classe = props.classe;
 
     this.state = {
-      collapse: props.classe.token ? false : true,
+      collapse: props.classe.token_calendar ? false : true,
       token: null,
-      calendario: false
+      calendario: props.classe.token_calendar ? props.classe.token_calendar : false
     };
   }
+
 
   toggle() {
     this.setState({ collapse: !this.state.collapse });
@@ -30,10 +31,12 @@ class Calendario extends Component {
     this.toggle();
     axios.post('http://localhost:8080/calendar/importLessons', { email: 'daniele.marocchi.studio@fitstic-edu.com', token: this.state.token, corso: this.classe.id})
       .then(res => {
-        if(res.data.message ==='calendaroOk')  ToastsStore.success("Il calendario è stato importato con successo")
-        if (res.data.message === 'calendarioKo') ToastsStore.warning("Errore durante l'importazione del calensario")
-        //console.log(res);
-        //console.log(res.data);
+        if(res.data.error){
+          ToastsStore.warning(res.data.message)
+        }
+        else{
+          ToastsStore.success(res.data.message)
+        }
       })
   }
 
@@ -50,7 +53,6 @@ class Calendario extends Component {
           <Col>
             <Card>
          
-
                 {this.state.calendario && (
                   <Iframe
                     url={"https://calendar.google.com/calendar/embed?src=" + this.state.calendario + "&ctz=Europe%2FRome"}

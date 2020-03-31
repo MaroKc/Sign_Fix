@@ -10,7 +10,7 @@ exports.stringLowerCase = (textToLower) => {
 }
 
 exports.formattedDate = (d = new Date) => {
-  let month = String(d.getMonth() + 1);
+  let month = String(d.getMonth() +1);
   let day = String(d.getDate());
   const year = String(d.getFullYear());
 
