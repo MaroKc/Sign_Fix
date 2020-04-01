@@ -81,7 +81,6 @@ let PrimoAccesso = (studentEmail) => {
       const queryPrimo = "INSERT INTO authentications (email_student, code) VALUES (?, ?)";
       connection.query(queryPrimo, [studentEmail, codice], function (errorPrimo, resultsPrimo, fields) {
          if (errorPrimo) { throw reject(new Error(errorPrimo)); }
-         console.log(resultsPrimo)
          if (resultsPrimo.length == 0) {
             resolve({ error: true, message: false });
          } else {
@@ -89,8 +88,7 @@ let PrimoAccesso = (studentEmail) => {
                {
                   error: false,
                   code: codice
-               }
-            );
+               });
          }
       });
    });
@@ -191,7 +189,6 @@ app.get('/fitsticEmail/:email', function (req, res) {
          try {
 
             var codice = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-            console.log(codice);
             var objectEmail = 'Conferma Mail'
             var textEmail = 'Il Codice per confermare l\'identità è il seguente : ' + codice
             sendEmails(emailStu, objectEmail, textEmail)
@@ -302,7 +299,6 @@ app.post('/badge', function (req, res) {
 
          const email = results[0].email_student;
          const dati = await LeassonExist(email, Data, ora, timeExtraEntrata, timeExtraUscita);
-         console.log(dati);
          var firma = null;
 
          if (!dati.error) {
@@ -358,6 +354,54 @@ app.get('/totalHours', function (req, res) {
    });
 });
 */
+
+app.post('/studentBadge', function (req, res) {
+
+   const email = req.body.email;
+   const datetimeNow = new Date();
+   const Data = tools.formattedDate(datetimeNow);
+   const ora = datetimeNow.getHours() + (datetimeNow.getMinutes() / 0.6) / 100;
+   //DA FARE IN SETTINGS
+   const timeExtraEntrata = 0.25;
+   const timeExtraUscita = 1;
+
+   //Una volta che ho il QR faccio una select per trovare l'email associata
+   connection.query("SELECT * FROM students WHERE email = '" + email+"'", async function (error, results, fields) {
+      if (error) throw error;
+
+      if (results.length == 1) {
+
+         const email = results[0].email_student;
+         const dati = await LeassonExist(email, Data, ora, timeExtraEntrata, timeExtraUscita);
+         var firma = null;
+
+         if (!dati.error) {
+
+            if (dati.message.sign === null) {
+               (dati.message.start <= ora ? firma = dati.message.start : firma = Math.ceil(ora / 5) * 5)
+               const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
+               connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
+                  if (errorIns) throw errorIns;
+                  res.send({ error: false, message: "Entrata registrata" });
+               });
+            } else {
+               (dati.message.end <= ora ? firma = dati.message.end : firma = (Math.ceil(ora / 5) * 5) - 5)
+               var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ?, lost_hours = ? WHERE id = ?";
+               connection.query(query, [datetimeNow, firma, firma + ' - final_start_time', dati.message.end + ' - ' + firma + ' - final_start_time', dati.message.sign], function (error, results, fields) {
+                  if (error) throw error;
+                  res.send({ error: false, message: "Uscita registrata" });
+               });
+            }
+
+         } else {
+            res.send({ error: true, message: false });
+         }
+      } else {
+         res.send({ error: true, message: false });
+      }
+   });
+});
+
 
 app.get('/getCourses/:email', function (req, res) {
 
@@ -771,11 +815,9 @@ app.get('/getSignature', function (req, res) {
 
 app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
-   var date_appoggio = req.params.date
+   var dataFinale = req.params.date
    var id_course = req.params.id_course
-
-   var data_Scelta = date_appoggio.split('-');
-   var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
+   
    connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
@@ -820,17 +862,16 @@ app.get('/lessonsTeacher/:id_company', function (req, res) {
 
 app.get('/listSignaturesStudents/:data_scelta/:id_course', function (req, res) {
    var data = []
-   var date_appoggio = req.params.data_scelta
+   var dataFinale = req.params.data_scelta
    var id_course = req.params.id_course
-   var data_Scelta = date_appoggio.split('-');
-   var dataFinale = data_Scelta[2] + '-' + data_Scelta[1] + '-' + data_Scelta[0]
+
 
    connection.query("SELECT s.final_start_time, s.final_end_time, a.first_name, a.last_name,l .id as id_lesson, a.email FROM students a LEFT JOIN lessons l ON l.id_course = a.id_course LEFT JOIN signatures_students s ON s.email_student = a.email AND s.id_lesson= l.id where ritirato=0 and a.id_course=" + id_course + " and l.date='" + dataFinale + "'", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
             {
-               mattinaPomeriggio: element.final_start_time >= 13 ? 1 : 0,
+              // mattinaPomeriggio: element.final_start_time > 12 ? 1 : 0,
                firstName: element.first_name,
                lastName: element.last_name,
                email: element.email,
@@ -888,7 +929,7 @@ app.get('/StudentPercentage/:email', function (req, res) {
       //var email= 'dmycockf@posterous.com'
 
       var email = req.params.email
-      var query = "select lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons from signatures_students join lessons on signatures_students.id_lesson= lessons.id where email_student =? group by lesson"
+      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN (SELECT * FROM signatures_students where email_student = 'azeale0@linkedin.com') s ON l.id = s.id_lesson GROUP by lesson"
       connection.query(query, [email], function (error, results, fields) {
          if (error) throw error;
          if (results.length !== 0) {
@@ -1063,6 +1104,7 @@ app.post('/calendar/importLessons', async function (req, res) {
 
          var errori = [];
          var datiInsert = [];
+         var datierrore= false;
 
          if (events.length) {
 
@@ -1094,12 +1136,16 @@ app.post('/calendar/importLessons', async function (req, res) {
                   }
 
                } catch (err) {
-                  return res.send({ error: false, data: errori, message: 'Errore di inserimento' });
+                  datierrore= true
                }
             }); //fine map
 
+            if (datierrore===true){
+               return res.send({ error: true, message: 'Errore di inserimento' });
+            }
+
          } else {
-            return res.send({ error: false, message: 'Non sono stati trovanti eventi salvati nel calendario' });
+            return res.send({ error: true, message: 'Non sono stati trovanti eventi salvati nel calendario' });
          }
 
          var interval = setInterval(() => {
@@ -1111,12 +1157,17 @@ app.post('/calendar/importLessons', async function (req, res) {
                   if (errorIns) throw errorIns;
 
                });
+
                clearInterval(interval)
-               return res.send({ error: false, message: 'calendaroOk' });
+               connection.query("UPDATE courses set token_calendar= '"+idCalendar+"' where id ="+courseID, function (errorIns, itemsIns, fields) {
+                  if (errorIns) throw errorIns;
+
+               });
+               return res.send({ error: false, message: 'Il calendario è stato importato correttamente' });
             }
             else {
                clearInterval(interval)
-               return res.send({ error: false, data: errori, message: 'calendarioKo' });
+               return res.send({ error: true, data: errori, message: 'Ci sono stati errori nell\'inserimento dei seguenti dati: '+errori });
             }
          }, 500);
       });

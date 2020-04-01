@@ -80,16 +80,7 @@ class Studenti extends Component {
 
   formatHours(hours) {
     var startLessonAppoggio = (hours.toString()).split('.')
-    var startLesson = ''
-
-    if (startLessonAppoggio[1]) {
-      var startLessonSecondaParte = startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
-      startLesson = startLessonAppoggio[0] + ': ' + (startLessonSecondaParte.toString()).substring(0, 2)
-      return startLesson
-    }
-    else{
-      return startLessonAppoggio[0]
-    }
+    return startLessonAppoggio[0]
   }
 
 

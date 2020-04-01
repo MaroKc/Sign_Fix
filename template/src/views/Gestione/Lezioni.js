@@ -53,44 +53,53 @@ class Lezioni extends React.Component {
   }
 
   getLessons = () => {
-      var data_appoggio = new Intl.DateTimeFormat('usa', { year: 'numeric', month: '2-digit', day: '2-digit'}).format(this.state.startDate)
-      var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
+      var data_scelta = this.state.startDate.toISOString().replace(/\T.+/, '')
 
       axios.get('http://localhost:8080/lessons/'+ data_scelta+'/'+this.props.classe["id"])
       .then(res => res.data)
       .then((data) => {
-        const lezioniMattina = [];
-        const lezioniPomeriggio = [];
-
-        data.map((item) => {
-        if(item.startTime < 12){
-        lezioniMattina.push({
-          name: item.name,
-          id: item.id,
-          lesson: item.lesson,
-          email: item.email,
-          classroom: item.classroom,
-          startTime: item.startTime,
-          endTime: item.endTime,
-        })
-      }
-      else{
-        lezioniPomeriggio.push({
-          name: item.name,
-          id: item.id,
-          lesson: item.lesson,
-          email: item.email,
-          classroom: item.classroom,
-          startTime: item.startTime,
-          endTime: item.endTime,
-        })
-      }
-      });
-        this.setState({ 
-          lezioniMattina ,
-          lezioniPomeriggio
+        if(data.length!==0){
+          const lezioniMattina = [];
+          const lezioniPomeriggio = [];
+          const firstLesson= data[0].id
+  
+          data.map((item) => {
+          if(firstLesson === item.id){
+          lezioniMattina.push({
+            name: item.name,
+            id: item.id,
+            lesson: item.lesson,
+            email: item.email,
+            classroom: item.classroom,
+            startTime: item.startTime,
+            endTime: item.endTime,
+          })
+        }
+        else{
+          lezioniPomeriggio.push({
+            name: item.name,
+            id: item.id,
+            lesson: item.lesson,
+            email: item.email,
+            classroom: item.classroom,
+            startTime: item.startTime,
+            endTime: item.endTime,
+          })
+        }
         });
-        
+          this.setState({ 
+            lezioniMattina ,
+            lezioniPomeriggio
+          });
+        }
+        else{
+          this.setState(
+            { 
+              lezioniMattina: [], 
+              lezioniPomeriggio:[] 
+           });
+        }
+
       })
       .catch(err => console.error(err));
 
@@ -98,11 +107,12 @@ class Lezioni extends React.Component {
       axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta+'/'+this.props.classe['id'])
         .then(res => res.data)
         .then((data) => {
-          const studentiMattina = [];
+          if(data.length !== 0){
+            const studentiMattina = [];
           const studentiPomeriggio = [];
-
+          const firstLesson= data[0].idLesson 
           data.map(item => {
-            if(item.mattinaPomeriggio === 0){
+            if(firstLesson === item.idLesson){
               studentiMattina.push({
                 idLesson: item.idLesson,
                 firstName: item.firstName,
@@ -111,10 +121,10 @@ class Lezioni extends React.Component {
                 emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
                 endTime: this.formatHours(item.endTime),
-                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, item.mattinaPomeriggio)
+                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, 0)
               })
             }
-            else if(item.mattinaPomeriggio === 1){
+            else {
               studentiPomeriggio.push({
                 idLesson: item.idLesson,
                 firstName: item.firstName,
@@ -122,7 +132,7 @@ class Lezioni extends React.Component {
                 emailStudent: item.emailStudent,
                 startTime: this.formatHours(item.startTime),
                 endTime: this.formatHours(item.endTime),
-                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, item.mattinaPomeriggio)
+                clickEvent: () => this.displayCard(item.emailStudent, item.idLesson, 1)
               })
             }
           });
@@ -131,6 +141,15 @@ class Lezioni extends React.Component {
               studentiMattina, 
               studentiPomeriggio 
            });
+          }
+          else{
+            this.setState(
+              { 
+                studentiMattina: [], 
+                studentiPomeriggio:[] 
+             });
+          }
+          
         })
 
         .catch(err => console.error(err));
@@ -190,7 +209,6 @@ class Lezioni extends React.Component {
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                <h5 className="d-block ml-md-4">mattina</h5>
                 <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5> 
                 </Col>
                 <Col className="col-sm-8 mt-3">
@@ -243,14 +261,13 @@ class Lezioni extends React.Component {
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(1)} aria-expanded={this.state.accordion[1]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                <h5 className="d-block ml-md-4">pomeriggio</h5>
                 <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
                 <Col className="col-sm-8 mt-3">
                 <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
-              {!assenti.length ? "" :  <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) =>  <span ket={i}> {item.firstName} {item.lastName}, </span>)}</h4></div>}
+              {!assenti.length ? "" :  <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) =>  <span key={i}> {item.firstName} {item.lastName}, </span>)}</h4></div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[1]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
