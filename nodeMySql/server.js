@@ -929,7 +929,7 @@ app.get('/StudentPercentage/:email', function (req, res) {
       //var email= 'dmycockf@posterous.com'
 
       var email = req.params.email
-      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN (SELECT * FROM signatures_students where email_student = 'azeale0@linkedin.com') s ON l.id = s.id_lesson GROUP by lesson"
+      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN ( SELECT * FROM signatures_students where email_student = '"+email+"' ) s ON l.id = s.id_lesson where l.date <= CURRENT_DATE GROUP by lesson"
       connection.query(query, [email], function (error, results, fields) {
          if (error) throw error;
          if (results.length !== 0) {
@@ -1150,6 +1150,11 @@ app.post('/calendar/importLessons', async function (req, res) {
 
          var interval = setInterval(() => {
             if (errori.length === 0) {
+               let curdata=new Date().toISOString().replace(/\T.+/, '')
+               connection.query("DELETE  FROM lessons where id_course ="+courseID+" and date> '"+curdata+"'", function (errorIns, itemsIns, fields) {
+                  if (errorIns) throw errorIns;
+
+               });
 
                const queryIns = 'INSERT INTO lessons (`lesson`, `companies_id`,`classroom`,`id_course`,`date`,`start_time`,`end_time`,`total_hours`,`creation_date`) VALUES ?';
 
