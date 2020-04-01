@@ -47,7 +47,6 @@ class Calendario extends Component {
         <Row>
           <Col>
             <Card>
-         
                 {this.state.calendario && (
                   <Iframe
                     url={"https://calendar.google.com/calendar/embed?src=" + this.state.calendario + "&ctz=Europe%2FRome"}
@@ -58,8 +57,6 @@ class Calendario extends Component {
                     scrolling="no"
                   />
                 )}
-                
-           
               <Collapse isOpen={this.state.collapse}>
                 <CardBody>
                   <InputGroup>
