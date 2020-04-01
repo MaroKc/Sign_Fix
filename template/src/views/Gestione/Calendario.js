@@ -16,7 +16,7 @@ class Calendario extends Component {
 
     this.state = {
       collapse: props.classe.token_calendar ? false : true,
-      token: null,
+      token: props.classe.token_calendar ? props.classe.token_calendar : null,
       calendario: props.classe.token_calendar ? props.classe.token_calendar : false
     };
   }
@@ -73,7 +73,7 @@ class Calendario extends Component {
                         <i className="fa fa-calendar-check-o"></i>
                       </InputGroupText>
                     </InputGroupAddon>
-                    <Input className="col-lg-5" onChange={this.changeToken} placeholder={this.state.calendario ? this.state.calendario : "Goole Calendar Token"} type="text" id="calendarID" name="calendarID" />
+                    <Input className="col-lg-5" onChange={this.changeToken} placeholder="Goole Calendar Token" value={this.state.calendario ? this.state.calendario : null} type="text" id="calendarID" name="calendarID" />
                     <InputGroupAddon addonType="append">
                       <Button onClick={() => this.importCalendar()} type="button" className="custom-btn">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
                     </InputGroupAddon>

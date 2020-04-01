@@ -13,7 +13,6 @@ class DefaultFooter extends Component {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
     const d = new Date()
-    console.log(d.getFullYear())
     return (
       <React.Fragment>
         <span><a href="https://fitstic.it" target="_blank"  rel="noopener noreferrer">FITSTIC</a> &copy; {d.getFullYear()}</span>

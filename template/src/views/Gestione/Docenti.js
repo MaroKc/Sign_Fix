@@ -192,7 +192,6 @@ handleChange = (event) => {
 
       const nonRitirato =this.state.docenti.filter(el => el.ritirato === 0) 
       const ritirato = this.state.docenti.filter(el => el.ritirato === 1)
-      console.log(ritirato)
     
       if (ritirato.length !== 0) {
         return (
