@@ -77,44 +77,47 @@ onclickModifyState = () => {
         })
     }
 
+
     selectLesson = () => {
-        if(this.props.docente.length === 1){
+        let docente = this.props.docente
+        let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
+        if (this.props.docente.length === 1) {
             return (
                 <>
-                    <tr>
-                        <td><h5>Lezione:</h5></td>
-                        <td><h5>{this.props.docente['0'].lessonName}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore fatte:</h5></td>
-                        <td><h5>{this.props.docente['0'].hoursOfLessons}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.props.docente['0'].totalHours}</h5></td>
-                    </tr>
+                    <h3 className="text-left">{docente[0].lessonName}</h3>
+                    <Row>
+                        <Col xs="6" className="mt-4 mb-4 text-center">
+                            <h6 className="mb-2">Ore fatte:</h6>
+                            <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
+                        </Col>
+                    </Row>
                 </>
             )
-        }else{
-            let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
+        } else {
+
             return (
                 <>
-                    <tr>
-                        <td><h5>Lezione:</h5></td>
-                        <td><h5>
-                            <Input type="select" name="select" id="select" className="w-auto" onChange={(e) => this.setState({ value: e.target.value })}>
-                                {this.props.docente.map((item, i) => <option key={i} value={item.lessonName}>{item.lessonName}</option>)}
-                            </Input>
-                        </h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore fatte:</h5></td>
-                        <td><h5>{this.state.value && totalHours['hoursOfLessons'] }</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
-                    </tr>
+
+                    <div className="d-flex justify-content-start mt-3 ml-3 mb-3">
+                        {this.props.docente.map((item, i) =>
+                            <Button
+                                value={item.lessonName}
+                                className={this.state.value === item.lessonName
+                                    ?
+                                    'custom2 mr-3 h-50'
+                                    :
+                                    'customPill mr-3 h-50'
+                                  }
+                                onClick={(e) => this.setState({ value: e.target.value })}
+                                key={i}>
+                                {item.lessonName}
+                            </Button>
+                        )}
+                    </div>
+                    <div className="text-center">
+                        <h6 className="mb-2">Ore fatte:</h6>
+                        <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
+                    </div>
                 </>
             )
         }
@@ -139,14 +142,14 @@ changeInfo = (changeInfo) => {
                         <td><h5>Identificativo Calendario <br /> o compagnia</h5></td>
                         <td><h5>{this.props.docente['0'].companyName}</h5> </td>
                     </tr>
-                    {this.selectLesson()}
+                 
                 </tbody>
             </Table>
+            {this.selectLesson()}
             </>
         )
     }
     else {
-        let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
 
         const regexLettere = /^[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF'\s]*$/;
         const { firstName, lastName, companyName } = this.state
@@ -168,18 +171,6 @@ changeInfo = (changeInfo) => {
                     <tr>
                         <td><h5>Identificativo Calendario <br /> o compagnia:</h5></td>
                         <td><Input name='companyName' onChange={this.handleChange} value={this.state.companyName} valid={validationIdentificativo} invalid={!validationIdentificativo}/></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Lezione:</h5></td>
-                        <td><h5>{this.state.value && totalHours['lessonName']}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore fatte</h5></td>
-                        <td><h5>{this.state.value && totalHours['hoursOfLessons']}</h5></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Ore di lezione:</h5></td>
-                        <td><h5>{this.state.value && totalHours['totalHours']}</h5></td>
                     </tr>
                 </tbody>
             </Table>

@@ -38,7 +38,7 @@ class Studenti extends Component {
           residence: item.residence,
           fiscalCode: item.fiscalCode,
           hoursOfLessons: this.formatHours(item.hoursOfLessons),
-          percentage: item.percentage < "80" ? <div className="text-danger">{item.percentage}</div> : <div className="text-success">{item.percentage}</div>,
+          percentage: item.percentage < 80 ? <div className="text-danger">{item.percentage}%</div> : <div className="text-success">{item.percentage}%</div>,
           ritirato: item.ritirato,
           clickEvent: () => this.displayCard(item.email)
         }));
@@ -128,7 +128,7 @@ class Studenti extends Component {
       const nonRitirato = this.state.studenti.filter(el => el.ritirato === 0)
       const ritirato = this.state.studenti.filter(el => el.ritirato === 1)
 
-      if (ritirato !== 0) {
+      if (ritirato.length !== 0) {
         return (
           <div>
           <Card>
@@ -208,7 +208,7 @@ class Studenti extends Component {
       }
     }
     if(this.state.displayCard){
-      return <InfoStudente studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable}/>
+      return <InfoStudente idCorso={this.state.idCorso} studente={this.state.studenti.find((studente) => studente.email === this.state.displayCard)} getStudents={this.getStudents} displayTable={this.displayTable}/>
     }else{
       return (
         <>

@@ -19,10 +19,14 @@ class infoStudente extends React.Component {
       displayCard: this.props.displayCard,
       changeInfo: false,
       warning: false,
+      value: '',
+      percentageLessons: []
     }
   }
 
-
+componentDidMount() {
+  this.getLessonsPercentage()
+}
   callForUpdate = () => {
     axios.put('http://localhost:8080/updateStudent/' + this.state.email, {
       first_name: this.state.firstName,
@@ -55,6 +59,20 @@ class infoStudente extends React.Component {
       });
   }
 
+  getLessonsPercentage = () => {
+    axios.get('http://localhost:8080/StudentPercentage/' + this.state.email +'/'+ this.props.idCorso)
+        .then(res => res.data)
+        .then((data, index) => {
+            const percentageLessons = [];
+            data.data.map(item => percentageLessons.push({
+                lessonName: item.lessonName,
+                totalHours: item.totalHours,
+                percentage: item.percentage,
+            }));
+            this.setState({ percentageLessons });
+        })
+        .catch(err => console.error(err));
+}
 
   handleChange = (event) => {
     let name = event.target.name;
@@ -99,11 +117,13 @@ class infoStudente extends React.Component {
             <h4>{this.state.email}</h4>
             </Col>
             <Col xs='auto' className="text-center">
-            <h3>{this.state.percentage}</h3><h5>presenze</h5>
+            <h1>{this.state.percentage}</h1>
+            <h5>presenze</h5>
             </Col>
           </Row>
         <hr />
-        <Table borderless responsive>
+
+          <Table borderless responsive>
           <tbody className="">
             <tr>
               <td><h5>Residenza:</h5></td>
@@ -119,7 +139,10 @@ class infoStudente extends React.Component {
             </tr>
           </tbody>
         </Table>
-        
+
+          {this.percentageLessons()}
+
+       
         </>
       )
     }
@@ -164,6 +187,37 @@ class infoStudente extends React.Component {
         </Table>
       )
     }
+  }
+
+  percentageLessons = () => {
+    let totalHours = (this.state.percentageLessons.find(item => item.lessonName === this.state.value))
+    return (
+        <>
+            <div className="d-flex justify-content-start mt-3 ml-3 mb-3">
+                {this.state.percentageLessons.map((item, i) =>
+                    <Button
+                        value={item.lessonName}
+                        className={this.state.value === item.lessonName
+                            ?
+                            'custom2 mr-3 h-50'
+                            :
+                            'customPill mr-3 h-50'
+                          }
+                        onClick={(e) => this.setState({ value: e.target.value })}
+                        key={i}>
+                        {item.lessonName}
+                    </Button>
+                )}
+            </div>
+            {this.state.value !== '' &&
+            <Row className="d-flex justify-content-center">
+                <Col xs="6" className="mt-4 mb-4 text-center">
+                    <h6 className="mb-2">Ore fatte:</h6>
+                    <h2><b>{this.state.value && totalHours['percentage']+'%'}</b></h2>
+                </Col>
+            </Row>}
+        </>
+    )
   }
 
   renderButtons = (changeInfo) => {

@@ -97,7 +97,7 @@ class Login extends Component {
         <Modal isOpen={this.state.warning} toggle={this.toggleWarning}
           className={'modal-primary ' + this.props.className}>
           <ModalBody>
-            <div>
+            <div className="mb-3">
               Se la tua mail risulterà registrata ti invieremo una nuova password
               </div>
             <div>

@@ -33,8 +33,8 @@ function sendEmails(emailTo, objectEmail, text) {
    var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-         user: 'user',
-         pass: 'pass'
+         user: 'registro.luca.pw@gmail.com',
+         pass: 'fitstic2020'
       }
    });
 
@@ -903,7 +903,6 @@ app.get('/listStudents/:id_course', function (req, res) {
 
       results.forEach(element => {
          var percentage = ((element.hours_of_lessons * 100) / totalHours[0].totalHours).toFixed(0)
-
          data.push(
             {
                firstName: element.first_name,
@@ -913,8 +912,8 @@ app.get('/listStudents/:id_course', function (req, res) {
                dateOfBirth: element.date_of_birth,
                residence: element.residence,
                hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
-               totalHours: totalHours[0].totalHours,
-               percentage: (percentage) ? (percentage) : 0,
+               totalHours: totalHours[0].totalHours ? totalHours[0].totalHours : 0,
+               percentage: isNaN(percentage) ? 0 :(percentage) ,
                ritirato: element.ritirato
             })
       })
@@ -923,13 +922,13 @@ app.get('/listStudents/:id_course', function (req, res) {
 });
 
 
-app.get('/StudentPercentage/:email', function (req, res) {
+app.get('/StudentPercentage/:email/:id', function (req, res) {
    var data = []
    try {
       //var email= 'dmycockf@posterous.com'
-
+      var courseId = req.params.id
       var email = req.params.email
-      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN ( SELECT * FROM signatures_students where email_student = '"+email+"' ) s ON l.id = s.id_lesson where l.date <= CURRENT_DATE GROUP by lesson"
+      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN ( SELECT * FROM signatures_students where email_student = '"+email+"' ) s ON l.id = s.id_lesson where l.date <= CURRENT_DATE  and l.id_course ="+courseId+" GROUP by lesson"
       connection.query(query, [email], function (error, results, fields) {
          if (error) throw error;
          if (results.length !== 0) {

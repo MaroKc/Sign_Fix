@@ -3,6 +3,8 @@ import { Row, Col, Card, CardHeader, CardBody, Button, Input } from 'reactstrap'
 import axios from 'axios'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { Redirect } from 'react-router-dom';
+import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
 
 var QRCode = require('qrcode.react');
 
@@ -13,26 +15,29 @@ class StudentiPersonale extends Component {
 
         this.state = {
             studenti: [],
-            lessons: [],
-            lezione: [],
+            lesson: [],
+            percentageLessons: [],
             code: '',
             changeState: false,
             user: this.props.user,
             emailFirst: '',
-            codiceFirst: ''
+            codiceFirst: '',
+            codice: false,
+            value: '',
+            firmaIngresso: '',
+            firmaUscita: ''
         }
 
     }
 
     componentDidMount() {
-        console.log(this.state.user.email)
         if (this.state.user.email !== false) {
             this.getStudents();
             this.getLessonsPercentage();
             this.getLessons();
             this.getCode();
-        }
 
+        }
     }
 
     getCode = () => {
@@ -65,14 +70,24 @@ class StudentiPersonale extends Component {
     }
 
     getLessons = () => {
-        var d = new Date()
-        var data_appoggio = new Intl.DateTimeFormat('usa', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
-        var data_scelta = data_appoggio.replace(/[.*+?^${}/()|[\]\\]/g, '-')
-        axios.get('http://localhost:8080/lessons/' + data_scelta + '/' + this.state.user.id_course)
+        var d = new Date(),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+
+        const currDate = [year, month, day].join('-');
+        console.log(currDate)
+        axios.get('http://localhost:8080/lessons/' + currDate + '/' + this.state.user.id_course)
             .then(res => res.data)
             .then((data, index) => {
-                const lezione = [];
-                data.map(item => lezione.push({
+                const lesson = [];
+                data.map(item => lesson.push({
                     name: item.name,
                     classroom: item.classroom,
                     id: item.id,
@@ -81,24 +96,24 @@ class StudentiPersonale extends Component {
                     endTime: item.endTime
                 }));
 
-                this.setState({ lezione });
+                this.setState({ lesson });
 
             })
             .catch(err => console.error(err));
     }
 
     getLessonsPercentage = () => {
-        axios.get('http://localhost:8080/StudentPercentage/' + this.state.user.email)
+        axios.get('http://localhost:8080/StudentPercentage/' + this.state.user.email +'/'+ this.state.user.id_course)
             .then(res => res.data)
             .then((data, index) => {
-                const lessons = [];
-                data.map(item => lessons.push({
+                const percentageLessons = [];
+                data.data.map(item => percentageLessons.push({
                     lessonName: item.lessonName,
                     totalHours: item.totalHours,
-                    hoursOfLessons: this.formatHours(item.hoursOfLessons),
+                    hoursOfLessons: item.hoursOfLessons ? this.formatHours(item.hoursOfLessons) : 0,
                     percentage: item.percentage,
                 }));
-                this.setState({ lessons });
+                this.setState({ percentageLessons });
             })
             .catch(err => console.error(err));
     }
@@ -149,7 +164,7 @@ class StudentiPersonale extends Component {
         return (
             <Row>
                 <Col xs="6" className="my-auto text-center">
-                    <h6 className="mb-2">Ore fatte:</h6>
+                    <h6 className="mb-2">Ore totali:</h6>
                     <h2><b>{studente && studente.hoursOfLessons} / {studente && studente.totalHours}</b></h2>
                 </Col>
                 <Col xs="6" className="my-auto text-center">
@@ -233,29 +248,23 @@ class StudentiPersonale extends Component {
         if (mese === 10) mese = "Novembre";
         if (mese === 11) mese = "Dicembre";
 
-
-        let lezione = this.state.lezione
+        let lezione = this.state.lesson
         if (lezione.length !== 0 && lezione['0'].classroom === 'lezione online') {
             return (
                 lezione.map((item, i) =>
-                    <Card>
+                    <Card key={i}>
                         <CardHeader className="my-auto text-center">
                             <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
                         </CardHeader>
                         <div>
                             <CardBody>
                                 {
-                                    data.getHours() >= item.startTime.split(':')[0] && data.getHours() <= item.endTime.split(':')[0]
-                                        // && data.getMinutes() >= parseInt(item.startTime.split(':')[1].trim()) && data.getMinutes() <= parseInt(item.endTime.split(':')[1].trim())
+                                    data.getHours() >= item.startTime.split(':')[0] && data.getHours() <= item.endTime.split(':')[0]  
                                         ?
-                                        // ((this.state.signature.filter(it =>it.email_signature === this.props.user.email && it.id === item.lessonId).length === 0) 
-                                        // ? 
                                         <>
                                             <Button color="success" size="lg" className="mb-3" onClick={this.badgeTeacher} block> firma INGRESSSO </Button>
-                                            <Button color="success" size="lg" className="mb-3" block> firma USCITA </Button>
+                                            {this.state.firmaIngresso === '' ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <Button color="success" size="lg" className="mb-3" block> firma USCITA </Button>}
                                         </>
-                                        // : 
-                                        // <h5 className="text-center mb3 text-info">Hai già firmato!</h5>)
                                         :
                                         <>
                                             <Button color="success" size="lg" className="mb-3" disabled block> firma INGRESSSO</Button>
@@ -322,6 +331,7 @@ class StudentiPersonale extends Component {
                     <hr />
 
                     {this.infoStudent()}
+                    {this.selectLesson()}
 
                 </>
             )
@@ -333,20 +343,22 @@ class StudentiPersonale extends Component {
 
 
     buttonStep = (step) => {
-        console.log(step)
         if (step === 0) {
             axios.get('http://localhost:8080/fitsticEmail/' + this.state.emailFirst)
                 .then(res => res.data)
                 .then((data, index) => {
                     if (data.error) {
+                        ToastsStore.warning("OPS, qualcosa è andato storto. Prova con un'altra mail")
                         console.log(data.message)
                     } else {
-                        console.log(data.message)
+                        this.setState({codice: true})
+                        ToastsStore.success("A breve ti arriverà il codice a "+this.state.emailFirst)   
                     }
                 })
                 .catch(err => console.error(err));
+               
         } else if (step === 1) {
-            console.log("indietro")
+            console.log("arrivato")
         } else if (step === 2) {
             axios.post('http://localhost:8080/fitsticEmail', {codice: this.state.codiceFirst, emailFit: this.state.user.emailFit, email: this.state.emailFirst})
                 .then(res => res.data)
@@ -354,7 +366,7 @@ class StudentiPersonale extends Component {
                     if (data.error) {
                         console.log(data.message)
                     } else {
-                        console.log(data.message)
+                        return <Redirect to='/login'/>
                     }
                 })
                 .catch(err => console.error(err));
@@ -371,25 +383,72 @@ class StudentiPersonale extends Component {
     fitsticEmail = () => {
         return (
             <div>
-                <div>
-                    <p>Inserire Email Tua</p>
-                    <Input size="16" type="text" placeholder="Email" onChange={this.EmailFirstChange} />
-                    <Button color="primary" size="lg" className="btn mb-3" onClick={() => this.buttonStep(0)}> <b>Avanti</b></Button>
+                <div className= 'text-center'>
+                    <b>Inserisci la mail con cui ti sei registrato a FITSTIC, se vi sarà corrispondenza ti invieremo un codice </b>
+                    <Input className="mt-2" size="16" type="text" placeholder="Email" onChange={this.EmailFirstChange} />
+                    <Button size="lg" className="custom-btn mb-3 mt-2" onClick={() => this.buttonStep(0)}> <b>Invia Mail</b></Button>
                 </div>
-                <div>
-                    <p>Inserire Codice</p>
-                    <Input size="16" type="text" placeholder="Codice" onChange={this.CodiceFirstChange} />
-                    <Button color="primary" size="lg" className="btn mb-3" onClick={() => this.buttonStep(1)}> <b>Indietro</b></Button>
-                    <Button color="primary" size="lg" className="btn mb-3" onClick={() => this.buttonStep(2)}> <b>Invia</b></Button>
-                </div>
+                {this.insertCode()}
+                <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
+            </div>
+        )
+    }
+    insertCode = () => {
+        if(this.state.codice === true)
+        return (
+            <div className= 'text-center'>
+            <b>Inserisci Codice</b>
+            <Input className="mt-2" size="16" type="text" placeholder="Codice" onChange={this.CodiceFirstChange} />
+            <Button  size="lg" className="custom-btn mb-3 mt-2 mr-2" onClick={() => this.buttonStep(1)}> <b>Indietro</b></Button>
+            <Button  size="lg" className="custom-btn mb-3 mt-2" onClick={() => this.buttonStep(2)}> <b>Avanti</b></Button>
             </div>
         )
     }
 
+
+
+    selectLesson = () => {
+        let totalHours = (this.state.percentageLessons.find(item => item.lessonName === this.state.value))
+            return (
+                <>
+                    <div className="d-flex justify-content-start mt-3 ml-3 mb-3">
+                        {this.state.percentageLessons.map((item, i) =>
+                            <Button
+                                value={item.lessonName}
+                                color={this.state.value === item.lessonName
+                                    ?
+                                    'primary'
+                                    :
+                                    'ghost-primary'}
+                                className={this.state.value === item.lessonName
+                                    ?
+                                    'disabled active btn btn-pill mr-3 h-50'
+                                    :
+                                    'btn btn-pill mr-3 h-50'}
+                                onClick={(e) => this.setState({ value: e.target.value })}
+                                key={i}>
+                                {item.lessonName}
+                            </Button>
+                        )}
+                    </div>
+                    {this.state.value !== '' &&
+                    <Row className="d-flex justify-content-center">
+                        <Col xs="6" className="mt-4 mb-4 text-center">
+                            <h6 className="mb-2">Ore fatte:</h6>
+                            <h2><b>{this.state.value && totalHours['percentage']+'%'}</b></h2>
+                        </Col>
+                    </Row>}
+                </>
+            )
+        }
+
+
+
+
     render() {
 
         if (this.state.user.email !==false) {
-            return this.normal();
+            return (console.log(this.state.lesson), this.normal())
         } else {
             return this.fitsticEmail();
         }

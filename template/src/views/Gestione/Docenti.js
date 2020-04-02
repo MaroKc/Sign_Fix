@@ -90,7 +90,7 @@ class Docenti extends Component {
      .then(res => {
       if (res.data.message === "ok") {
         this.refresh();
-        ToastsStore.success(" è stato aggiunto alla lista docenti!");
+        ToastsStore.success("Il docente è stato aggiunto alla lista!");
       }else if (res.data.message === "esistente") ToastsStore.warning("OPS, la mail è stata già inserita");
 
     })

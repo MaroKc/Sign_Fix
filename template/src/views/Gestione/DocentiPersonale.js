@@ -298,7 +298,7 @@ class DocentiPersonale extends Component {
                     <Row>
                         <Col xs="6" className="mt-4 mb-4 text-center">
                             <h6 className="mb-2">Ore fatte:</h6>
-                            <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
+                            <h2 className=' text-nowrap'><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
                         </Col>
                         <Col xs="6" className="mt-4 mb-4 text-center">
                             <h6 className="mb-2">Presenze alunni:</h6>
@@ -492,7 +492,7 @@ class DocentiPersonale extends Component {
                         ? 
                         <Button color="success" size="lg" className="mb-3" onClick={this.badgeTeacher} block> TIMBRA </Button> 
                         : 
-                        <h5 className="text-center mb3 text-info">Hai già firmato!</h5>)
+                        <h5 className="text-center mb3 text-info">Hai firmato!</h5>)
                     : 
                     <Button color="success" size="lg" className="mb-3" disabled block> timbra</Button>
                 }

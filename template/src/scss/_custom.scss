@@ -9,11 +9,34 @@ margin:0px;
 .custom-btn {
     color: #fff;
   background-color: rgb(58, 180, 180);
-  background-color: cutom-color;
   border-color: rgb(44, 125, 125);
-  border-color: cutom-cor;
   }
   .custom-btn:hover{
   background-color: rgb(69, 167, 167);
   color: #fff;
   }
+
+
+  .customPill {
+    color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+  border-color: rgb(44, 125, 125);
+  border-radius: 16px
+  }
+  .customPill:hover{
+  background-color: rgb(69, 167, 167);
+  color: #fff;
+  border-radius: 16px
+  }
+
+  .custom2 {
+    color: #fff;
+  background-color: rgb(58, 180, 180);
+  border-color: rgb(44, 125, 125);
+  border-radius: 16px
+  }
+  .custom2:hover{
+    background-color: rgb(69, 167, 167);
+    color: #fff;
+    border-radius: 16px
+    }
