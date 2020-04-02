@@ -62,7 +62,7 @@ class StudentiPersonale extends Component {
                     lastName: item.lastName,
                     email: item.email,
                     totalHours: item.totalHours,
-                    hoursOfLessons: this.formatHours(item.hoursOfLessons),
+                    hoursOfLessons:item.hoursOfLessons,
                     percentage: item.percentage,
                 }));
                 this.setState({ studenti });
@@ -111,7 +111,7 @@ class StudentiPersonale extends Component {
                 data.data.map(item => percentageLessons.push({
                     lessonName: item.lessonName,
                     totalHours: item.totalHours,
-                    hoursOfLessons: item.hoursOfLessons ? this.formatHours(item.hoursOfLessons) : 0,
+                    hoursOfLessons: item.hoursOfLessons ? item.hoursOfLessons : 0,
                     percentage: item.percentage,
                 }));
                 this.setState({ percentageLessons });
@@ -368,7 +368,7 @@ class StudentiPersonale extends Component {
                         ToastsStore.success("A breve ti arriverà il codice a "+this.state.emailFirst)   
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(err => console.err2400000572204590or(err));
                
         } else if (step === 1) {
             console.log("arrivato")

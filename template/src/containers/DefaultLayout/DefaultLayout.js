@@ -87,15 +87,16 @@ class DefaultLayout extends Component {
       user: cookieUser ? cookieUser : null,
       navMenu: navM,
       routes: navR,
-      to: navTo
+      to: navTo,
+      redirect: false
     }
 
   }
 
   componentDidMount() {
     if (this.state.user === null) {
-      return <Redirect to='/login' />
-    } 
+      this.setState({ redirect: true })
+    }
   }
 
 
@@ -104,9 +105,15 @@ class DefaultLayout extends Component {
     sessionStorage.setItem("corso", JSON.stringify(corso));
   }
 
+  redirectOff = () => {
+    return <Redirect to='/login' />
+  }
+
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   signOut(e) {
+    localStorage.removeItem('utente')
+    this.setState({ redirect: true })
     e.preventDefault()
   }
 
@@ -114,7 +121,11 @@ class DefaultLayout extends Component {
     const classe = this.state.classe;
     const user = this.state.user
     return (
+
       <div className="app" style={user && user.responsible_level !== 2 ? { background: "white" } : null}>
+        {this.state.redirect && (
+          this.redirectOff()
+        )}
         {classe && (
           <AppHeader fixed>
             <Suspense fallback={this.loading()}>
