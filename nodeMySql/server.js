@@ -168,6 +168,7 @@ app.post('/tokensignin', function (req, res) {
                   res.send({ error: false, data: items[0], message: 'Studente trovato' })
                );
             } else {
+
                return res.send({ error: false, data: { email: false, emailFit: email }, message: 'Utente Non Presente' });
             }
          })
@@ -355,7 +356,7 @@ app.get('/totalHours', function (req, res) {
    });
 });
 */
-
+/*
 app.post('/studentBadge', function (req, res) {
 
    const email = req.body.email;
@@ -392,7 +393,7 @@ app.post('/studentBadge', function (req, res) {
       res.send({ error: true, message: false });
    }
 });
-
+*/
 
 app.get('/getCourses/:email', function (req, res) {
 
@@ -514,8 +515,9 @@ app.get('/teacherDetails/:id_course', function (req, res) {
    const id_course = req.params.id_course
    try {
       var data = []
-      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons," +
-         " ( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours " +
+      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email," +
+         "(SELECT sum(st.hours_of_lessons) FROM `signatures_teachers` st where st.email_responsible = t.email_responsible ) as hourOfLessons," +
+         " ( SELECT SUM(total_hours) FROM lessons where  date <= CURRENT_DATE and l.lesson = lesson ) AS totalHours " +
          " FROM teachers t " +
          " JOIN companies c ON t.companies_id = c.id " +
          "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible " +
@@ -704,8 +706,8 @@ app.put('/forgotPassword', function (req, res) {
    })
 });
 
-/*
-app.post('/studentBadge', function (req, res) {
+
+app.post('/studentBadge', async function (req, res) {
    try {
       const datetimeNow = new Date();
       const Data = tools.formattedDate(datetimeNow);
@@ -744,7 +746,7 @@ app.post('/studentBadge', function (req, res) {
       return res.send({ error: false, data: error, message: 'ko' });
    }
 });
-*/
+
 
 app.put('/updateSignature/:id_lesson', function (req, res) {
 
@@ -817,7 +819,7 @@ app.get('/lessons/:date/:id_course', function (req, res) {
    var dataFinale = req.params.date
    var id_course = req.params.id_course
 
-   connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
+   connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course, function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
@@ -865,7 +867,7 @@ app.get('/listSignaturesStudents/:data_scelta/:id_course', function (req, res) {
    var id_course = req.params.id_course
 
 
-   connection.query("SELECT s.final_start_time, s.final_end_time, a.first_name, a.last_name,l .id as id_lesson, a.email FROM students a LEFT JOIN lessons l ON l.id_course = a.id_course LEFT JOIN signatures_students s ON s.email_student = a.email AND s.id_lesson= l.id where ritirato=0 and a.id_course=" + id_course + " and l.date='" + dataFinale + "'", function (error, results, fields) {
+   connection.query("SELECT s.final_start_time, s.final_end_time, a.first_name, a.last_name,l .id as id_lesson, a.email FROM students a LEFT JOIN lessons l ON l.id_course = a.id_course LEFT JOIN signatures_students s ON s.email_student = a.email AND s.id_lesson= l.id where ritirato=0 and a.id_course=" + id_course + " and l.date='" + dataFinale + "' ORDER BY l.id", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
