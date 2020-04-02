@@ -35,7 +35,7 @@ class Docenti extends Component {
   }
 
   componentDidMount() {
-    this.getTeachers();
+    //this.getTeachers();
     this.getTeacherDetails();
   }
 
@@ -58,7 +58,7 @@ class Docenti extends Component {
   }
 
   getTeacherDetails = () => {
-    axios.get('http://localhost:8080/teacherDetails')
+    axios.get('http://localhost:8080/teacherDetails/'+this.props.classe["id"])
     .then(res =>  {
       let dettagliDocente = [];
       res.data.data.map(item => dettagliDocente.push({
@@ -73,6 +73,23 @@ class Docenti extends Component {
         totalHours: this.formatHours(item.totalHours),
         clickEvent: () => this.displayCard(item.emailTeacher)
       }));
+      let docenti = [];
+      var firstTeacher ='';
+      res.data.data.map(item =>{
+        if(firstTeacher !== item.emailTeacher){
+          docenti.push({
+            companyName: item.name,
+            firstName: item.firstName,
+            lastName: item.lastName,
+            ritirato: item.ritirato,
+            companyId: item.companyId,
+            emailDocente: item.emailTeacher,
+            clickEvent: () => this.displayCard(item.emailTeacher)
+          })
+          firstTeacher = item.emailTeacher;
+        }
+      });
+      this.setState({ docenti });
       this.setState({ dettagliDocente });
     })
     .catch(err => console.error(err));
@@ -142,7 +159,7 @@ displayTab = () => {
   }
   
 refresh = () => {
-  this.getTeachers();
+ // this.getTeachers();
   this.displayTable();
   this.getTeacherDetails();
 }
@@ -276,7 +293,7 @@ handleChange = (event) => {
 
       return <InfoDocente 
       docente = {groupedPeople[(this.state.dettagliDocente.find((docente) => docente.emailDocente === this.state.displayCard))['emailDocente']]} 
-      getTeachers={this.getTeachers} 
+     // getTeachers={this.getTeachers} 
       getTeacherDetails={this.getTeacherDetails} 
       displayTable={this.displayTable}
       />

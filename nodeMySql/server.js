@@ -33,8 +33,8 @@ function sendEmails(emailTo, objectEmail, text) {
    var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-         user: 'user',
-         pass: 'pass'
+         user: 'registro.luca.pw@gmail.com',
+         pass: 'fitstic2020'
       }
    });
 
@@ -519,10 +519,19 @@ app.get('/listTeachers', function (req, res) {
 });
 
 
-app.get('/teacherDetails', function (req, res) {
+app.get('/teacherDetails/:id_course', function (req, res) {
+   const id_course= req.params.id_course
    try {
       var data = []
-      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours FROM teachers t JOIN companies c ON t.companies_id = c.id LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible LEFT JOIN lessons l ON l.id = s.id_lesson GROUP BY t.email_responsible, l.lesson"
+      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,"+
+     " ( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours " +
+     " FROM teachers t " +
+     " JOIN companies c ON t.companies_id = c.id "+
+      "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible "+
+      "LEFT JOIN lessons l ON l.companies_id = c.id "+
+      "WHERE l.id_course="+id_course+
+      " GROUP BY t.email_responsible, l.lesson"+
+      " ORDER BY t.email_responsible";
       connection.query(query, function (error, results, fields) {
          if (error) throw error;
 
@@ -596,7 +605,6 @@ app.post('/createTeacher', function (req, res) {
    var firstName = req.body.firstName
    var lastName = req.body.lastName
    var emailDocente = req.body.emailDocente
-   var idCorso = req.body.idCorso
    var companyName = req.body.companyName
    var company = []
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
@@ -620,7 +628,7 @@ app.post('/createTeacher', function (req, res) {
                         name: element.name,
                      })
                })
-               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + idCorso + "," + company[0].id + ",0) ", function (error, result, fields) {
+               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + company[0].id + ",0) ", function (error, result, fields) {
                   if (error) throw error;
                   sendEmails(emailDocente, objectEmail, textEmail)
                   connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('" + emailDocente + "','" + hash + "',4)", function (errorAuth, resultAuth, fields) {
@@ -642,7 +650,7 @@ app.post('/createTeacher', function (req, res) {
                               name: element.name,
                            })
                      })
-                     connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + idCorso + "," + company[0].id + ",0)", function (error, result, fields) {
+                     connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + company[0].id + ",0)", function (error, result, fields) {
                         if (error) throw error;
                         sendEmails(emailDocente, objectEmail, textEmail)
                         connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('" + emailDocente + "','" + hash + "',4)", function (errorAuth, resultAuth, fields) {
@@ -903,7 +911,6 @@ app.get('/listStudents/:id_course', function (req, res) {
 
       results.forEach(element => {
          var percentage = ((element.hours_of_lessons * 100) / totalHours[0].totalHours).toFixed(0)
-
          data.push(
             {
                firstName: element.first_name,
@@ -913,8 +920,8 @@ app.get('/listStudents/:id_course', function (req, res) {
                dateOfBirth: element.date_of_birth,
                residence: element.residence,
                hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
-               totalHours: totalHours[0].totalHours,
-               percentage: (percentage) ? (percentage) : 0,
+               totalHours: totalHours[0].totalHours ? totalHours[0].totalHours : 0,
+               percentage: isNaN(percentage) ? 0 :(percentage) ,
                ritirato: element.ritirato
             })
       })
@@ -923,13 +930,13 @@ app.get('/listStudents/:id_course', function (req, res) {
 });
 
 
-app.get('/StudentPercentage/:email', function (req, res) {
+app.get('/StudentPercentage/:email/:id', function (req, res) {
    var data = []
    try {
       //var email= 'dmycockf@posterous.com'
-
+      var courseId = req.params.id
       var email = req.params.email
-      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN ( SELECT * FROM signatures_students where email_student = '"+email+"' ) s ON l.id = s.id_lesson where l.date <= CURRENT_DATE GROUP by lesson"
+      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN ( SELECT * FROM signatures_students where email_student = '"+email+"' ) s ON l.id = s.id_lesson where l.date <= CURRENT_DATE  and l.id_course ="+courseId+" GROUP by lesson"
       connection.query(query, [email], function (error, results, fields) {
          if (error) throw error;
          if (results.length !== 0) {
@@ -1151,7 +1158,7 @@ app.post('/calendar/importLessons', async function (req, res) {
          var interval = setInterval(() => {
             if (errori.length === 0) {
                let curdata=new Date().toISOString().replace(/\T.+/, '')
-               connection.query("DELETE  FROM lessons where id_course ="+courseID+" and date> '"+curdata+"'", function (errorIns, itemsIns, fields) {
+               connection.query("DELETE  FROM lessons where id_course ="+courseID+" and date >= '"+curdata+"' and email_signature is null", function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
 
                });

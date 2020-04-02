@@ -19,7 +19,8 @@ class StudentiPersonale extends Component {
             changeState: false,
             user: this.props.user,
             emailFirst: '',
-            codiceFirst: ''
+            codiceFirst: '',
+            callNext: false
         }
 
     }
@@ -355,12 +356,17 @@ class StudentiPersonale extends Component {
                         console.log(data.message)
                     } else {
                         console.log(data.message)
+                        this.callNext()
                     }
                 })
                 .catch(err => console.error(err));
         }
     }
 
+    callNext = () => {
+        localStorage.removeItem('utente')
+        this.setState({callNext: true})
+    }
     EmailFirstChange = (e) => {
         this.setState({ emailFirst: e.target.value });
     }
@@ -371,6 +377,9 @@ class StudentiPersonale extends Component {
     fitsticEmail = () => {
         return (
             <div>
+                {this.state.callNext && (
+                    <Redirect to='/login'/>
+                )}
                 <div>
                     <p>Inserire Email Tua</p>
                     <Input size="16" type="text" placeholder="Email" onChange={this.EmailFirstChange} />
@@ -379,7 +388,6 @@ class StudentiPersonale extends Component {
                 <div>
                     <p>Inserire Codice</p>
                     <Input size="16" type="text" placeholder="Codice" onChange={this.CodiceFirstChange} />
-                    <Button color="primary" size="lg" className="btn mb-3" onClick={() => this.buttonStep(1)}> <b>Indietro</b></Button>
                     <Button color="primary" size="lg" className="btn mb-3" onClick={() => this.buttonStep(2)}> <b>Invia</b></Button>
                 </div>
             </div>

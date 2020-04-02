@@ -27,7 +27,7 @@ exports.formattedDecimal = (hoursToFormats) => {
     return hours_of_lessons
   }
   else {
-    return hoursToFormats = "0"
+    return hoursToFormats = 0
   }
 }
 
@@ -43,7 +43,6 @@ exports.formattedToDecimal = (hoursToFormats) => {
   }
   else {
     var hours = hoursToFormats[0] + '.' + (parseInt(hoursToFormats[1].trim(), 10) / 0.60).toFixed(0)
-    console.log(hours)
     return hours
   }
 }

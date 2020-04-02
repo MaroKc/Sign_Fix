@@ -128,7 +128,7 @@ class Studenti extends Component {
       const nonRitirato = this.state.studenti.filter(el => el.ritirato === 0)
       const ritirato = this.state.studenti.filter(el => el.ritirato === 1)
 
-      if (ritirato !== 0) {
+      if (ritirato.length !== 0) {
         return (
           <div>
           <Card>
