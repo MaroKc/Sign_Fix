@@ -356,7 +356,7 @@ app.get('/totalHours', function (req, res) {
 });
 */
 
-app.post('/studentBadge', function (req, res) {
+app.post('/studentBadge', async function (req, res) {
 
    const email = req.body.email;
    const datetimeNow = new Date();
