@@ -24,12 +24,13 @@ class Calendario extends Component {
 
   importCalendar() {
     this.setState({ calendario: this.state.token });
-    axios.post('http://localhost:8080/calendar/importLessons', { email: 'daniele.marocchi.studio@fitstic-edu.com', token: this.state.token, corso: this.classe.id})
+    this.toggle();
+    axios.post('http://localhost:8080/calendar/importLessons', { email: 'daniele.marocchi.studio@fitstic-edu.com', token: this.state.token, corso: this.classe.id })
       .then(res => {
-        if(res.data.error){
+        if (res.data.error) {
           ToastsStore.warning(res.data.message)
         }
-        else{
+        else {
           ToastsStore.success(res.data.message)
         }
       })
@@ -47,16 +48,19 @@ class Calendario extends Component {
         <Row>
           <Col>
             <Card>
-                {this.state.calendario && (
-                  <Iframe
-                    url={"https://calendar.google.com/calendar/embed?src=" + this.state.calendario + "&ctz=Europe%2FRome"}
-                    width="100%"
-                    height="600"
-                    style={{ border: 0 }}
-                    frameborder="0"
-                    scrolling="no"
-                  />
-                )}
+
+              {this.state.calendario && (
+                <Iframe
+                  url={"https://calendar.google.com/calendar/embed?src=" + this.state.calendario + "&ctz=Europe%2FRome"}
+                  width="100%"
+                  height="600"
+                  style={{ border: 0 }}
+                  frameborder="0"
+                  scrolling="no"
+                />
+              )}
+
+
               <Collapse isOpen={this.state.collapse}>
                 <CardBody>
                   <InputGroup>
@@ -65,7 +69,7 @@ class Calendario extends Component {
                         <i className="fa fa-calendar-check-o"></i>
                       </InputGroupText>
                     </InputGroupAddon>
-                    <Input className="col-lg-5" onChange={this.changeToken} placeholder="Goole Calendar Token" value={this.state.calendario ? this.state.calendario : null} type="text" id="calendarID" name="calendarID" />
+                    <Input className="col-lg-5" onChange={this.changeToken} placeholder="Goole Calendar Token" value={this.state.token ? this.state.token : ''} type="text" id="calendarID" name="calendarID" />
                     <InputGroupAddon addonType="append">
                       <Button onClick={() => this.importCalendar()} type="button" className="custom-btn">{this.state.calendario ? "Aggiorna" : "Salva"}</Button>
                     </InputGroupAddon>
@@ -75,7 +79,8 @@ class Calendario extends Component {
             </Card>
           </Col>
         </Row>
-        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground/>
+        <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
+
       </div>
     );
   }

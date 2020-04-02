@@ -519,10 +519,19 @@ app.get('/listTeachers', function (req, res) {
 });
 
 
-app.get('/teacherDetails', function (req, res) {
+app.get('/teacherDetails/:id_course', function (req, res) {
+   const id_course= req.params.id_course
    try {
       var data = []
-      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours FROM teachers t JOIN companies c ON t.companies_id = c.id LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible LEFT JOIN lessons l ON l.id = s.id_lesson GROUP BY t.email_responsible, l.lesson"
+      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,"+
+     " ( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours " +
+     " FROM teachers t " +
+     " JOIN companies c ON t.companies_id = c.id "+
+      "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible "+
+      "LEFT JOIN lessons l ON l.companies_id = c.id "+
+      "WHERE l.id_course="+id_course+
+      " GROUP BY t.email_responsible, l.lesson"+
+      " ORDER BY t.email_responsible";
       connection.query(query, function (error, results, fields) {
          if (error) throw error;
 
@@ -596,7 +605,6 @@ app.post('/createTeacher', function (req, res) {
    var firstName = req.body.firstName
    var lastName = req.body.lastName
    var emailDocente = req.body.emailDocente
-   var idCorso = req.body.idCorso
    var companyName = req.body.companyName
    var company = []
    var password = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
@@ -620,7 +628,7 @@ app.post('/createTeacher', function (req, res) {
                         name: element.name,
                      })
                })
-               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + idCorso + "," + company[0].id + ",0) ", function (error, result, fields) {
+               connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + company[0].id + ",0) ", function (error, result, fields) {
                   if (error) throw error;
                   sendEmails(emailDocente, objectEmail, textEmail)
                   connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('" + emailDocente + "','" + hash + "',4)", function (errorAuth, resultAuth, fields) {
@@ -642,7 +650,7 @@ app.post('/createTeacher', function (req, res) {
                               name: element.name,
                            })
                      })
-                     connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `id_course`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + idCorso + "," + company[0].id + ",0)", function (error, result, fields) {
+                     connection.query("INSERT INTO `teachers`(`email_responsible`, `first_name`, `last_name`, `companies_id`, `ritirato`) VALUES ('" + emailDocente + "','" + firstName + "','" + lastName + "'," + company[0].id + ",0)", function (error, result, fields) {
                         if (error) throw error;
                         sendEmails(emailDocente, objectEmail, textEmail)
                         connection.query("INSERT INTO `responsibles_auth`(`email`, `password`, `responsible_level`) VALUES ('" + emailDocente + "','" + hash + "',4)", function (errorAuth, resultAuth, fields) {
@@ -1150,7 +1158,7 @@ app.post('/calendar/importLessons', async function (req, res) {
          var interval = setInterval(() => {
             if (errori.length === 0) {
                let curdata=new Date().toISOString().replace(/\T.+/, '')
-               connection.query("DELETE  FROM lessons where id_course ="+courseID+" and date> '"+curdata+"'", function (errorIns, itemsIns, fields) {
+               connection.query("DELETE  FROM lessons where id_course ="+courseID+" and date >= '"+curdata+"' and email_signature is null", function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
 
                });

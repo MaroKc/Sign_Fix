@@ -25,7 +25,8 @@ class StudentiPersonale extends Component {
             codice: false,
             value: '',
             firmaIngresso: '',
-            firmaUscita: ''
+            firmaUscita: '',
+            callNext: ''
         }
 
     }
@@ -366,13 +367,18 @@ class StudentiPersonale extends Component {
                     if (data.error) {
                         console.log(data.message)
                     } else {
-                        return <Redirect to='/login'/>
+                        console.log(data.message)
+                        this.callNext()
                     }
                 })
                 .catch(err => console.error(err));
         }
     }
 
+    callNext = () => {
+        localStorage.removeItem('utente')
+        this.setState({callNext: true})
+    }
     EmailFirstChange = (e) => {
         this.setState({ emailFirst: e.target.value });
     }
@@ -383,6 +389,9 @@ class StudentiPersonale extends Component {
     fitsticEmail = () => {
         return (
             <div>
+                {this.state.callNext && (
+                    <Redirect to='/login' />
+                )}
                 <div className= 'text-center'>
                     <b>Inserisci la mail con cui ti sei registrato a FITSTIC, se vi sarà corrispondenza ti invieremo un codice </b>
                     <Input className="mt-2" size="16" type="text" placeholder="Email" onChange={this.EmailFirstChange} />

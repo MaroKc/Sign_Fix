@@ -26,13 +26,13 @@ class Lezioni extends React.Component {
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.getLessons()
   }
   handleChange = date => {
-      this.setState({
-        startDate: date
-      },()=> this.getLessons()); 
+    this.setState({
+      startDate: date
+    }, () => this.getLessons());
   }
 
   displayCard = (e, f, g) => {
@@ -53,66 +53,66 @@ class Lezioni extends React.Component {
   }
 
   getLessons = () => {
-      var data_scelta = this.state.startDate.toISOString().replace(/\T.+/, '')
+    var data_scelta = this.state.startDate.toISOString().replace(/\T.+/, '')
 
-      axios.get('http://localhost:8080/lessons/'+ data_scelta+'/'+this.props.classe["id"])
+    axios.get('http://localhost:8080/lessons/' + data_scelta + '/' + this.props.classe["id"])
       .then(res => res.data)
       .then((data) => {
-        if(data.length!==0){
+        if (data.length !== 0) {
           const lezioniMattina = [];
           const lezioniPomeriggio = [];
-          const firstLesson= data[0].id
-  
+          const firstLesson = data[0].id
+
           data.map((item) => {
-          if(firstLesson === item.id){
-          lezioniMattina.push({
-            name: item.name,
-            id: item.id,
-            lesson: item.lesson,
-            email: item.email,
-            classroom: item.classroom,
-            startTime: item.startTime,
-            endTime: item.endTime,
-          })
-        }
-        else{
-          lezioniPomeriggio.push({
-            name: item.name,
-            id: item.id,
-            lesson: item.lesson,
-            email: item.email,
-            classroom: item.classroom,
-            startTime: item.startTime,
-            endTime: item.endTime,
-          })
-        }
-        });
-          this.setState({ 
-            lezioniMattina ,
+            if (firstLesson === item.id) {
+              lezioniMattina.push({
+                name: item.name,
+                id: item.id,
+                lesson: item.lesson,
+                email: item.email,
+                classroom: item.classroom,
+                startTime: item.startTime,
+                endTime: item.endTime,
+              })
+            }
+            else {
+              lezioniPomeriggio.push({
+                name: item.name,
+                id: item.id,
+                lesson: item.lesson,
+                email: item.email,
+                classroom: item.classroom,
+                startTime: item.startTime,
+                endTime: item.endTime,
+              })
+            }
+          });
+          this.setState({
+            lezioniMattina,
             lezioniPomeriggio
           });
         }
-        else{
+        else {
           this.setState(
-            { 
-              lezioniMattina: [], 
-              lezioniPomeriggio:[] 
-           });
+            {
+              lezioniMattina: [],
+              lezioniPomeriggio: []
+            });
         }
 
       })
       .catch(err => console.error(err));
 
 
-      axios.get('http://localhost:8080/listSignaturesStudents/'+data_scelta+'/'+this.props.classe['id'])
-        .then(res => res.data)
-        .then((data) => {
-          if(data.length !== 0){
-            const studentiMattina = [];
+    axios.get('http://localhost:8080/listSignaturesStudents/' + data_scelta + '/' + this.props.classe['id'])
+      .then(res => res.data)
+      .then((data) => {
+        if (data.length !== 0) {
+          const studentiMattina = [];
           const studentiPomeriggio = [];
-          const firstLesson= data[0].idLesson 
+          const firstLesson = data[0].idLesson
           data.map(item => {
-            if(firstLesson === item.idLesson){
+            if (firstLesson === item.idLesson) {
               studentiMattina.push({
                 idLesson: item.idLesson,
                 firstName: item.firstName,
@@ -137,85 +137,86 @@ class Lezioni extends React.Component {
             }
           });
           this.setState(
-            { 
-              studentiMattina, 
-              studentiPomeriggio 
-           });
-          }
-          else{
-            this.setState(
-              { 
-                studentiMattina: [], 
-                studentiPomeriggio:[] 
-             });
-          }
-          
-        })
+            {
+              studentiMattina,
+              studentiPomeriggio
+            });
+        }
+        else {
+          this.setState(
+            {
+              studentiMattina: [],
+              studentiPomeriggio: []
+            });
+        }
 
-        .catch(err => console.error(err));
-    }
+      })
 
-
-  formatHours (hours){
-      var startLessonAppoggio= (hours.toString()).split('.')
-      var startLesson= ''
-
-      var startLessonPrimaParte=  startLessonAppoggio[0].length === 1 ? '0'+startLessonAppoggio[0] :  startLessonAppoggio[0]
-      if(startLessonAppoggio[1]){
-        var startLessonSecondaParte =  startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1]+'0' :  startLessonAppoggio[1]
-        startLesson= startLessonPrimaParte+': '+startLessonSecondaParte
-        return startLesson
-      }
-      else if(startLessonAppoggio[0] ==='assente' ){
-        return startLessonAppoggio[0]
-      }
-      else{
-        startLesson= startLessonPrimaParte+': 00'
-        return startLesson
-      }
+      .catch(err => console.error(err));
   }
 
-    lezioneMattina = () => {
-      let nomeLezione;
-      let inizioLezione;
-      let fineLezione;
-      let classe;
-      let identificativo;
-      
-      this.state.lezioniMattina.map((mapItem) => {
-        identificativo = mapItem.name;
-        nomeLezione = mapItem.lesson;
-        inizioLezione = mapItem.startTime;
-        fineLezione = mapItem.endTime;
-        classe = mapItem.classroom;
+
+  formatHours(hours) {
+    var startLessonAppoggio = (hours.toString()).split('.')
+    var startLesson = ''
+
+    var startLessonPrimaParte = startLessonAppoggio[0].length === 1 ? '0' + startLessonAppoggio[0] : startLessonAppoggio[0]
+    if (startLessonAppoggio[1]) {
+      var startLessonSecondaParte = startLessonAppoggio[1].length === 1 ? startLessonAppoggio[1] + '0' : startLessonAppoggio[1]
+      startLesson = startLessonPrimaParte + ': ' + startLessonSecondaParte
+      return startLesson
+    }
+    else if (startLessonAppoggio[0] === 'assente') {
+      return startLessonAppoggio[0]
+    }
+    else {
+      startLesson = startLessonPrimaParte + ': 00'
+      return startLesson
+    }
+  }
+
+  lezioneMattina = () => {
+    let nomeLezione;
+    let inizioLezione;
+    let fineLezione;
+    let classe;
+    let identificativo;
+
+    this.state.lezioniMattina.map((mapItem) => {
+      identificativo = mapItem.name;
+      nomeLezione = mapItem.lesson;
+      inizioLezione = mapItem.startTime;
+      fineLezione = mapItem.endTime;
+      classe = mapItem.classroom;
     });
 
     let assenti = []
 
     this.state.studentiMattina.map((item) => {
-      if(item.startTime === 'assente'){
+      if (item.startTime === 'assente') {
         assenti.push({
           firstName: item.firstName,
           lastName: item.lastName
         })
-      }})
+      }
+    })
 
     if (nomeLezione) {
-      
+
       return <>
-        
+
         <Card className="m-md-4 ">
           <CardHeader id="headingOne">
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5> 
+                  <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
                 <Col className="col-sm-8 mt-3">
-                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
+                  <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
-             {!assenti.length ? "" :  <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) => <span key={i}>{item.firstName} {item.lastName}, </span>)}</h4> </div>}
+              {!assenti.length ? "" : <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) => <span key={i}>{item.firstName} {item.lastName}, </span>)}</h4> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
@@ -236,22 +237,23 @@ class Lezioni extends React.Component {
     let identificativo;
 
     this.state.lezioniPomeriggio.map((mapItem) => {
-        identificativo = mapItem.name;
-        nomeLezione = mapItem.lesson;
-        inizioLezione = mapItem.startTime;
-        fineLezione = mapItem.endTime;
-        classe = mapItem.classroom;
+      identificativo = mapItem.name;
+      nomeLezione = mapItem.lesson;
+      inizioLezione = mapItem.startTime;
+      fineLezione = mapItem.endTime;
+      classe = mapItem.classroom;
     });
 
     let assenti = []
 
     this.state.studentiPomeriggio.map((item) => {
-      if(item.startTime === "assente"){
+      if (item.startTime === "assente") {
         assenti.push({
           firstName: item.firstName,
           lastName: item.lastName
         })
-      }})
+      }
+    })
 
 
     if (nomeLezione) {
@@ -261,13 +263,13 @@ class Lezioni extends React.Component {
             <Button block color=" " className="text-left m-0 p-0" onClick={() => this.toggleAccordion(1)} aria-expanded={this.state.accordion[1]} aria-controls="collapseOne">
               <Row>
                 <Col className="my-auto col-sm-4">
-                <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
+                  <h5 className="d-block ml-md-4 ">{this.formatHours(inizioLezione)} - {this.formatHours(fineLezione)}</h5>
                 </Col>
                 <Col className="col-sm-8 mt-3">
-                <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
+                  <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
-              {!assenti.length ? "" :  <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) =>  <span key={i}> {item.firstName} {item.lastName}, </span>)}</h4></div>}
+              {!assenti.length ? "" : <div className="ml-md-4"> <h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) => <span key={i}> {item.firstName} {item.lastName}, </span>)}</h4></div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[1]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
@@ -276,7 +278,7 @@ class Lezioni extends React.Component {
             </CardBody>
           </Collapse>
         </Card>
-        
+
       </>
     }
   }
@@ -311,44 +313,45 @@ class Lezioni extends React.Component {
             field: 'endTime',
           },
         ],
-        rows:this.state.studentiMattina
+        rows: this.state.studentiMattina
       };
 
-  return (
-    <div>
-      <Card>
-        <CardBody>
-          <MDBDataTable
-            responsive
-            hover
-            data={data}
-            searching={false}
-            paging={false}
-            noBottomColumns={true}
-          />
-        </CardBody>
-      </Card>
-    </div>
-  );  
+      return (
+        <div>
+          <Card>
+            <CardBody>
+              <MDBDataTable
+                responsive
+                hover
+                data={data}
+                searching={false}
+                paging={false}
+                noBottomColumns={true}
+              />
+            </CardBody>
+          </Card>
+        </div>
+      );
     }
-    if(this.state.displayCard && this.state.mattinaPomeriggio === 0){
+    if (this.state.displayCard && this.state.mattinaPomeriggio === 0) {
       return <OreLezioniMattina
-      studenteMattina={this.state.studentiMattina.find((studente) => studente.emailStudent === this.state.displayCard)} 
-      lezioneMattina={this.state.lezioniMattina.find(lezione => lezione.id === this.state.displayId )}
+        studenteMattina={this.state.studentiMattina.find((studente) => studente.emailStudent === this.state.displayCard)}
+        lezioneMattina={this.state.lezioniMattina.find(lezione => lezione.id === this.state.displayId)}
 
-      getLessons={this.getLessons} 
-      displayTable={this.displayTable}
+        getLessons={this.getLessons}
+        displayTable={this.displayTable}
       />
-    }else{
-    return (
-      <>
-        {DatatablePage()}
-      </>
-    )}
+    } else {
+      return (
+        <>
+          {DatatablePage()}
+        </>
+      )
+    }
   }
-  
 
-  tabPanePomeriggio() { 
+
+  tabPanePomeriggio() {
 
     const DatatablePage = () => {
       const data = {
@@ -370,42 +373,43 @@ class Lezioni extends React.Component {
             field: 'endTime',
           },
         ],
-        rows: this.state.studentiPomeriggio 
+        rows: this.state.studentiPomeriggio
       };
 
       // this.state.studentiPomeriggio.startTime === "assente" ? <div className="text-success">"assente"</div> : this.state.studentiPomeriggio.startTime
-  return (
-    <div>
-      <Card>
-        <CardBody>
-          <MDBDataTable
-            responsive
-            hover
-            data={data
-            }
-            searching={false}
-            paging={false}
-            noBottomColumns={true}
-          />
-        </CardBody>
-      </Card>
-    </div>
-  );  
+      return (
+        <div>
+          <Card>
+            <CardBody>
+              <MDBDataTable
+                responsive
+                hover
+                data={data
+                }
+                searching={false}
+                paging={false}
+                noBottomColumns={true}
+              />
+            </CardBody>
+          </Card>
+        </div>
+      );
     }
-    if(this.state.displayCard && this.state.mattinaPomeriggio === 1){
-      return <OreLezioniPomeriggio 
-      studentePomeriggio={this.state.studentiPomeriggio.find((studente) => studente.emailStudent === this.state.displayCard)} 
-      lezionePomeriggio={this.state.lezioniPomeriggio.find(lezione => lezione.id === this.state.displayId )}
+    if (this.state.displayCard && this.state.mattinaPomeriggio === 1) {
+      return <OreLezioniPomeriggio
+        studentePomeriggio={this.state.studentiPomeriggio.find((studente) => studente.emailStudent === this.state.displayCard)}
+        lezionePomeriggio={this.state.lezioniPomeriggio.find(lezione => lezione.id === this.state.displayId)}
 
-      getLessons={this.getLessons} 
-      displayTable={this.displayTable}
+        getLessons={this.getLessons}
+        displayTable={this.displayTable}
       />
-    }else{
-    return (
-      <>
-        {DatatablePage()}
-      </>
-    )}
+    } else {
+      return (
+        <>
+          {DatatablePage()}
+        </>
+      )
+    }
   }
 
   render() {
@@ -417,14 +421,14 @@ class Lezioni extends React.Component {
           </CardHeader>
           <CardBody>
             <div className="d-flex justify-content-center">
-            <div className="form-group">
-              <DatePicker
-                selected={this.state.startDate}
-                onChange={this.handleChange}
-                dateFormat="dd/MM/yyyy"
-                className="border border-dark rounded text-center"
-              />
-               </div>
+              <div className="form-group">
+                <DatePicker
+                  selected={this.state.startDate}
+                  onChange={this.handleChange}
+                  dateFormat="dd/MM/yyyy"
+                  className="border border-dark rounded text-center"
+                />
+              </div>
             </div>
             {this.lezioneMattina()}
             {this.lezionePomeriggio()}
