@@ -308,7 +308,7 @@ app.post('/badge', function (req, res) {
                const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
                connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
-                  res.send({ error: false, message: "Entrata registrata" });
+                  res.send({ error: false, message: "Entrata registrata alle " });
                });
             } else {
                (dati.message.end <= ora ? firma = dati.message.end : firma = (Math.ceil(ora / 5) * 5) - 5)
@@ -826,7 +826,7 @@ app.get('/lessons/:date/:id_course', function (req, res) {
    var dataFinale = req.params.date
    var id_course = req.params.id_course
    
-   connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
+   connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + " ORDER BY start_time", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
          data.push(
