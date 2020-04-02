@@ -168,7 +168,7 @@ app.post('/tokensignin', function (req, res) {
                   res.send({ error: false, data: items[0], message: 'Studente trovato' })
                );
             } else {
-               return res.send({ error: false, data: {email : false, emailFit: email}, message: 'Utente Non Presente' });
+               return res.send({ error: false, data: { email: false, emailFit: email }, message: 'Utente Non Presente' });
             }
          })
 
@@ -258,6 +258,7 @@ let LeassonExist = (studentEmail, Data, ora, timeExtraEntrata, timeExtraUscita) 
    return new Promise(function (resolve, reject) {
 
       const queryLeasson = "SELECT l.id, l.start_time, l.end_time, l.date, k.id as sign, l.total_hours FROM lessons l LEFT JOIN students s ON s.id_course = l.id_course LEFT JOIN signatures_students k ON k.id_lesson = l.id and k.email_student = s.email where s.email = '" + studentEmail + "' and l.date = '" + Data + "' and (l.start_time - " + timeExtraEntrata + " <= " + ora + " and end_time + " + timeExtraUscita + " >= " + ora + ")";
+      console.log(queryLeasson)
       connection.query(queryLeasson, function (errorLeasson, resultsLeasson, fields) {
          if (errorLeasson) { throw reject(new Error(errorLeasson)); }
          if (resultsLeasson.length == 0) {
@@ -300,20 +301,20 @@ app.post('/badge', function (req, res) {
          const email = results[0].email_student;
          const dati = await LeassonExist(email, Data, ora, timeExtraEntrata, timeExtraUscita);
          var firma = null;
+         console.log(dati)
 
          if (!dati.error) {
-
-            if (dati.message.sign === null) {
-               (dati.message.start <= ora ? firma = dati.message.start : firma = Math.ceil(ora / 5) * 5)
-               const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
-               connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
+            if (dati.message.sign == null) {
+               (dati.message.start >= ora ? firma = dati.message.start : firma = Math.floor(ora) + ((Math.ceil(((ora % 1) * 100) / 5) * 5) / 100))
+               const queryIns = 'INSERT INTO signatures_students (code_authentication,email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?, ?)';
+               connection.query(queryIns, [0, email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
                   res.send({ error: false, message: "Entrata registrata" });
                });
             } else {
-               (dati.message.end <= ora ? firma = dati.message.end : firma = (Math.ceil(ora / 5) * 5) - 5)
-               var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ?, lost_hours = ? WHERE id = ?";
-               connection.query(query, [datetimeNow, firma, firma + ' - final_start_time', dati.message.end + ' - ' + firma + ' - final_start_time', dati.message.sign], function (error, results, fields) {
+               (dati.message.end <= ora ? firma = dati.message.end : firma = Math.floor(ora) + ((Math.ceil(((ora % 1) * 100) / 5) * 5) / 100))
+               var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ? - final_start_time, lost_hours = ? - hours_of_lessons WHERE id = ?";
+               connection.query(query, [datetimeNow, firma, firma, dati.message.hour, dati.message.sign], function (error, results, fields) {
                   if (error) throw error;
                   res.send({ error: false, message: "Uscita registrata" });
                });
@@ -331,12 +332,12 @@ app.post('/badge', function (req, res) {
 
 app.get('/getCode/:email', function (req, res) {
 
-   var email =req.params.email
+   var email = req.params.email
    //var ruolo = 1;
-      connection.query("SELECT * FROM `authentications` WHERE email_student='"+email+"'", function (error, results, fields) {
-         if (error) throw error;
-         return res.send({ error: true, data: results, message: 'ok' });
-      });
+   connection.query("SELECT * FROM `authentications` WHERE email_student='" + email + "'", function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: true, data: results, message: 'ok' });
+   });
 })
 
 
@@ -366,40 +367,30 @@ app.post('/studentBadge', function (req, res) {
    const timeExtraUscita = 1;
 
    //Una volta che ho il QR faccio una select per trovare l'email associata
-   connection.query("SELECT * FROM students WHERE email = '" + email+"'", async function (error, results, fields) {
-      if (error) throw error;
+   const dati = await LeassonExist(email, Data, ora, timeExtraEntrata, timeExtraUscita);
+   var firma = null;
+   console.log(dati)
 
-      if (results.length == 1) {
-
-         const email = results[0].email_student;
-         const dati = await LeassonExist(email, Data, ora, timeExtraEntrata, timeExtraUscita);
-         var firma = null;
-
-         if (!dati.error) {
-
-            if (dati.message.sign === null) {
-               (dati.message.start <= ora ? firma = dati.message.start : firma = Math.ceil(ora / 5) * 5)
-               const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
-               connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
-                  if (errorIns) throw errorIns;
-                  res.send({ error: false, message: "Entrata registrata" });
-               });
-            } else {
-               (dati.message.end <= ora ? firma = dati.message.end : firma = (Math.ceil(ora / 5) * 5) - 5)
-               var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ?, lost_hours = ? WHERE id = ?";
-               connection.query(query, [datetimeNow, firma, firma + ' - final_start_time', dati.message.end + ' - ' + firma + ' - final_start_time', dati.message.sign], function (error, results, fields) {
-                  if (error) throw error;
-                  res.send({ error: false, message: "Uscita registrata" });
-               });
-            }
-
-         } else {
-            res.send({ error: true, message: false });
-         }
+   if (!dati.error) {
+      if (dati.message.sign == null) {
+         (dati.message.start >= ora ? firma = dati.message.start : firma = Math.floor(ora) + ((Math.ceil(((ora % 1) * 100) / 5) * 5) / 100))
+         const queryIns = 'INSERT INTO signatures_students (code_authentication,email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?, ?)';
+         connection.query(queryIns, [0, email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
+            if (errorIns) throw errorIns;
+            res.send({ error: false, message: "Entrata registrata" });
+         });
       } else {
-         res.send({ error: true, message: false });
+         (dati.message.end <= ora ? firma = dati.message.end : firma = Math.floor(ora) + ((Math.ceil(((ora % 1) * 100) / 5) * 5) / 100))
+         var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ? - final_start_time, lost_hours = ? - hours_of_lessons WHERE id = ?";
+         connection.query(query, [datetimeNow, firma, firma, dati.message.hour, dati.message.sign], function (error, results, fields) {
+            if (error) throw error;
+            res.send({ error: false, message: "Uscita registrata" });
+         });
       }
-   });
+
+   } else {
+      res.send({ error: true, message: false });
+   }
 });
 
 
@@ -425,12 +416,12 @@ app.get('/getCourses/:email', function (req, res) {
 
 app.get('/getCode/:email', function (req, res) {
 
-   var email =req.params.email
+   var email = req.params.email
    //var ruolo = 1;
-      connection.query("SELECT * FROM `authentications` WHERE email_student='"+email+"'", function (error, results, fields) {
-         if (error) throw error;
-         return res.send({ error: true, data: results, message: 'ok' });
-      });
+   connection.query("SELECT * FROM `authentications` WHERE email_student='" + email + "'", function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: true, data: results, message: 'ok' });
+   });
 })
 
 
@@ -520,18 +511,18 @@ app.get('/listTeachers', function (req, res) {
 
 
 app.get('/teacherDetails/:id_course', function (req, res) {
-   const id_course= req.params.id_course
+   const id_course = req.params.id_course
    try {
       var data = []
-      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons,"+
-     " ( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours " +
-     " FROM teachers t " +
-     " JOIN companies c ON t.companies_id = c.id "+
-      "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible "+
-      "LEFT JOIN lessons l ON l.companies_id = c.id "+
-      "WHERE l.id_course="+id_course+
-      " GROUP BY t.email_responsible, l.lesson"+
-      " ORDER BY t.email_responsible";
+      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email,sum(s.hours_of_lessons) as hourOfLessons," +
+         " ( SELECT SUM(total_hours) FROM lessons where lesson = l.lesson ) AS totalHours " +
+         " FROM teachers t " +
+         " JOIN companies c ON t.companies_id = c.id " +
+         "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible " +
+         "LEFT JOIN lessons l ON l.companies_id = c.id " +
+         "WHERE l.id_course=" + id_course +
+         " GROUP BY t.email_responsible, l.lesson" +
+         " ORDER BY t.email_responsible";
       connection.query(query, function (error, results, fields) {
          if (error) throw error;
 
@@ -825,7 +816,7 @@ app.get('/lessons/:date/:id_course', function (req, res) {
    var data = [];
    var dataFinale = req.params.date
    var id_course = req.params.id_course
-   
+
    connection.query("SELECT name,email_signature,classroom,lessons.id,lesson,start_time,end_time FROM lessons join companies on lessons.companies_id=companies.id  WHERE date= '" + (dataFinale) + "' and id_course=" + id_course + "", function (error, results, fields) {
       if (error) throw error;
       results.forEach(element => {
@@ -879,7 +870,7 @@ app.get('/listSignaturesStudents/:data_scelta/:id_course', function (req, res) {
       results.forEach(element => {
          data.push(
             {
-              // mattinaPomeriggio: element.final_start_time > 12 ? 1 : 0,
+               // mattinaPomeriggio: element.final_start_time > 12 ? 1 : 0,
                firstName: element.first_name,
                lastName: element.last_name,
                email: element.email,
@@ -906,7 +897,7 @@ app.get('/listStudents/:id_course', function (req, res) {
          totalHours: results[0].total_hours
       })
    });
-   connection.query("SELECT first_name,last_name,email,residence,SUM(hours_of_lessons) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student where id_course= " + id_course + " GROUP BY email", function (error, results, fields) {
+   connection.query("SELECT first_name,last_name,email,residence,round(SUM(hours_of_lessons),2) as hours_of_lessons,SUM(lost_hours) as lost_hours,fiscal_code,date_of_birth,ritirato FROM students left join signatures_students on students.email=signatures_students.email_student where id_course= " + id_course + " GROUP BY email", function (error, results, fields) {
       if (error) throw error;
 
       results.forEach(element => {
@@ -921,7 +912,7 @@ app.get('/listStudents/:id_course', function (req, res) {
                residence: element.residence,
                hoursOfLessons: tools.formattedDecimal(element.hours_of_lessons),
                totalHours: totalHours[0].totalHours ? totalHours[0].totalHours : 0,
-               percentage: isNaN(percentage) ? 0 :(percentage) ,
+               percentage: isNaN(percentage) ? 0 : (percentage),
                ritirato: element.ritirato
             })
       })
@@ -936,7 +927,7 @@ app.get('/StudentPercentage/:email/:id', function (req, res) {
       //var email= 'dmycockf@posterous.com'
       var courseId = req.params.id
       var email = req.params.email
-      var query = "SELECT lesson, sum(total_hours) as total_hours ,sum(hours_of_lessons)as hours_of_lessons FROM lessons l LEFT JOIN ( SELECT * FROM signatures_students where email_student = '"+email+"' ) s ON l.id = s.id_lesson where l.date <= CURRENT_DATE  and l.id_course ="+courseId+" GROUP by lesson"
+      var query = "SELECT lesson, sum(total_hours) as total_hours ,round(sum(hours_of_lessons),2) as hours_of_lessons FROM lessons l LEFT JOIN ( SELECT * FROM signatures_students where email_student = '" + email + "' ) s ON l.id = s.id_lesson where l.date <= CURRENT_DATE  and l.id_course =" + courseId + " GROUP by lesson"
       connection.query(query, [email], function (error, results, fields) {
          if (error) throw error;
          if (results.length !== 0) {
@@ -1111,7 +1102,7 @@ app.post('/calendar/importLessons', async function (req, res) {
 
          var errori = [];
          var datiInsert = [];
-         var datierrore= false;
+         var datierrore = false;
 
          if (events.length) {
 
@@ -1143,11 +1134,11 @@ app.post('/calendar/importLessons', async function (req, res) {
                   }
 
                } catch (err) {
-                  datierrore= true
+                  datierrore = true
                }
             }); //fine map
 
-            if (datierrore===true){
+            if (datierrore === true) {
                return res.send({ error: true, message: 'Errore di inserimento' });
             }
 
@@ -1157,8 +1148,8 @@ app.post('/calendar/importLessons', async function (req, res) {
 
          var interval = setInterval(() => {
             if (errori.length === 0) {
-               let curdata=new Date().toISOString().replace(/\T.+/, '')
-               connection.query("DELETE  FROM lessons where id_course ="+courseID+" and date >= '"+curdata+"' and email_signature is null", function (errorIns, itemsIns, fields) {
+               let curdata = new Date().toISOString().replace(/\T.+/, '')
+               connection.query("DELETE  FROM lessons where id_course =" + courseID + " and date >= '" + curdata + "' and email_signature is null", function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
 
                });
@@ -1171,7 +1162,7 @@ app.post('/calendar/importLessons', async function (req, res) {
                });
 
                clearInterval(interval)
-               connection.query("UPDATE courses set token_calendar= '"+idCalendar+"' where id ="+courseID, function (errorIns, itemsIns, fields) {
+               connection.query("UPDATE courses set token_calendar= '" + idCalendar + "' where id =" + courseID, function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
 
                });
@@ -1179,7 +1170,7 @@ app.post('/calendar/importLessons', async function (req, res) {
             }
             else {
                clearInterval(interval)
-               return res.send({ error: true, data: errori, message: 'Ci sono stati errori nell\'inserimento dei seguenti dati: '+errori });
+               return res.send({ error: true, data: errori, message: 'Ci sono stati errori nell\'inserimento dei seguenti dati: ' + errori });
             }
          }, 500);
       });

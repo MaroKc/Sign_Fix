@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Iframe from 'react-iframe'
-import { Card, Collapse, CardBody, Button, Col, Row, InputGroup, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Card,CardFooter, Collapse, CardBody, Button, Col, Row, InputGroup, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import axios from 'axios';
 import { ToastsContainer, ToastsStore, ToastsContainerPosition } from 'react-toasts';
 
@@ -13,6 +13,7 @@ class Calendario extends Component {
 
     this.changeToken = this.changeToken.bind(this);
     this.classe = props.classe;
+    this.toggle = this.toggle.bind(this);
 
     this.state = {
       collapse: props.classe.token_calendar ? false : true,
@@ -38,6 +39,10 @@ class Calendario extends Component {
 
   changeToken(e) {
     this.setState({ token: e.target.value });
+  }
+
+  toggle() {
+    this.setState({ collapse: !this.state.collapse });
   }
 
 
@@ -76,6 +81,9 @@ class Calendario extends Component {
                   </InputGroup>
                 </CardBody>
               </Collapse>
+              <CardFooter>
+                <Button color="dark" onClick={this.toggle} className="custom-btn mb-1" id="toggleCollapse" outline><i className="fa fa-cog"></i>&nbsp;Impostazioni</Button>
+              </CardFooter>
             </Card>
           </Col>
         </Row>
