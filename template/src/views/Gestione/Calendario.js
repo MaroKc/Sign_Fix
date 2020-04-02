@@ -60,7 +60,6 @@ class Calendario extends Component {
                 />
               )}
 
-
               <Collapse isOpen={this.state.collapse}>
                 <CardBody>
                   <InputGroup>

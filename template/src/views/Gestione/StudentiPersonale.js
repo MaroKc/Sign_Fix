@@ -175,40 +175,55 @@ class StudentiPersonale extends Component {
         )
     }
 
-    // badgeStudent = () => {
-    //     var d = new Date(),
-    //     month = '' + (d.getMonth() + 1),
-    //     day = '' + d.getDate(),
-    //     year = d.getFullYear();
+    addZero(i) {
+        if (i < 10) {
+          i = "0" + i;
+        }
+        return i;
+    }
 
-    // if (month.length < 2)
-    //     month = '0' + month;
-    // if (day.length < 2)
-    //     day = '0' + day;
+    badgeIngresso = () => {
 
-    // const currDate = [year, month, day].join('-');
+        var d = new Date();
+        var h = this.addZero(d.getHours());
+        var m = this.addZero(d.getMinutes());
+        var s = this.addZero(d.getSeconds());
 
-    //     const todayLesson = this.state.lezioni.filter(lezione => lezione.date === currDate)
-    //     const todayMattina =todayLesson.filter(lezione => lezione.startTime.split(':')[0] < 13)
-    //     const todayPomeriggio =todayLesson.filter(lezione => lezione.startTime.split(':')[0] >= 13)
 
-    //     axios.put('http://localhost:8080/teacherBadge', {
-    //         email: this.props.user.email,
-    //         date: currDate,
-    //         startTime: d.getHours() < 13 ? todayMattina['0'].startTime : todayPomeriggio['0'].startTime,
-    //         endTime: d.getHours() < 13 ? todayMattina['0'].endTime : todayPomeriggio['0'].endTime,
-    //         lessonId: d.getHours() < 13 ? todayMattina['0'].lessonId : todayPomeriggio['0'].lessonId,
-    //     })
-    //         .then(res => {
-    //             if (res.data.message === "ok") {
-    //                 this.getSignature()
-    //             }
-    //             else if (res.data.message === "ko")console.log('problema')
-    //         })
-    //         .catch(err => {
-    //             return console.log(err);
-    //         });
-    // }
+        axios.put('http://localhost:8080/studentBadge', {
+            email: this.state.user.email,
+        })
+            .then(res => {
+                if (res.data.message === "ok") {
+                    this.setState({firmaIngresso: h + ":" + m + ":" + s})
+                }
+                else if (res.data.message === "ko") console.log('problema')
+            })
+            .catch(err => {
+                return console.log(err);
+            });
+    }
+
+    badgeUscita = () => {
+        var d = new Date();
+        var h = this.addZero(d.getHours());
+        var m = this.addZero(d.getMinutes());
+        var s = this.addZero(d.getSeconds());
+
+        axios.put('http://localhost:8080/studentBadge', {
+            email: this.state.user.email,
+        })
+            .then(res => {
+                if (res.data.message === "ok") {
+                    this.setState({firmaUscita: h + ":" + m + ":" + s})
+                }
+                else if (res.data.message === "ko") console.log('problema')
+            })
+            .catch(err => {
+                return console.log(err);
+            });
+    }
+
 
     todayLesson() {
         var d = new Date(),
@@ -216,17 +231,14 @@ class StudentiPersonale extends Component {
             day = '' + d.getDate(),
             year = d.getFullYear();
 
-
         if (month.length < 2)
             month = '0' + month;
         if (day.length < 2)
             day = '0' + day;
 
         let data = new Date();
-
         let giorno = data.getDay();
         let mese = data.getMonth();
-
 
         if (giorno === 0) giorno = "Domenica";
         if (giorno === 1) giorno = "Lunedì";
@@ -263,12 +275,12 @@ class StudentiPersonale extends Component {
                                     data.getHours() >= item.startTime.split(':')[0] && data.getHours() <= item.endTime.split(':')[0]  
                                         ?
                                         <>
-                                            <Button color="success" size="lg" className="mb-3" onClick={this.badgeTeacher} block> firma INGRESSSO </Button>
+                                            <Button color="success" size="lg" className="mb-3" onClick={this.badgeIngresso} block> firma INGRESSO </Button>
                                             {this.state.firmaIngresso === '' ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <Button color="success" size="lg" className="mb-3" block> firma USCITA </Button>}
                                         </>
                                         :
                                         <>
-                                            <Button color="success" size="lg" className="mb-3" disabled block> firma INGRESSSO</Button>
+                                            <Button color="success" size="lg" className="mb-3" disabled block> firma INGRESSO</Button>
                                             <Button color="success" size="lg" className="mb-3" disabled block> firma USCITA</Button>
                                         </>
                                 }
@@ -452,12 +464,10 @@ class StudentiPersonale extends Component {
         }
 
 
-
-
     render() {
 
         if (this.state.user.email !==false) {
-            return (console.log(this.state.lesson), this.normal())
+            return this.normal();
         } else {
             return this.fitsticEmail();
         }
