@@ -126,13 +126,11 @@ class DefaultLayout extends Component {
         {this.state.redirect && (
           this.redirectOff()
         )}
-        {classe && (
           <AppHeader fixed>
             <Suspense fallback={this.loading()}>
               <DefaultHeader onLogout={e => this.signOut(e)} classe={this.state.classe} />
             </Suspense>
           </AppHeader>
-        )}
 
         <div className="app-body">
           {classe && (
