@@ -3,6 +3,7 @@ import { Col, Row } from 'reactstrap';
 import { Line } from 'react-chartjs-2';
 import CardClassi from './CardClassi';
 import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 
 const rdn = () => {
@@ -72,6 +73,7 @@ class Classi extends Component {
       corsi: [],
       changeCorso: props.changeCorso,
       display: false,
+      redirect: false
     }
   }
 
@@ -83,6 +85,10 @@ class Classi extends Component {
     })
   }
 
+  redirectOff =(i) => {
+    this.state.changeCorso(i)
+    this.setState({ redirect:true });
+  }
   
 
   render() {
@@ -97,7 +103,7 @@ class Classi extends Component {
           <Col 
           xs={12} sm={12} md={6} 
           key={this.state.corsi[i].id} 
-          onClick={() => this.state.changeCorso(this.state.corsi[i])} 
+          onClick={() => this.redirectOff(this.state.corsi[i])} 
           style={this.props.classe !== null && this.props.classe['id'] === 1  ? {border: 'rounded', background: '#2f353a' } : null}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i].name, anno: this.state.corsi[i].start_year + "-" + this.state.corsi[i].end_year, curse: this.state.corsi[i].start_year < this.state.corsi[i+1].start_year ? "Classe 2" : ""})} >
               <div className="chart-wrapper">
@@ -109,7 +115,7 @@ class Classi extends Component {
           <Col 
           xs={12} sm={12} md={6} 
           key={this.state.corsi[i + 1].id} 
-          onClick={() => this.state.changeCorso(this.state.corsi[i + 1])} 
+          onClick={() => this.redirectOff(this.state.corsi[i + 1])} 
           style={this.props.classe !== null && this.props.classe['id'] === 3  ? {border: 'rounded', background: '#2f353a' } : null}>
             <CardClassi dataBox={() => ({ variant: this.state.corsi[i + 1].name, anno: this.state.corsi[i + 1].start_year + "-" + this.state.corsi[i + 1].end_year, curse: this.state.corsi[i].start_year < this.state.corsi[i+1].start_year ? "Classe 1" : "" })} >
               <div className="chart-wrapper">
@@ -123,7 +129,9 @@ class Classi extends Component {
 
     return (
       <div className="animated fadeIn my-auto">
-        
+        {this.state.redirect && (
+          <Redirect to="/studenti" />
+        )}
         {items}
 
         {/* this.state.corsi.map(corso => 

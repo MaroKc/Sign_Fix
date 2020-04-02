@@ -550,6 +550,45 @@ app.get('/teacherDetails/:id_course', function (req, res) {
    }
 });
 
+app.get('/teacherDetailsEmail/:email', function (req, res) {
+   const email = req.params.email
+   try {
+      var data = []
+      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email," +
+         "(SELECT sum(st.hours_of_lessons) FROM `signatures_teachers` st where st.email_responsible = t.email_responsible ) as hourOfLessons," +
+         " ( SELECT SUM(total_hours) FROM lessons where  date <= CURRENT_DATE and l.lesson = lesson ) AS totalHours " +
+         " FROM teachers t " +
+         " JOIN companies c ON t.companies_id = c.id " +
+         "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible " +
+         "LEFT JOIN lessons l ON l.companies_id = c.id " +
+         " WHERE t.email_responsible= ?"+
+         " GROUP BY t.email_responsible, l.lesson" +
+         " ORDER BY t.email_responsible";
+      connection.query(query,[email], function (error, results, fields) {
+         if (error) throw error;
+
+         results.forEach(element => {
+            data.push(
+               {
+                  name: element.name,
+                  lesson: element.lesson,
+                  firstName: element.first_name,
+                  lastName: element.last_name,
+                  ritirato: element.ritirato,
+                  companyId: element.company_id,
+                  emailTeacher: element.email,
+                  hoursOfLessons: tools.formattedDecimal(element.hourOfLessons),
+                  totalHours: tools.formattedDecimal(element.totalHours),
+               })
+         })
+         // return res.send({error: true, data:data, message: 'ok'}); 
+         return res.send({ error: true, data: data, message: 'ok' });
+      });
+   } catch (error) {
+      return res.send({ error: true, data: error, message: 'ko' });
+   }
+});
+
 
 app.put('/updateTeacher/:email', function (req, res) {
    try {
