@@ -22,7 +22,6 @@ class DefaultHeader extends Component {
 
     return (
       <React.Fragment>
-        <AppSidebarToggler className="d-lg-none" display="md" mobile />
 
         {this.props.classe && <AppSidebarToggler className="d-lg-none"  mobile /> }
        
