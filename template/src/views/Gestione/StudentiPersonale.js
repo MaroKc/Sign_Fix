@@ -24,8 +24,8 @@ class StudentiPersonale extends Component {
             codiceFirst: '',
             codice: false,
             value: '',
-            firmaIngresso: '',
-            firmaUscita: '',
+            firmaIngresso: [],
+            firmaUscita: [],
             callNext: ''
         }
 
@@ -37,6 +37,8 @@ class StudentiPersonale extends Component {
             this.getLessonsPercentage();
             this.getLessons();
             this.getCode();
+            this.signatureEntrata();
+            this.signatureUscita();
 
         }
     }
@@ -184,20 +186,14 @@ class StudentiPersonale extends Component {
 
     badgeIngresso = () => {
 
-        var d = new Date();
-        var h = this.addZero(d.getHours());
-        var m = this.addZero(d.getMinutes());
-        var s = this.addZero(d.getSeconds());
-
-
-        axios.put('http://localhost:8080/studentBadge', {
+        axios.post('http://localhost:8080/studentBadge', {
             email: this.state.user.email,
         })
             .then(res => {
-                if (res.data.message === "ok") {
-                    this.setState({firmaIngresso: h + ":" + m + ":" + s})
+                if (res.data.error === false) {
+                    this.signatureEntrata()
                 }
-                else if (res.data.message === "ko") console.log('problema')
+                else console.log('problema')
             })
             .catch(err => {
                 return console.log(err);
@@ -205,23 +201,37 @@ class StudentiPersonale extends Component {
     }
 
     badgeUscita = () => {
-        var d = new Date();
-        var h = this.addZero(d.getHours());
-        var m = this.addZero(d.getMinutes());
-        var s = this.addZero(d.getSeconds());
 
-        axios.put('http://localhost:8080/studentBadge', {
+        axios.post('http://localhost:8080/studentBadge', {
             email: this.state.user.email,
         })
-            .then(res => {
-                if (res.data.message === "ok") {
-                    this.setState({firmaUscita: h + ":" + m + ":" + s})
-                }
-                else if (res.data.message === "ko") console.log('problema')
-            })
+        .then(res => {
+            if (res.data.error === false) {
+                this.signatureUscita()
+            }
+            else console.log('problema')
+        })
             .catch(err => {
                 return console.log(err);
             });
+    }
+
+    signatureEntrata = () => {
+        
+        axios.get('http://localhost:8080/signatureEntrata')
+        .then(res => {
+            this.setState({firmaIngresso: res.data.data})
+            })
+        .catch(err => console.error(err));
+    }
+
+    signatureUscita = () => {
+        
+        axios.get('http://localhost:8080/signatureUscita')
+        .then(res => {
+            this.setState({firmaUscita: res.data.data})
+            })
+        .catch(err => console.error(err));
     }
 
 
@@ -270,13 +280,14 @@ class StudentiPersonale extends Component {
                             <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
                         </CardHeader>
                         <div>
+                           
                             <CardBody>
                                 {
                                     data.getHours() >= item.startTime.split(':')[0] && data.getHours() <= item.endTime.split(':')[0]  
                                         ?
                                         <>
-                                            <Button color="success" size="lg" className="mb-3" onClick={this.badgeIngresso} block> firma INGRESSO </Button>
-                                            {this.state.firmaIngresso === '' ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <Button color="success" size="lg" className="mb-3" block> firma USCITA </Button>}
+                                            {this.state.firmaIngresso.length === 0 ? <Button color="success" size="lg" className="mb-3" onClick={this.badgeIngresso} block> firma INGRESSO </Button> : <div className="text-center mb-3"><b>Hai firmato </b></div>}
+                                            {this.state.firmaIngresso.length === 0 ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : (this.state.firmaUscita.length === 0 ? <Button onClick={this.badgeUscita} color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <div className="text-center mb-3"><b>Hai firmato </b></div> )}
                                         </>
                                         :
                                         <>
@@ -295,6 +306,7 @@ class StudentiPersonale extends Component {
         } else {
             return (
                 <Card>
+                    
                     <CardHeader className="my-auto text-center">
                         <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
                     </CardHeader>

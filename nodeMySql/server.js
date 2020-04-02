@@ -356,7 +356,7 @@ app.get('/totalHours', function (req, res) {
 });
 */
 
-app.post('/studentBadge', function (req, res) {
+app.post('/studentBadge', async function (req, res) {
 
    const email = req.body.email;
    const datetimeNow = new Date();
@@ -806,6 +806,22 @@ app.put('/teacherBadge', function (req, res) {
 app.get('/getSignature', function (req, res) {
    connection.query("SELECT email_signature, id FROM lessons WHERE DATE(date) = CURDATE()", function (error, items, fields) {
       if (error) throw error;
+      return res.send({ error: false, data: items, message: 'users list.' });
+   });
+});
+
+app.get('/signatureEntrata', function (req, res) {
+   connection.query("SELECT email_student, id FROM signatures_students WHERE DATE(date) = CURDATE() ", function (error, items, fields) {
+      if (error) throw error;
+      console.log(items)
+      return res.send({ error: false, data: items, message: 'users list.' });
+   });
+});
+
+app.get('/signatureUscita', function (req, res) {
+   connection.query("SELECT final_end_time FROM signatures_students WHERE DATE(date) = CURDATE() ", function (error, items, fields) {
+      if (error) throw error;
+      console.log(items)
       return res.send({ error: false, data: items, message: 'users list.' });
    });
 });
