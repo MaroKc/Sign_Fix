@@ -330,7 +330,6 @@ app.post('/badge', function (req, res) {
    });
 });
 
-
 app.get('/getCode/:email', function (req, res) {
 
    var email = req.params.email
@@ -356,7 +355,7 @@ app.get('/totalHours', function (req, res) {
    });
 });
 */
-/*
+
 app.post('/studentBadge', function (req, res) {
 
    const email = req.body.email;
@@ -376,7 +375,7 @@ app.post('/studentBadge', function (req, res) {
       if (dati.message.sign == null) {
          (dati.message.start >= ora ? firma = dati.message.start : firma = Math.floor(ora) + ((Math.ceil(((ora % 1) * 100) / 5) * 5) / 100))
          const queryIns = 'INSERT INTO signatures_students (code_authentication,email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?, ?)';
-         connection.query(queryIns, [0, email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
+         connection.query(queryIns, [1, email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
             if (errorIns) throw errorIns;
             res.send({ error: false, message: "Entrata registrata" });
          });
@@ -393,7 +392,7 @@ app.post('/studentBadge', function (req, res) {
       res.send({ error: true, message: false });
    }
 });
-*/
+
 
 app.get('/getCourses/:email', function (req, res) {
 
@@ -526,6 +525,45 @@ app.get('/teacherDetails/:id_course', function (req, res) {
          " GROUP BY t.email_responsible, l.lesson" +
          " ORDER BY t.email_responsible";
       connection.query(query, function (error, results, fields) {
+         if (error) throw error;
+
+         results.forEach(element => {
+            data.push(
+               {
+                  name: element.name,
+                  lesson: element.lesson,
+                  firstName: element.first_name,
+                  lastName: element.last_name,
+                  ritirato: element.ritirato,
+                  companyId: element.company_id,
+                  emailTeacher: element.email,
+                  hoursOfLessons: tools.formattedDecimal(element.hourOfLessons),
+                  totalHours: tools.formattedDecimal(element.totalHours),
+               })
+         })
+         // return res.send({error: true, data:data, message: 'ok'}); 
+         return res.send({ error: true, data: data, message: 'ok' });
+      });
+   } catch (error) {
+      return res.send({ error: true, data: error, message: 'ko' });
+   }
+});
+
+app.get('/teacherDetailsEmail/:email', function (req, res) {
+   const email = req.params.email
+   try {
+      var data = []
+      var query = "SELECT name,l.lesson,first_name,ritirato,last_name,t.companies_id as company_id,t.email_responsible as email," +
+         "(SELECT sum(st.hours_of_lessons) FROM `signatures_teachers` st where st.email_responsible = t.email_responsible ) as hourOfLessons," +
+         " ( SELECT SUM(total_hours) FROM lessons where  date <= CURRENT_DATE and l.lesson = lesson ) AS totalHours " +
+         " FROM teachers t " +
+         " JOIN companies c ON t.companies_id = c.id " +
+         "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible " +
+         "LEFT JOIN lessons l ON l.companies_id = c.id " +
+         " WHERE t.email_responsible= ?"+
+         " GROUP BY t.email_responsible, l.lesson" +
+         " ORDER BY t.email_responsible";
+      connection.query(query,[email], function (error, results, fields) {
          if (error) throw error;
 
          results.forEach(element => {
@@ -704,47 +742,6 @@ app.put('/forgotPassword', function (req, res) {
          return res.send({ error: false, message: 'ko' });
       }
    })
-});
-
-
-app.post('/studentBadge', async function (req, res) {
-   try {
-      const datetimeNow = new Date();
-      const Data = tools.formattedDate(datetimeNow);
-      const ora = datetimeNow.getHours() + (datetimeNow.getMinutes() / 0.6) / 100;
-      //DA FARE IN SETTINGS
-      const timeExtraEntrata = 0.25;
-      const timeExtraUscita = 1;
-      const email = req.body.email;
-
-      const dati = await LeassonExist(email,Data,ora,timeExtraEntrata,timeExtraUscita);
-      var firma = null;
-
-      if (!dati.error) {
-
-         if (dati.message.sign === null) {
-            (dati.message.start <= ora ? firma = dati.message.start : firma = Math.ceil(ora/5)*5)
-            const queryIns = 'INSERT INTO signatures_students (email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?)';
-            connection.query(queryIns, [email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
-               if (errorIns) throw errorIns;
-               res.send({ error: false, message: "Entrata registrata" });
-            });
-         } else {
-            (dati.message.end <= ora ? firma = dati.message.end : firma = (Math.ceil(ora/5)*5) - 5)
-            var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ?, lost_hours = ? WHERE id = ?";
-            connection.query(query, [datetimeNow, firma, firma + ' - final_start_time', dati.message.end + ' - ' + firma + ' - final_start_time', dati.message.sign], function (error, results, fields) {
-               if (error) throw error;
-               res.send({ error: false, message: "Uscita registrata" });
-            });
-         }
-
-      } else {
-         res.send({ error: true, message: 'ko' });
-      }
-     
-   } catch (error) {
-      return res.send({ error: false, data: error, message: 'ko' });
-   }
 });
 
 

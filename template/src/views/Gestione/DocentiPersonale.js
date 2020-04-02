@@ -71,7 +71,7 @@ class DocentiPersonale extends Component {
 
     
     getTeacherDetails = () => {
-        axios.get('http://localhost:8080/teacherDetails')
+        axios.get('http://localhost:8080/teacherDetailsEmail/'+this.props.user.email)
             .then(res => {
                 let dettagliDocente = [];
                 res.data.data.map(item => dettagliDocente.push({
