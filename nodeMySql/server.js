@@ -258,32 +258,46 @@ app.post('/auth', function (req, res) {
 let LeassonExist = (studentEmail, Data, ora, timeExtraEntrata, timeExtraUscita) => {
    return new Promise(function (resolve, reject) {
 
-      const queryLeasson = "SELECT l.id, l.start_time, l.end_time, l.date, k.id as sign, l.total_hours FROM lessons l LEFT JOIN students s ON s.id_course = l.id_course LEFT JOIN signatures_students k ON k.id_lesson = l.id and k.email_student = s.email where s.email = '" + studentEmail + "' and l.date = '" + Data + "' and (l.start_time - " + timeExtraEntrata + " <= " + ora + " and end_time + " + timeExtraUscita + " >= " + ora + ")";
-      console.log(queryLeasson)
+      const queryLeasson = "SELECT l.id, l.start_time, l.end_time, l.date, k.id as sign, k.final_start_time, k.final_end_time, l.total_hours FROM lessons l LEFT JOIN students s ON s.id_course = l.id_course LEFT JOIN signatures_students k ON k.id_lesson = l.id and k.email_student = s.email where s.email = '" + studentEmail + "' and l.date = '" + Data + "' and (l.start_time - " + timeExtraEntrata + " <= " + ora + " and end_time + " + timeExtraUscita + " >= " + ora + ")";
       connection.query(queryLeasson, function (errorLeasson, resultsLeasson, fields) {
          if (errorLeasson) { throw reject(new Error(errorLeasson)); }
          if (resultsLeasson.length == 0) {
-            resolve({ error: true, message: false });
+            resolve({ error: true, message: "Non sono presenti lezioni ora" });
          } else {
-            resolve(
-               {
-                  error: false,
-                  message: {
-                     id: resultsLeasson[0].id,
-                     start: resultsLeasson[0].start_time,
-                     end: resultsLeasson[0].end_time,
-                     date: resultsLeasson[0].date,
-                     sign: resultsLeasson[0].sign,
-                     hour: resultsLeasson[0].total_hours
-                  }
+            console.log("13221")
+
+            if (resultsLeasson[0].final_start_time + 0.01 < ora) {
+               if (resultsLeasson[0].final_end_time == null) {
+                  console.log("fsfsadas")
+
+                  resolve(
+                     {
+                        error: false,
+                        message: {
+                           id: resultsLeasson[0].id,
+                           start: resultsLeasson[0].start_time,
+                           end: resultsLeasson[0].end_time,
+                           date: resultsLeasson[0].date,
+                           sign: resultsLeasson[0].sign,
+                           hour: resultsLeasson[0].total_hours
+                        }
+                     }
+                  );
+               } else {
+                  resolve({ error: true, message: "Uscita Già Registrata" });
                }
-            );
+            } else {
+               resolve({ error: true, message: "Entrata Già Registrata" });
+            }
          }
       });
    });
 }
 
+
+
 app.post('/badge', function (req, res) {
+
 
    const qr = req.body.qr;
    const datetimeNow = new Date();
@@ -292,6 +306,8 @@ app.post('/badge', function (req, res) {
    //DA FARE IN SETTINGS
    const timeExtraEntrata = 0.25;
    const timeExtraUscita = 1;
+   const hours = datetimeNow.getHours();
+   const minutes = (datetimeNow.getMinutes() < 10 ? "0" + datetimeNow.getMinutes() : datetimeNow.getMinutes() );
 
    //Una volta che ho il QR faccio una select per trovare l'email associata
    connection.query('SELECT * FROM authentications WHERE Code = ' + connection.escape(qr), async function (error, results, fields) {
@@ -302,7 +318,6 @@ app.post('/badge', function (req, res) {
          const email = results[0].email_student;
          const dati = await LeassonExist(email, Data, ora, timeExtraEntrata, timeExtraUscita);
          var firma = null;
-         console.log(dati)
 
          if (!dati.error) {
             if (dati.message.sign == null) {
@@ -310,22 +325,22 @@ app.post('/badge', function (req, res) {
                const queryIns = 'INSERT INTO signatures_students (code_authentication,email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?, ?)';
                connection.query(queryIns, [0, email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
-                  res.send({ error: false, message: "Entrata registrata alle " });
+                  res.send({ error: false, message: "Entrata registrata alle " + hours + ":" + minutes });
                });
             } else {
                (dati.message.end <= ora ? firma = dati.message.end : firma = Math.floor(ora) + ((Math.ceil(((ora % 1) * 100) / 5) * 5) / 100))
                var query = "UPDATE signatures_students SET current_end_time = ?, final_end_time = ?, hours_of_lessons = ? - final_start_time, lost_hours = ? - hours_of_lessons WHERE id = ?";
                connection.query(query, [datetimeNow, firma, firma, dati.message.hour, dati.message.sign], function (error, results, fields) {
                   if (error) throw error;
-                  res.send({ error: false, message: "Uscita registrata" });
+                  res.send({ error: false, message: "Uscita registrata alle " + hours + ":" + minutes });
                });
             }
 
          } else {
-            res.send({ error: true, message: false });
+            res.send({ error: true, message: dati.message });
          }
       } else {
-         res.send({ error: true, message: false });
+         res.send({ error: true, message: "QR CODE NON VALIDO" });
       }
    });
 });
@@ -560,10 +575,10 @@ app.get('/teacherDetailsEmail/:email', function (req, res) {
          " JOIN companies c ON t.companies_id = c.id " +
          "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible " +
          "LEFT JOIN lessons l ON l.companies_id = c.id " +
-         " WHERE t.email_responsible= ?"+
+         " WHERE t.email_responsible= ?" +
          " GROUP BY t.email_responsible, l.lesson" +
          " ORDER BY t.email_responsible";
-      connection.query(query,[email], function (error, results, fields) {
+      connection.query(query, [email], function (error, results, fields) {
          if (error) throw error;
 
          results.forEach(element => {
