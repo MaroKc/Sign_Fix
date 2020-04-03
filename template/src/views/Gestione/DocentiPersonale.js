@@ -97,6 +97,7 @@ class DocentiPersonale extends Component {
             .catch(err => console.error(err));
     }
 
+
     badgeTeacher = () => {
         var d = new Date(),
         month = '' + (d.getMonth() + 1),
@@ -126,6 +127,7 @@ class DocentiPersonale extends Component {
                     this.getSignature()
                     this.getTeacherDetails()
                 }
+                else if (res.data.message === "ko")console.log('problema')
             })
             .catch(err => {
                 return console.log(err);
@@ -248,7 +250,7 @@ class DocentiPersonale extends Component {
 
     selectLesson = () => {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
-        let dettaglioDocente = this.state.dettagliDocente && this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
+        let dettaglioDocente = this.state.dettagliDocente.find(dettaglioDocente => dettaglioDocente.companyId === docente.companyId)
         let totalHours = (this.state.dettagliDocente.find(item => item.lessonName === this.state.value))
         if (this.state.dettagliDocente.length === 1) {
             return (
@@ -298,7 +300,7 @@ class DocentiPersonale extends Component {
                     <Row>
                         <Col xs="6" className="mt-4 mb-4 text-center">
                             <h6 className="mb-2">Ore fatte:</h6>
-                            <h2 className=' text-nowrap'><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
+                            <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
                         </Col>
                         <Col xs="6" className="mt-4 mb-4 text-center">
                             <h6 className="mb-2">Presenze alunni:</h6>
@@ -492,7 +494,7 @@ class DocentiPersonale extends Component {
                         ? 
                         <Button color="success" size="lg" className="mb-3" onClick={this.badgeTeacher} block> TIMBRA </Button> 
                         : 
-                        <h5 className="text-center mb3 text-info">Hai firmato!</h5>)
+                        <h5 className="text-center mb3 text-info">Hai già firmato!</h5>)
                     : 
                     <Button color="success" size="lg" className="mb-3" disabled block> timbra</Button>
                 }
@@ -558,6 +560,7 @@ class DocentiPersonale extends Component {
 
     infoTeacher() {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
+        console.log(docente)
 
         return (
             <div>
