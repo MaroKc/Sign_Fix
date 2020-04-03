@@ -63,8 +63,8 @@ class StudentiPersonale extends Component {
                     firstName: item.firstName,
                     lastName: item.lastName,
                     email: item.email,
-                    totalHours: item.totalHours,
-                    hoursOfLessons:item.hoursOfLessons,
+                    totalHours: Math.round(item.totalHours,0),
+                    hoursOfLessons: Math.round(item.hoursOfLessons,0),
                     percentage: item.percentage,
                 }));
                 this.setState({ studenti });
