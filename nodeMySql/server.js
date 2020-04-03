@@ -449,25 +449,25 @@ app.post('/importCsv/:id_course', function (req, res) {
    try {
       // split the contents by new line
       const lines = data.split(/\r?\n/);
-
       for (let i = 0; i < lines.length - 1; i++) {
 
          // splitta ogni riga in vari campi ai quali si può accedere così: name= lines[i].split(',')[7]
          const lineaSplittata = lines[i].split(',')
-         const email = tools.stringLowerCase(tools.stringTrim(lineaSplittata[22]));
-         const firstName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[7]));
-         const lastName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[8]));
-         const birth = tools.stringLowerCase(tools.stringTrim(lineaSplittata[10]));
-         const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15]));
-         const fiscalCode = lineaSplittata[3];
-         var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES (" + email + "," + firstName + "," + lastName + "," + birth + "," + residence + "," + fiscalCode + "," + idCorso + ",0)";
+         const email = tools.stringLowerCase(tools.stringTrim(lineaSplittata[22].replace(/"/g, '')));
+         const firstName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[7].replace(/"/g, '')));
+         const lastName = tools.stringLowerCase(tools.stringTrim(lineaSplittata[8].replace(/"/g, '')));
+         const birth = tools.stringLowerCase(tools.stringTrim(lineaSplittata[10].replace(/"/g, '')));
+         const residence = tools.stringLowerCase(tools.stringTrim(lineaSplittata[15].replace(/"/g, '')));
+         const fiscalCode = lineaSplittata[3].replace(/"/g, '');
+         var query = "INSERT INTO `students`(`email`, `first_name`, `last_name`, `date_of_birth`, `residence`, `fiscal_code`, `id_course`, `ritirato`) VALUES (?,?,?,?,?,?,?,?)";
 
-         connection.query(query, function (error, results, fields) {
+         connection.query(query,[email, firstName, lastName, birth, residence, fiscalCode, idCorso, 0], function (error, results, fields) {
             if (error) throw error;
          });
       }
+      return res.send({ error: false, message: 'ok' });
+
       // il res.send deve andare fuori ai cicli, perchè invia dati e se ci sono ancora operazioni da svolgere le interrompe
-      return res.send({ error: true, message: 'ok' });
 
    } catch (err) {
       return res.send({ error: true, data: err, message: 'ko' });
@@ -536,7 +536,6 @@ app.get('/teacherDetails/:id_course', function (req, res) {
          " JOIN companies c ON t.companies_id = c.id " +
          "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible " +
          "LEFT JOIN lessons l ON l.companies_id = c.id " +
-         "WHERE l.id_course=" + id_course +
          " GROUP BY t.email_responsible, l.lesson" +
          " ORDER BY t.email_responsible";
       connection.query(query, function (error, results, fields) {

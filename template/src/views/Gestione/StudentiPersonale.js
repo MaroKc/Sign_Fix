@@ -39,7 +39,7 @@ class StudentiPersonale extends Component {
             this.getCode();
             this.signatureEntrata();
             this.signatureUscita();
-
+console.log(this.state.lesson)
         }
     }
 
@@ -63,8 +63,8 @@ class StudentiPersonale extends Component {
                     firstName: item.firstName,
                     lastName: item.lastName,
                     email: item.email,
-                    totalHours: item.totalHours,
-                    hoursOfLessons:item.hoursOfLessons,
+                    totalHours: Math.round(item.totalHours,0),
+                    hoursOfLessons: Math.round(item.hoursOfLessons,0),
                     percentage: item.percentage,
                 }));
                 this.setState({ studenti });
@@ -216,8 +216,7 @@ class StudentiPersonale extends Component {
             });
     }
 
-    signatureEntrata = () => {
-        
+    signatureEntrata = () => {  
         axios.get('http://localhost:8080/signatureEntrata')
         .then(res => {
             this.setState({firmaIngresso: res.data.data})
@@ -226,7 +225,6 @@ class StudentiPersonale extends Component {
     }
 
     signatureUscita = () => {
-        
         axios.get('http://localhost:8080/signatureUscita')
         .then(res => {
             this.setState({firmaUscita: res.data.data})
@@ -272,9 +270,12 @@ class StudentiPersonale extends Component {
         if (mese === 11) mese = "Dicembre";
 
         let lezione = this.state.lesson
-        if (lezione.length !== 0 && lezione['0'].classroom === 'lezione online') {
+        if (lezione.length !== 0) {
             return (
-                lezione.map((item, i) =>
+                lezione.map((item, i) =>{
+                if (item.classroom === 'lezione online'){
+
+                return(
                     <Card key={i}>
                         <CardHeader className="my-auto text-center">
                             <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
@@ -286,8 +287,8 @@ class StudentiPersonale extends Component {
                                     data.getHours() >= item.startTime.split(':')[0] && data.getHours() <= item.endTime.split(':')[0]  
                                         ?
                                         <>
-                                            {this.state.firmaIngresso.length === 0 ? <Button color="success" size="lg" className="mb-3" onClick={this.badgeIngresso} block> firma INGRESSO </Button> : <div className="text-center mb-3"><b>Hai firmato </b></div>}
-                                            {this.state.firmaIngresso.length === 0 ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : (this.state.firmaUscita.length === 0 ? <Button onClick={this.badgeUscita} color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <div className="text-center mb-3"><b>Hai firmato </b></div> )}
+                                            {this.state.firmaIngresso.length === 0 ? <Button color="success" size="lg" className="mb-3" onClick={this.badgeIngresso} block> firma INGRESSO </Button> : <div className="text-center mb-3"><b>Hai firmato l'ingresso</b></div>}
+                                            {this.state.firmaIngresso.length === 0 ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : (this.state.firmaUscita.length === 0 ? <Button onClick={this.badgeUscita} color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <div className="text-center mb-3"><b>Hai firmato l'uscita</b></div> )}
                                         </>
                                         :
                                         <>
@@ -300,7 +301,8 @@ class StudentiPersonale extends Component {
 
                             </CardBody>
                         </div>
-                    </Card>
+                    </Card>)
+        }}
                 )
             )
         } else {
@@ -342,7 +344,7 @@ class StudentiPersonale extends Component {
         if (!this.state.changeState) {
             return (
                 <>
-                    <div className="text-center">
+                    <div className="text-center mt-3">
                         <Button color="primary" size="lg" className="btn-pill mb-3" onClick={this.changeState}> <b>QR code</b></Button>
                     </div>
                     {this.todayLesson()}
