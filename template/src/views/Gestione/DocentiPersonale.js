@@ -126,7 +126,6 @@ class DocentiPersonale extends Component {
                     this.getSignature()
                     this.getTeacherDetails()
                 }
-                else if (res.data.message === "ko")console.log('problema')
             })
             .catch(err => {
                 return console.log(err);

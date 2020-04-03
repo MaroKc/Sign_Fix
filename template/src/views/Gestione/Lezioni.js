@@ -216,7 +216,7 @@ class Lezioni extends React.Component {
                   <h5> <p>Luogo: <b> {classe} </b></p> <p>Lezione: <b>{nomeLezione}</b></p> <p>Identificativo: <b>{identificativo}</b></p></h5>
                 </Col>
               </Row>
-              {!assenti.length ? "" : <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) => <span key={i}>{item.firstName} {item.lastName}, </span>)}</h4> </div>}
+              {!assenti.length ? "" : <div className="ml-md-4"><h4> <b className="text-danger">Assenti:</b> {assenti.map((item, i) => <span key={i}>{item.firstName} {item.lastName}{i == assenti.length-1 ? '' : ','} </span>)}</h4> </div>}
             </Button>
           </CardHeader>
           <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
