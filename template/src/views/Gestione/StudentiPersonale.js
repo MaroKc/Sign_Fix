@@ -39,7 +39,7 @@ class StudentiPersonale extends Component {
             this.getCode();
             this.signatureEntrata();
             this.signatureUscita();
-
+console.log(this.state.lesson)
         }
     }
 
@@ -216,8 +216,7 @@ class StudentiPersonale extends Component {
             });
     }
 
-    signatureEntrata = () => {
-        
+    signatureEntrata = () => {  
         axios.get('http://localhost:8080/signatureEntrata')
         .then(res => {
             this.setState({firmaIngresso: res.data.data})
@@ -226,7 +225,6 @@ class StudentiPersonale extends Component {
     }
 
     signatureUscita = () => {
-        
         axios.get('http://localhost:8080/signatureUscita')
         .then(res => {
             this.setState({firmaUscita: res.data.data})
@@ -342,7 +340,7 @@ class StudentiPersonale extends Component {
         if (!this.state.changeState) {
             return (
                 <>
-                    <div className="text-center">
+                    <div className="text-center mt-3">
                         <Button color="primary" size="lg" className="btn-pill mb-3" onClick={this.changeState}> <b>QR code</b></Button>
                     </div>
                     {this.todayLesson()}
