@@ -521,7 +521,6 @@ app.get('/teacherDetails/:id_course', function (req, res) {
          " JOIN companies c ON t.companies_id = c.id " +
          "LEFT JOIN signatures_teachers s ON s.email_responsible = t.email_responsible " +
          "LEFT JOIN lessons l ON l.companies_id = c.id " +
-         " WHERE id_course ="+id_course+
          " GROUP BY t.email_responsible, l.lesson" +
          " ORDER BY t.email_responsible";
       connection.query(query, function (error, results, fields) {

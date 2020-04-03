@@ -82,24 +82,28 @@ class InfoDocente extends React.Component {
         let docente = this.props.docente
         let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
 
-
             return (
                 <>
 
                     <div className="d-flex justify-content-start mt-3 ml-3 mb-3">
                         {this.props.docente.map((item, i) =>
+                        {if(item.lessonName ){
+                            return(
                             <Button
-                                value={item.lessonName}
-                                className={this.state.value === item.lessonName
-                                    ?
-                                    'custom2 mr-3 h-50'
-                                    :
-                                    'customPill mr-3 h-50'
-                                  }
-                                onClick={(e) => this.setState({ value: e.target.value })}
-                                key={i}>
-                                {item.lessonName}
-                            </Button>
+                            value={item.lessonName}
+                            className={this.state.value === item.lessonName
+                                ?
+                                'custom2 mr-3 h-50'
+                                :
+                                'customPill mr-3 h-50'
+                              }
+                            onClick={(e) => this.setState({ value: e.target.value })}
+                            key={i}>
+                            {item.lessonName}
+                        </Button>
+                            )}
+                        }
+                           
                         )}
                     </div>
                     <div className="text-center">

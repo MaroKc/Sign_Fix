@@ -346,7 +346,7 @@ class StudentiPersonale extends Component {
         if (!this.state.changeState) {
             return (
                 <>
-                    <div className="text-center">
+                    <div className="text-center mt-3">
                         <Button color="primary" size="lg" className="btn-pill mb-3" onClick={this.changeState}> <b>QR code</b></Button>
                     </div>
                     {this.todayLesson()}
