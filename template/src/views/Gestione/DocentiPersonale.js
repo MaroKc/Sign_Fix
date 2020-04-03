@@ -124,8 +124,8 @@ class DocentiPersonale extends Component {
             .then(res => {
                 if (res.data.message === "ok") {
                     this.getSignature()
+                    this.getTeacherDetails()
                 }
-                else if (res.data.message === "ko")console.log('problema')
             })
             .catch(err => {
                 return console.log(err);
@@ -558,7 +558,6 @@ class DocentiPersonale extends Component {
 
     infoTeacher() {
         let docente = this.state.docenti.find(docente => docente.emailDocente === this.props.user.email)
-        console.log(docente)
 
         return (
             <div>
