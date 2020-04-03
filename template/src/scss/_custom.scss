@@ -40,3 +40,29 @@ margin:0px;
     color: #fff;
     border-radius: 16px
     }
+
+
+.loginButton {
+  color: #fff;
+  background-color: #2c7d7d;
+}
+.loginButton:hover {
+  color: #fff;
+  background-color: rgb(69, 167, 167);
+}
+.loginButton:active {
+  color: #fff;
+  background-color: rgb(69, 167, 167);
+}
+
+.customPill2 {
+  color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);
+border-color: rgb(44, 125, 125);
+border-radius: 16px
+}
+.customPill2:hover{
+background-color: #2c7d7d;
+color: #fff;
+border-radius: 16px
+}

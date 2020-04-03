@@ -81,19 +81,7 @@ class InfoDocente extends React.Component {
     selectLesson = () => {
         let docente = this.props.docente
         let totalHours = (this.props.docente.find(item => item.lessonName === this.state.value))
-        if (this.props.docente.length === 1) {
-            return (
-                <>
-                    <h3 className="text-left">{docente[0].lessonName}</h3>
-                    <Row>
-                        <Col xs="6" className="mt-4 mb-4 text-center">
-                            <h6 className="mb-2">Ore fatte:</h6>
-                            <h2><b>{this.state.value && totalHours['hoursOfLessons']} / {this.state.value && totalHours['totalHours']}</b></h2>
-                        </Col>
-                    </Row>
-                </>
-            )
-        } else {
+
 
             return (
                 <>
@@ -120,7 +108,7 @@ class InfoDocente extends React.Component {
                     </div>
                 </>
             )
-        }
+        
     }
 
 

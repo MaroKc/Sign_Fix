@@ -4,6 +4,7 @@ import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGr
 import axios from 'axios';
 import { GoogleLogin } from 'react-google-login';
 import {ToastsContainer, ToastsStore, ToastsContainerPosition} from 'react-toasts';
+import { AppFooter } from '@coreui/react';
 
 import Background from '../LandingPage/img/libro2.jpg';
 
@@ -144,7 +145,7 @@ class Login extends Component {
                       </InputGroup>
                       <Row>
                         <Col xs="6">
-                          <Button style={{background: '#2c7d7d'}} onClick={this.login} className="px-4 text-white">Login</Button>
+                          <Button className="loginButton px-4" onClick={this.login}>Login</Button>
                         </Col>
                         <Col xs="6" className="text-right">
                           <Button  color='link' className="px-0" onClick={this.toggleWarning}>Forgot password?</Button>
@@ -177,6 +178,11 @@ class Login extends Component {
               </CardGroup>
             </Col>
           </Row>
+            <Row  className="justify-content-center" style= {{paddingLeft: '15px', paddingRight: '15px' }}> 
+              <Col md="8" className="text-center mt-1 mb-4 p-1" style= {{borderRadius: '16px' }}>
+              <a href="http://164.68.110.63/sing_fix/#/Badge"><Button block className="customPill2 p-1"> <b>PAGINA BADGE</b> </Button></a>
+              </Col>
+            </Row>
           <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.TOP_CENTER} lightBackground />
         </Container>
       </div>

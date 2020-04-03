@@ -310,7 +310,7 @@ app.post('/badge', function (req, res) {
                const queryIns = 'INSERT INTO signatures_students (code_authentication,email_student, date, current_start_time, final_start_time, id_lesson) VALUES (?, ?, ?, ?, ?, ?)';
                connection.query(queryIns, [0, email, Data, datetimeNow, firma, dati.message.id], function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
-                  res.send({ error: false, message: "Entrata registrata" });
+                  res.send({ error: false, message: "Entrata registrata alle " });
                });
             } else {
                (dati.message.end <= ora ? firma = dati.message.end : firma = Math.floor(ora) + ((Math.ceil(((ora % 1) * 100) / 5) * 5) / 100))
@@ -806,6 +806,22 @@ app.put('/teacherBadge', function (req, res) {
 app.get('/getSignature', function (req, res) {
    connection.query("SELECT email_signature, id FROM lessons WHERE DATE(date) = CURDATE()", function (error, items, fields) {
       if (error) throw error;
+      return res.send({ error: false, data: items, message: 'users list.' });
+   });
+});
+
+app.get('/signatureEntrata', function (req, res) {
+   connection.query("SELECT email_student, id FROM signatures_students WHERE DATE(date) = CURDATE() ", function (error, items, fields) {
+      if (error) throw error;
+      console.log(items)
+      return res.send({ error: false, data: items, message: 'users list.' });
+   });
+});
+
+app.get('/signatureUscita', function (req, res) {
+   connection.query("SELECT final_end_time FROM signatures_students WHERE DATE(date) = CURDATE() ", function (error, items, fields) {
+      if (error) throw error;
+      console.log(items)
       return res.send({ error: false, data: items, message: 'users list.' });
    });
 });
