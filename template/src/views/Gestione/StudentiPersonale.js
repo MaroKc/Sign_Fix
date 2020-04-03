@@ -63,8 +63,8 @@ console.log(this.state.lesson)
                     firstName: item.firstName,
                     lastName: item.lastName,
                     email: item.email,
-                    totalHours: item.totalHours,
-                    hoursOfLessons:item.hoursOfLessons,
+                    totalHours: Math.round(item.totalHours,0),
+                    hoursOfLessons: Math.round(item.hoursOfLessons,0),
                     percentage: item.percentage,
                 }));
                 this.setState({ studenti });
@@ -270,9 +270,12 @@ console.log(this.state.lesson)
         if (mese === 11) mese = "Dicembre";
 
         let lezione = this.state.lesson
-        if (lezione.length !== 0 && lezione['0'].classroom === 'lezione online') {
+        if (lezione.length !== 0) {
             return (
-                lezione.map((item, i) =>
+                lezione.map((item, i) =>{
+                if (item.classroom === 'lezione online'){
+
+                return(
                     <Card key={i}>
                         <CardHeader className="my-auto text-center">
                             <h4> <b>{giorno + ' ' + day + ' ' + mese + ' ' + year}</b></h4>
@@ -284,8 +287,8 @@ console.log(this.state.lesson)
                                     data.getHours() >= item.startTime.split(':')[0] && data.getHours() <= item.endTime.split(':')[0]  
                                         ?
                                         <>
-                                            {this.state.firmaIngresso.length === 0 ? <Button color="success" size="lg" className="mb-3" onClick={this.badgeIngresso} block> firma INGRESSO </Button> : <div className="text-center mb-3"><b>Hai firmato </b></div>}
-                                            {this.state.firmaIngresso.length === 0 ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : (this.state.firmaUscita.length === 0 ? <Button onClick={this.badgeUscita} color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <div className="text-center mb-3"><b>Hai firmato </b></div> )}
+                                            {this.state.firmaIngresso.length === 0 ? <Button color="success" size="lg" className="mb-3" onClick={this.badgeIngresso} block> firma INGRESSO </Button> : <div className="text-center mb-3"><b>Hai firmato l'ingresso</b></div>}
+                                            {this.state.firmaIngresso.length === 0 ? <Button disabled color="success" size="lg" className="mb-3" block> firma USCITA </Button> : (this.state.firmaUscita.length === 0 ? <Button onClick={this.badgeUscita} color="success" size="lg" className="mb-3" block> firma USCITA </Button> : <div className="text-center mb-3"><b>Hai firmato l'uscita</b></div> )}
                                         </>
                                         :
                                         <>
@@ -298,7 +301,8 @@ console.log(this.state.lesson)
 
                             </CardBody>
                         </div>
-                    </Card>
+                    </Card>)
+        }}
                 )
             )
         } else {
