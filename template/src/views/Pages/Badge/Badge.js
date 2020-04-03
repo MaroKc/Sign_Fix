@@ -96,11 +96,9 @@ return (giorno + ' ' + day + ' ' + mese + ' ' + year)
               <Card>
               <span className="clearfix">
                 <h2 className="pt-3 text-center mt-3"> <b>{this.today()}</b></h2>
-                <br />
-                <h1 className="text-center mb-4"><b>{h + ":" + m}</b></h1>
                 <hr />
                 <h4 className="text-center mb-4">Passa il tuo QR code personale nel lettore per registrare la tua presenza</h4>
-                <h3 className="mt-3">{this.state.message}</h3>
+                <h1 className="mt-3 text-center">{this.state.message}</h1>
               </span>
 
               </Card>
