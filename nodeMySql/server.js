@@ -1135,7 +1135,7 @@ app.post('/calendar/importLessons', async function (req, res) {
          var datierrore = false;
 
          if (events.length) {
-
+            console.log(events.length)
             events.map(async (event, i) => {
                var riga = {}
 
@@ -1177,9 +1177,10 @@ app.post('/calendar/importLessons', async function (req, res) {
          }
 
          var interval = setInterval(() => {
+            console.log("INTER")
             if (errori.length === 0) {
                let curdata = new Date().toISOString().replace(/\T.+/, '')
-               connection.query("DELETE  FROM lessons where id_course =" + courseID + " and date >= '" + curdata + "' and email_signature is null", function (errorIns, itemsIns, fields) {
+               connection.query("DELETE FROM lessons where id_course =" + courseID + " and date >= '" + curdata + "' and email_signature is null", function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
 
                });
@@ -1188,7 +1189,7 @@ app.post('/calendar/importLessons', async function (req, res) {
 
                connection.query(queryIns, [datiInsert], function (errorIns, itemsIns, fields) {
                   if (errorIns) throw errorIns;
-
+                  console.log("INS")
                });
 
                clearInterval(interval)
