@@ -33,7 +33,7 @@
     "jquery": "^3.4.1",
     "mdbreact": "^4.25.5",
     "moment": "^2.24.0",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "npm": "^6.13.7",
     "prop-types": "^15.7.2",
     "qrcode.react": "^1.0.0",
